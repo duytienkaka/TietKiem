@@ -1,0 +1,1328 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_en.dart';
+import 'app_localizations_vi.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'generated/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('vi'),
+  ];
+
+  /// No description provided for @appTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiết Kiệm'**
+  String get appTitle;
+
+  /// No description provided for @homeTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get homeTab;
+
+  /// No description provided for @transactionsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactionsTab;
+
+  /// No description provided for @statisticsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statisticsTab;
+
+  /// No description provided for @walletsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get walletsTab;
+
+  /// No description provided for @quickAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add'**
+  String get quickAdd;
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get greetingMorning;
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get greetingAfternoon;
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get greetingEvening;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get quickActions;
+
+  /// No description provided for @trackCashflowOneTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Track cashflow in just one tap'**
+  String get trackCashflowOneTap;
+
+  /// No description provided for @addIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Add income'**
+  String get addIncome;
+
+  /// No description provided for @addExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get addExpense;
+
+  /// No description provided for @transfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get transfer;
+
+  /// No description provided for @myWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'My wallets'**
+  String get myWallets;
+
+  /// No description provided for @swipeBalances.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe through your available balances'**
+  String get swipeBalances;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get viewAll;
+
+  /// No description provided for @recentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get recentActivity;
+
+  /// No description provided for @latestMoneyMovements.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest money movements across your wallets'**
+  String get latestMoneyMovements;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @noWalletsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No wallets yet'**
+  String get noWalletsYet;
+
+  /// No description provided for @createWalletStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a wallet to start tracking your finances.'**
+  String get createWalletStart;
+
+  /// No description provided for @createWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Create wallet'**
+  String get createWallet;
+
+  /// No description provided for @noTransactionsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get noTransactionsYet;
+
+  /// No description provided for @transactionsWillAppear.
+  ///
+  /// In en, this message translates to:
+  /// **'Your income, expenses, and transfers will show up here.'**
+  String get transactionsWillAppear;
+
+  /// No description provided for @addTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add transaction'**
+  String get addTransaction;
+
+  /// No description provided for @walletCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} wallets'**
+  String walletCount(int count);
+
+  /// No description provided for @totalBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Total balance'**
+  String get totalBalance;
+
+  /// No description provided for @spendingPulse.
+  ///
+  /// In en, this message translates to:
+  /// **'Your spending pulse and cashflow, all in one place.'**
+  String get spendingPulse;
+
+  /// No description provided for @walletsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get walletsTitle;
+
+  /// No description provided for @allWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'All wallets'**
+  String get allWallets;
+
+  /// No description provided for @walletsTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} wallets • Total {total}'**
+  String walletsTotal(int count, String total);
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @noWalletsCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'No wallets created'**
+  String get noWalletsCreated;
+
+  /// No description provided for @addCashBankSavingWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a cash, bank, or saving wallet to begin.'**
+  String get addCashBankSavingWallet;
+
+  /// No description provided for @walletDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet deleted.'**
+  String get walletDeleted;
+
+  /// No description provided for @createWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create wallet'**
+  String get createWalletTitle;
+
+  /// No description provided for @editWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit wallet'**
+  String get editWalletTitle;
+
+  /// No description provided for @walletName.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name'**
+  String get walletName;
+
+  /// No description provided for @openingBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening balance'**
+  String get openingBalance;
+
+  /// No description provided for @walletType.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet type'**
+  String get walletType;
+
+  /// No description provided for @color.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get color;
+
+  /// No description provided for @icon.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get icon;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
+  /// No description provided for @enterValidOpeningBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid opening balance.'**
+  String get enterValidOpeningBalance;
+
+  /// No description provided for @walletTypeCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get walletTypeCash;
+
+  /// No description provided for @walletTypeBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get walletTypeBank;
+
+  /// No description provided for @walletTypeSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving'**
+  String get walletTypeSaving;
+
+  /// No description provided for @iconWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet'**
+  String get iconWallet;
+
+  /// No description provided for @iconBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get iconBank;
+
+  /// No description provided for @iconSavings.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings'**
+  String get iconSavings;
+
+  /// No description provided for @availableBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Available balance'**
+  String get availableBalance;
+
+  /// No description provided for @primaryAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary account'**
+  String get primaryAccount;
+
+  /// No description provided for @securedWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Secured wallet'**
+  String get securedWallet;
+
+  /// No description provided for @transactionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactionsTitle;
+
+  /// No description provided for @activityFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity feed'**
+  String get activityFeed;
+
+  /// No description provided for @searchFilterManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Search, filter and manage your money movements'**
+  String get searchFilterManage;
+
+  /// No description provided for @searchNoteOrCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Search note or category'**
+  String get searchNoteOrCategory;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @noMatchingTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching transactions'**
+  String get noMatchingTransactions;
+
+  /// No description provided for @tryDifferentSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search or add a new transaction.'**
+  String get tryDifferentSearch;
+
+  /// No description provided for @clearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get clearFilters;
+
+  /// No description provided for @resultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} results'**
+  String resultsCount(int count);
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @statisticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statisticsTitle;
+
+  /// No description provided for @noDataToChart.
+  ///
+  /// In en, this message translates to:
+  /// **'No data to chart'**
+  String get noDataToChart;
+
+  /// No description provided for @addIncomeExpenseToReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Add income or expense transactions to see reports.'**
+  String get addIncomeExpenseToReports;
+
+  /// No description provided for @insights.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights'**
+  String get insights;
+
+  /// No description provided for @quickVisualOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick visual overview of your spending behaviour'**
+  String get quickVisualOverview;
+
+  /// No description provided for @income.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get income;
+
+  /// No description provided for @expense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get expense;
+
+  /// No description provided for @net.
+  ///
+  /// In en, this message translates to:
+  /// **'Net'**
+  String get net;
+
+  /// No description provided for @expenseBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense breakdown'**
+  String get expenseBreakdown;
+
+  /// No description provided for @incomeVsExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Income vs expense'**
+  String get incomeVsExpense;
+
+  /// No description provided for @newTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'New transaction'**
+  String get newTransaction;
+
+  /// No description provided for @editTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit transaction'**
+  String get editTransaction;
+
+  /// No description provided for @createWalletContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Create wallet and continue'**
+  String get createWalletContinue;
+
+  /// No description provided for @quickAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick add'**
+  String get quickAddTitle;
+
+  /// No description provided for @quickEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick edit'**
+  String get quickEditTitle;
+
+  /// No description provided for @coreFieldsFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Core fields first. Extra details when needed.'**
+  String get coreFieldsFirst;
+
+  /// No description provided for @wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet'**
+  String get wallet;
+
+  /// No description provided for @lastUsedWalletPreselected.
+  ///
+  /// In en, this message translates to:
+  /// **'Last used wallet is preselected'**
+  String get lastUsedWalletPreselected;
+
+  /// No description provided for @targetWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Target wallet'**
+  String get targetWallet;
+
+  /// No description provided for @tapOnceSwitchDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap once to switch destination'**
+  String get tapOnceSwitchDestination;
+
+  /// No description provided for @noTargetWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'No target wallet'**
+  String get noTargetWallet;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @tapIconChangeInstantly.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap icon to change instantly'**
+  String get tapIconChangeInstantly;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get note;
+
+  /// No description provided for @addNoteIfNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Add note if needed'**
+  String get addNoteIfNeeded;
+
+  /// No description provided for @noReceiptAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'No receipt attached'**
+  String get noReceiptAttached;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get saving;
+
+  /// No description provided for @moreDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'More details'**
+  String get moreDetails;
+
+  /// No description provided for @optionalFieldsOutWay.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional fields stay out of the way'**
+  String get optionalFieldsOutWay;
+
+  /// No description provided for @noteAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Note added'**
+  String get noteAdded;
+
+  /// No description provided for @receiptAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt attached'**
+  String get receiptAttached;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @verified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get verified;
+
+  /// No description provided for @review.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get review;
+
+  /// No description provided for @headlineIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'How much came in?'**
+  String get headlineIncome;
+
+  /// No description provided for @headlineExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'How much went out?'**
+  String get headlineExpense;
+
+  /// No description provided for @headlineTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'How much do you want to move?'**
+  String get headlineTransfer;
+
+  /// No description provided for @saveIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Save income'**
+  String get saveIncome;
+
+  /// No description provided for @saveExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Save expense'**
+  String get saveExpense;
+
+  /// No description provided for @saveTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Save transfer'**
+  String get saveTransfer;
+
+  /// No description provided for @updateIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Update income'**
+  String get updateIncome;
+
+  /// No description provided for @updateExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Update expense'**
+  String get updateExpense;
+
+  /// No description provided for @updateTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Update transfer'**
+  String get updateTransfer;
+
+  /// No description provided for @unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
+  /// No description provided for @unknownWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown wallet'**
+  String get unknownWallet;
+
+  /// No description provided for @walletNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name is required.'**
+  String get walletNameRequired;
+
+  /// No description provided for @walletHasTransactionsCannotDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet has transactions and cannot be deleted.'**
+  String get walletHasTransactionsCannotDelete;
+
+  /// No description provided for @amountMustBeGreaterThanZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount must be greater than zero.'**
+  String get amountMustBeGreaterThanZero;
+
+  /// No description provided for @selectTargetWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a target wallet for transfer.'**
+  String get selectTargetWallet;
+
+  /// No description provided for @transferWalletsDifferent.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer wallets must be different.'**
+  String get transferWalletsDifferent;
+
+  /// No description provided for @sourceWalletNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Source wallet not found.'**
+  String get sourceWalletNotFound;
+
+  /// No description provided for @targetWalletNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Target wallet not found.'**
+  String get targetWalletNotFound;
+
+  /// No description provided for @enterValidAmountGreaterThanZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid amount greater than zero.'**
+  String get enterValidAmountGreaterThanZero;
+
+  /// No description provided for @categorySalary.
+  ///
+  /// In en, this message translates to:
+  /// **'Salary'**
+  String get categorySalary;
+
+  /// No description provided for @categoryGift.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift'**
+  String get categoryGift;
+
+  /// No description provided for @categoryBonus.
+  ///
+  /// In en, this message translates to:
+  /// **'Bonus'**
+  String get categoryBonus;
+
+  /// No description provided for @categoryTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get categoryTransfer;
+
+  /// No description provided for @categoryFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get categoryFood;
+
+  /// No description provided for @categoryTransport.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get categoryTransport;
+
+  /// No description provided for @categoryShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get categoryShopping;
+
+  /// No description provided for @categoryBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Bills'**
+  String get categoryBills;
+
+  /// No description provided for @categoryHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get categoryHealth;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @transactionNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction not found'**
+  String get transactionNotFound;
+
+  /// No description provided for @transactionInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction information'**
+  String get transactionInformation;
+
+  /// No description provided for @dateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Date & time'**
+  String get dateTime;
+
+  /// No description provided for @receiptImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt image'**
+  String get receiptImage;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @deleteTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete transaction'**
+  String get deleteTransaction;
+
+  /// No description provided for @deleteTransactionPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'This transaction will be removed permanently. Do you want to continue?'**
+  String get deleteTransactionPrompt;
+
+  /// No description provided for @statusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get statusConfirmed;
+
+  /// No description provided for @statusUnconfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unconfirmed'**
+  String get statusUnconfirmed;
+
+  /// No description provided for @errorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get errorTitle;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @helloUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, Alex'**
+  String get helloUser;
+
+  /// No description provided for @profileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profileTitle;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @profilePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Your profile area is ready for account details, identity, and preferences.'**
+  String get profilePlaceholder;
+
+  /// No description provided for @settingsPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'This settings area is ready for language, notifications, and app preferences.'**
+  String get settingsPlaceholder;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get editProfile;
+
+  /// No description provided for @quickOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick overview'**
+  String get quickOverview;
+
+  /// No description provided for @financeSnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'A fast snapshot of your account activity'**
+  String get financeSnapshot;
+
+  /// No description provided for @totalTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Total transactions'**
+  String get totalTransactions;
+
+  /// No description provided for @personalInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal information'**
+  String get personalInformation;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get fullName;
+
+  /// No description provided for @fullNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your name.'**
+  String get fullNameRequired;
+
+  /// No description provided for @emailOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Email (optional)'**
+  String get emailOptional;
+
+  /// No description provided for @notUpdatedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not updated yet'**
+  String get notUpdatedYet;
+
+  /// No description provided for @removeAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove avatar'**
+  String get removeAvatar;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @generalSection.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get generalSection;
+
+  /// No description provided for @generalSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language and display preferences'**
+  String get generalSectionSubtitle;
+
+  /// No description provided for @appSettingsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'App settings'**
+  String get appSettingsSection;
+
+  /// No description provided for @appSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Control how the app behaves every day'**
+  String get appSettingsSubtitle;
+
+  /// No description provided for @dataSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get dataSection;
+
+  /// No description provided for @dataSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export or reset your local finance data'**
+  String get dataSectionSubtitle;
+
+  /// No description provided for @securitySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get securitySection;
+
+  /// No description provided for @securitySectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra protection for your finances'**
+  String get securitySectionSubtitle;
+
+  /// No description provided for @aboutSection.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutSection;
+
+  /// No description provided for @aboutSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App details and development information'**
+  String get aboutSectionSubtitle;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @vietnamese.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese'**
+  String get vietnamese;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @chooseLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose language'**
+  String get chooseLanguage;
+
+  /// No description provided for @currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currency;
+
+  /// No description provided for @vndCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese dong (VND)'**
+  String get vndCurrency;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get darkMode;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light mode'**
+  String get lightMode;
+
+  /// No description provided for @darkModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce glare and keep the app comfortable at night'**
+  String get darkModeSubtitle;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @notificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay up to date with reminders and finance updates'**
+  String get notificationsSubtitle;
+
+  /// No description provided for @exportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Export data'**
+  String get exportData;
+
+  /// No description provided for @exportDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview and copy your finance data as JSON or CSV'**
+  String get exportDataSubtitle;
+
+  /// No description provided for @exportJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Export JSON'**
+  String get exportJson;
+
+  /// No description provided for @exportCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Export CSV'**
+  String get exportCsv;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @resetData.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset data'**
+  String get resetData;
+
+  /// No description provided for @resetDataSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallets and transactions on this device'**
+  String get resetDataSubtitle;
+
+  /// No description provided for @resetDataPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'All wallets and transactions on this device will be deleted. Do you want to continue?'**
+  String get resetDataPrompt;
+
+  /// No description provided for @dataResetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Data reset successfully'**
+  String get dataResetSuccess;
+
+  /// No description provided for @appLock.
+  ///
+  /// In en, this message translates to:
+  /// **'App lock'**
+  String get appLock;
+
+  /// No description provided for @appLockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Require an extra lock before opening the app'**
+  String get appLockSubtitle;
+
+  /// No description provided for @pinSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN setup'**
+  String get pinSetup;
+
+  /// No description provided for @pinSetupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare a quick access PIN for future releases'**
+  String get pinSetupSubtitle;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get comingSoon;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'App version'**
+  String get appVersion;
+
+  /// No description provided for @developer.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer'**
+  String get developer;
+
+  /// No description provided for @settingsHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Control your experience'**
+  String get settingsHeroTitle;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) =>
+      <String>['en', 'vi'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'en':
+      return AppLocalizationsEn();
+    case 'vi':
+      return AppLocalizationsVi();
+  }
+
+  throw FlutterError(
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
+}
