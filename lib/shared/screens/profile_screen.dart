@@ -14,6 +14,7 @@ import '../widgets/app_card.dart';
 import '../widgets/async_value_view.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/section_header.dart';
+import '../widgets/skeleton_box.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -25,22 +26,27 @@ class ProfileScreen extends ConsumerWidget {
     final transactionsAsync = ref.watch(transactionProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.profileTitle)),
-      body: AsyncValueView(
-        value: preferencesAsync,
-        data: (preferences) => AsyncValueView(
-          value: walletsAsync,
-          data: (wallets) => AsyncValueView(
-            value: transactionsAsync,
-            data: (transactions) {
-              final totalBalance = wallets.fold<double>(
-                0,
-                (sum, wallet) => sum + wallet.balance,
-              );
+      appBar: AppBar(
+        title: Text(context.l10n.profileTitle),
+      ),
+      body: SafeArea(
+        child: AsyncValueView(
+          value: preferencesAsync,
+          loadingBuilder: (_) => const _ProfileLoadingState(),
+          data: (preferences) => AsyncValueView(
+            value: walletsAsync,
+            loadingBuilder: (_) => const _ProfileLoadingState(),
+            data: (wallets) => AsyncValueView(
+              value: transactionsAsync,
+              loadingBuilder: (_) => const _ProfileLoadingState(),
+              data: (transactions) {
+                final totalBalance = wallets.fold<double>(
+                  0,
+                  (sum, wallet) => sum + wallet.balance,
+                );
 
-              return SafeArea(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                   children: [
                     AnimatedReveal(
                       child: AppCard(
@@ -82,7 +88,6 @@ class ProfileScreen extends ConsumerWidget {
                           children: [
                             SectionHeader(
                               title: context.l10n.quickOverview,
-                              subtitle: context.l10n.financeSnapshot,
                             ),
                             const SizedBox(height: 16),
                             Row(
@@ -135,9 +140,9 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -176,11 +181,7 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
 
-    if (!context.mounted) {
-      return;
-    }
-
-    if (selection == null) {
+    if (!context.mounted || selection == null) {
       return;
     }
 
@@ -217,57 +218,67 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (sheetContext) => Padding(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 8,
-          bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
-        ),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                context.l10n.editProfile,
-                style: Theme.of(context).textTheme.titleLarge,
+      builder: (sheetContext) => SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 8,
+            bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: AppCard(
+                padding: const EdgeInsets.all(20),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.l10n.editProfile,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: nameController,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(labelText: context.l10n.fullName),
+                        validator: (value) => value == null || value.trim().isEmpty
+                            ? context.l10n.fullNameRequired
+                            : null,
+                      ),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(labelText: context.l10n.emailOptional),
+                      ),
+                      const SizedBox(height: 18),
+                      AppButton(
+                        label: context.l10n.save,
+                        icon: Icons.check_rounded,
+                        onPressed: () async {
+                          if (formKey.currentState?.validate() != true) {
+                            return;
+                          }
+                          await ref.read(appPreferencesProvider.notifier).updateProfile(
+                                name: nameController.text,
+                                email: emailController.text,
+                              );
+                          if (sheetContext.mounted) {
+                            Navigator.of(sheetContext).pop();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: nameController,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(labelText: context.l10n.fullName),
-                validator: (value) => value == null || value.trim().isEmpty
-                    ? context.l10n.fullNameRequired
-                    : null,
-              ),
-              const SizedBox(height: 14),
-              TextFormField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(labelText: context.l10n.emailOptional),
-              ),
-              const SizedBox(height: 18),
-              AppButton(
-                label: context.l10n.save,
-                icon: Icons.check_rounded,
-                onPressed: () async {
-                  if (formKey.currentState?.validate() != true) {
-                    return;
-                  }
-                  await ref.read(appPreferencesProvider.notifier).updateProfile(
-                        name: nameController.text,
-                        email: emailController.text,
-                      );
-                  if (sheetContext.mounted) {
-                    Navigator.of(sheetContext).pop();
-                  }
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -275,6 +286,59 @@ class ProfileScreen extends ConsumerWidget {
 
     nameController.dispose();
     emailController.dispose();
+  }
+}
+
+class _ProfileLoadingState extends StatelessWidget {
+  const _ProfileLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: const Column(
+            children: [
+              SkeletonBox(width: 108, height: 108, shape: BoxShape.circle),
+              SizedBox(height: 18),
+              SkeletonBox(width: 160, height: 24),
+              SizedBox(height: 8),
+              SkeletonBox(width: 200, height: 14),
+              SizedBox(height: 18),
+              SkeletonBox(width: 128, height: 42, borderRadius: 999),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SkeletonBox(width: 120, height: 18),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(child: SkeletonBox(height: 96, borderRadius: 18)),
+                  SizedBox(width: 12),
+                  Expanded(child: SkeletonBox(height: 96, borderRadius: 18)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 

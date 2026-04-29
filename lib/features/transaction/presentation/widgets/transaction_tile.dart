@@ -140,11 +140,18 @@ class TransactionTile extends StatelessWidget {
                     transitionOnUserGestures: true,
                     child: Material(
                       color: Colors.transparent,
-                      child: Text(
-                        '$amountPrefix${formatCurrency(context, transaction.amount)}',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: amountColor,
-                          fontWeight: FontWeight.w800,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 110),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            '$amountPrefix${formatCurrency(context, transaction.amount)}',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: amountColor,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                         ),
                       ),
                     ),

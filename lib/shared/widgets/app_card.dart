@@ -18,15 +18,22 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final card = DecoratedBox(
       decoration: BoxDecoration(
-        color: gradient == null ? Colors.white : null,
+        color: gradient == null ? scheme.surface : null,
         gradient: gradient,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.03)),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(
+            alpha: Theme.of(context).brightness == Brightness.dark ? 0.4 : 0.35,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withValues(
+              alpha: Theme.of(context).brightness == Brightness.dark ? 0.18 : 0.04,
+            ),
             blurRadius: 26,
             offset: const Offset(0, 10),
           ),
@@ -48,7 +55,7 @@ class AppCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(borderRadius),
           onTap: onTap,
-          splashColor: Colors.white.withValues(alpha: 0.06),
+          splashColor: scheme.primary.withValues(alpha: 0.08),
           highlightColor: Colors.transparent,
           child: card,
         ),

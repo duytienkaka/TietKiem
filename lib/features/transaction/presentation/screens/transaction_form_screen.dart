@@ -15,29 +15,38 @@ import '../../../../shared/widgets/shake_widget.dart';
 import '../../../../shared/widgets/skeleton_box.dart';
 import '../../../../shared/widgets/smooth_bottom_sheet.dart';
 import '../../../../shared/utils/currency_input_formatter.dart';
+import '../../../ai/domain/entities/ai_transaction_draft.dart';
+import '../../../ai/presentation/providers/finance_ai_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../../category/presentation/providers/category_provider.dart';
+import '../../../recurring/presentation/providers/recurring_provider.dart';
 import '../../../wallet/domain/entities/wallet.dart';
 import '../../../wallet/presentation/providers/wallet_provider.dart';
 import '../../../wallet/presentation/screens/wallet_screen.dart';
 import '../../domain/entities/finance_transaction.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/amount_input.dart';
+import '../widgets/calculator_bottom_sheet.dart';
 import '../widgets/category_selector.dart';
 
 Future<void> showTransactionEntrySheet(
   BuildContext context, {
   TransactionType? initialType,
+  String? transactionId,
 }) {
   return showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
+    isDismissible: true,
+    enableDrag: true,
     useSafeArea: true,
+    showDragHandle: true,
     backgroundColor: Colors.transparent,
     builder: (_) => SmoothBottomSheet(
       child: TransactionEntryView(
         initialType: initialType,
+        transactionId: transactionId,
         embedded: true,
       ),
     ),
@@ -48,19 +57,26 @@ class TransactionFormScreen extends StatelessWidget {
   const TransactionFormScreen({
     super.key,
     this.initialTypeName,
+    this.transactionId,
   });
 
   final String? initialTypeName;
+  final String? transactionId;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: const Color(0xFFF1F2F8),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
       appBar: AppBar(
-        title: Text(context.l10n.newTransaction),
+        title: Text(
+          transactionId == null
+              ? context.l10n.newTransaction
+              : context.l10n.editTransaction,
+        ),
       ),
       body: TransactionEntryView(
+        transactionId: transactionId,
         initialType: initialTypeName == null
             ? null
             : TransactionType.values.byName(initialTypeName!),
@@ -73,10 +89,12 @@ class TransactionEntryView extends ConsumerStatefulWidget {
   const TransactionEntryView({
     super.key,
     this.initialType,
+    this.transactionId,
     this.embedded = false,
   });
 
   final TransactionType? initialType;
+  final String? transactionId;
   final bool embedded;
 
   @override
@@ -98,9 +116,13 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
   String? _imagePath;
   bool _saving = false;
   bool _initialized = false;
+  FinanceTransaction? _editingTransaction;
   bool _detailsExpanded = false;
   int _shakeTrigger = 0;
   int _rawAmount = 0;
+  bool _recurringEnabled = false;
+  RecurringInterval _recurringInterval = RecurringInterval.monthly;
+  bool _aiBusy = false;
 
   @override
   void initState() {
@@ -115,6 +137,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
 
   @override
   void dispose() {
+    _amountFocusNode.unfocus();
     _amountController.dispose();
     _noteController.dispose();
     _amountFocusNode.dispose();
@@ -155,6 +178,16 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
           final safeBottomInset = mediaQuery.viewPadding.bottom;
           final keyboardInset = mediaQuery.viewInsets.bottom;
           final actionAreaHeight = 112 + safeBottomInset;
+          final suggestedCategories = _type == TransactionType.transfer
+              ? <Category>[]
+              : _suggestCategories(
+                  context,
+                  categories: availableCategories,
+                  transactions: transactions,
+                  note: _noteController.text,
+                  amount: _rawAmount,
+                  type: _type,
+                );
 
           _categoryId = _type == TransactionType.transfer
               ? null
@@ -181,26 +214,57 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                             ScrollViewKeyboardDismissBehavior.onDrag,
                         padding: EdgeInsets.fromLTRB(
                           16,
-                          widget.embedded ? 12 : 8,
+                          widget.embedded ? 8 : 8,
                           16,
                           actionAreaHeight,
                         ),
                         children: [
-                          if (widget.embedded)
-                            Center(
-                              child: Container(
-                                width: 54,
-                                height: 5,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFD0D5DD),
-                                  borderRadius: BorderRadius.circular(999),
+                          SizedBox(height: widget.embedded ? 4 : 4),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () async {
+                                    final result = await showAmountCalculatorSheet(
+                                      context,
+                                      initialValue: _rawAmount,
+                                    );
+                                    if (result != null) {
+                                      _applyCalculatedAmount(result);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.calculate_rounded),
+                                  label: Text(context.l10n.calculator),
                                 ),
                               ),
-                            ),
-                          SizedBox(height: widget.embedded ? 12 : 4),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: _aiBusy
+                                      ? null
+                                      : () => _showNaturalInputSheet(
+                                            context,
+                                            wallets: wallets,
+                                            categories: categories,
+                                          ),
+                                  icon: _aiBusy
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        )
+                                      : const Icon(Icons.auto_awesome_rounded),
+                                  label: Text(context.l10n.aiNaturalEntry),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
                           _HeaderText(
-                            title: context.l10n.quickAddTitle,
-                            subtitle: context.l10n.coreFieldsFirst,
+                            title: _formTitle(context),
+                            subtitle: widget.transactionId == null
+                                ? context.l10n.coreFieldsFirst
+                                : context.l10n.editTransactionSubtitle,
                           ),
                           const SizedBox(height: 14),
                           GestureDetector(
@@ -316,6 +380,144 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                               ),
                             ),
                           ],
+                          if (_type != TransactionType.transfer) ...[
+                            const SizedBox(height: 14),
+                            _CompactSection(
+                              title: context.l10n.smartSuggestions,
+                              subtitle: context.l10n.smartSuggestionsSubtitle,
+                              child: suggestedCategories.isEmpty
+                                  ? Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          context.l10n.noSmartSuggestions,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        OutlinedButton.icon(
+                                          onPressed: _aiBusy
+                                              ? null
+                                              : () => _runAiClassification(
+                                                    context,
+                                                    wallets: wallets,
+                                                    categories: categories,
+                                                  ),
+                                          icon: _aiBusy
+                                              ? const SizedBox(
+                                                  width: 18,
+                                                  height: 18,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : const Icon(
+                                                  Icons.auto_awesome_rounded,
+                                                ),
+                                          label: Text(
+                                            context.l10n.aiClassifyTransaction,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children:
+                                              suggestedCategories.map((category) {
+                                            return ActionChip(
+                                              label: Text(
+                                                category.displayName(context),
+                                              ),
+                                              avatar: const Icon(
+                                                Icons.auto_awesome,
+                                                size: 16,
+                                              ),
+                                              onPressed: () => setState(
+                                                () => _categoryId = category.id,
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        OutlinedButton.icon(
+                                          onPressed: _aiBusy
+                                              ? null
+                                              : () => _runAiClassification(
+                                                    context,
+                                                    wallets: wallets,
+                                                    categories: categories,
+                                                  ),
+                                          icon: _aiBusy
+                                              ? const SizedBox(
+                                                  width: 18,
+                                                  height: 18,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : const Icon(
+                                                  Icons.auto_awesome_rounded,
+                                                ),
+                                          label: Text(
+                                            context.l10n.aiClassifyTransaction,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                            const SizedBox(height: 14),
+                            _CompactSection(
+                              title: context.l10n.recurring,
+                              subtitle: context.l10n.recurringHint,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SwitchListTile.adaptive(
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Text(context.l10n.enableRecurring),
+                                    value: _recurringEnabled,
+                                    onChanged: (value) {
+                                      setState(() => _recurringEnabled = value);
+                                    },
+                                  ),
+                                  if (_recurringEnabled) ...[
+                                    const SizedBox(height: 6),
+                                    DropdownButtonFormField<RecurringInterval>(
+                                      initialValue: _recurringInterval,
+                                      decoration: InputDecoration(
+                                        labelText: context.l10n.repeatEvery,
+                                        prefixIcon:
+                                            const Icon(Icons.repeat_rounded),
+                                      ),
+                                      items: RecurringInterval.values
+                                          .map(
+                                            (interval) => DropdownMenuItem(
+                                              value: interval,
+                                              child: Text(interval.label(context)),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          setState(() => _recurringInterval = value);
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 14),
                           _DetailsCard(
                             expanded: _detailsExpanded,
@@ -425,7 +627,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                         16 + safeBottomInset + (widget.embedded ? keyboardInset : 0),
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                         boxShadow: [
                           BoxShadow(
@@ -476,21 +678,38 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
       return;
     }
 
-    final latest = transactions.firstOrNull;
-    if (latest != null) {
-      _type = widget.initialType ?? latest.type;
-      _walletId = latest.walletId;
-      _targetWalletId = latest.targetWalletId;
-      _categoryId = latest.categoryId == 'transfer' ? null : latest.categoryId;
-      _status = latest.status;
+    final editing = widget.transactionId == null
+        ? null
+        : transactions.where((item) => item.id == widget.transactionId).firstOrNull;
+    _editingTransaction = editing;
+
+    if (editing != null) {
+      _type = editing.type;
+      _walletId = editing.walletId;
+      _targetWalletId = editing.targetWalletId;
+      _categoryId = editing.categoryId == 'transfer' ? null : editing.categoryId;
+      _status = editing.status;
+      _imagePath = editing.imagePath;
+      _noteController.text = editing.note ?? '';
+      _applyCalculatedAmount(editing.amount.round());
     } else {
-      _type = widget.initialType ?? TransactionType.expense;
-      _walletId = wallets.firstOrNull?.id;
-      final initialCategories =
-          categories.where((item) => item.type == _type && item.id != 'transfer').toList();
-      _categoryId = initialCategories.firstOrNull?.id;
+      final latest = transactions.firstOrNull;
+      if (latest != null) {
+        _type = widget.initialType ?? latest.type;
+        _walletId = latest.walletId;
+        _targetWalletId = latest.targetWalletId;
+        _categoryId = latest.categoryId == 'transfer' ? null : latest.categoryId;
+        _status = latest.status;
+      } else {
+        _type = widget.initialType ?? TransactionType.expense;
+        _walletId = wallets.firstOrNull?.id;
+        final initialCategories = categories
+            .where((item) => item.type == _type && item.id != 'transfer')
+            .toList();
+        _categoryId = initialCategories.firstOrNull?.id;
+      }
     }
-    _detailsExpanded = false;
+    _detailsExpanded = editing != null;
     _initialized = true;
   }
 
@@ -499,6 +718,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
       _type = type;
       if (_type == TransactionType.transfer) {
         _categoryId = null;
+        _recurringEnabled = false;
       } else {
         final matches = categories
             .where((item) => item.type == _type && item.id != 'transfer')
@@ -533,7 +753,9 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
 
     setState(() => _saving = true);
     try {
-      await ref.read(transactionProvider.notifier).addTransaction(
+      FocusScope.of(context).unfocus();
+      await ref.read(transactionProvider.notifier).saveTransaction(
+            id: _editingTransaction?.id,
             type: _type,
             amount: _rawAmount.toDouble(),
             walletId: _walletId!,
@@ -542,7 +764,19 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
             note: _noteController.text,
             imagePath: _imagePath,
             status: _status,
+            createdAt: _editingTransaction?.createdAt,
           );
+      if (_recurringEnabled && _type != TransactionType.transfer) {
+        await ref.read(recurringProvider.notifier).saveRule(
+              type: _type,
+              amount: _rawAmount.toDouble(),
+              walletId: _walletId!,
+              categoryId: _categoryId ?? 'transfer',
+              note: _noteController.text,
+              status: _status,
+              interval: _recurringInterval,
+            );
+      }
       if (mounted) {
         context.pop();
       }
@@ -561,22 +795,340 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
 
   void _applyCalculatedAmount(int value) {
     final normalized = value < 0 ? 0 : value;
-    final formatted = formatVietnameseCurrencyFromInt(normalized);
     setState(() {
       _rawAmount = normalized;
-      _amountController.value = TextEditingValue(
-        text: formatted,
-        selection: TextSelection.collapsed(offset: formatted.length),
-      );
+      applyCurrencyEditingValue(_amountController, normalized);
     });
     _amountFocusNode.requestFocus();
   }
 
+  Future<void> _runAiClassification(
+    BuildContext context, {
+    required List<Wallet> wallets,
+    required List<Category> categories,
+  }) async {
+    if (_aiBusy) {
+      return;
+    }
+    setState(() => _aiBusy = true);
+    final languageCode = Localizations.localeOf(context).languageCode;
+    try {
+      final draft = await ref.read(financeAiServiceProvider).classifyTransaction(
+            note: _noteController.text,
+            amount: _rawAmount,
+            fallbackType: _type,
+            categories: categories,
+            wallets: wallets,
+            languageCode: languageCode,
+          );
+      if (!mounted) {
+        return;
+      }
+      if (!draft.hasMeaningfulSuggestion) {
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          SnackBar(content: Text(this.context.l10n.aiSuggestionFailed)),
+        );
+        return;
+      }
+      _applyAiDraft(draft, categories: categories, wallets: wallets);
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(content: Text(this.context.l10n.aiCategoryApplied)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _aiBusy = false);
+      }
+    }
+  }
+
+  Future<void> _showNaturalInputSheet(
+    BuildContext context, {
+    required List<Wallet> wallets,
+    required List<Category> categories,
+  }) async {
+    final parsed = await showModalBottomSheet<AiTransactionDraft>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (_) => _NaturalInputSheet(
+        initialText: _noteController.text,
+        wallets: wallets,
+        categories: categories,
+        fallbackType: _type,
+      ),
+    );
+
+    if (!mounted || parsed == null) {
+      return;
+    }
+
+    if (!parsed.hasMeaningfulSuggestion) {
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        SnackBar(content: Text(this.context.l10n.aiSuggestionFailed)),
+      );
+      return;
+    }
+
+    _applyAiDraft(parsed, categories: categories, wallets: wallets);
+  }
+
+  void _applyAiDraft(
+    AiTransactionDraft draft, {
+    required List<Category> categories,
+    required List<Wallet> wallets,
+  }) {
+    setState(() {
+      if (draft.type != null) {
+        _type = draft.type!;
+      }
+      if (draft.amount != null && draft.amount! > 0) {
+        _rawAmount = draft.amount!;
+        applyCurrencyEditingValue(_amountController, draft.amount!);
+      }
+      if (draft.note?.trim().isNotEmpty ?? false) {
+        _noteController.text = draft.note!.trim();
+      }
+
+      final categoriesForType = categories
+          .where((item) => item.type == _type && item.id != 'transfer')
+          .toList();
+      final nextCategoryId = draft.categoryId;
+      if (_type == TransactionType.transfer) {
+        _categoryId = null;
+        _recurringEnabled = false;
+      } else if (nextCategoryId != null &&
+          categoriesForType.any((item) => item.id == nextCategoryId)) {
+        _categoryId = nextCategoryId;
+      }
+
+      if (draft.walletId != null &&
+          wallets.any((wallet) => wallet.id == draft.walletId)) {
+        _walletId = draft.walletId;
+      }
+      if (_type == TransactionType.transfer &&
+          draft.targetWalletId != null &&
+          wallets.any((wallet) => wallet.id == draft.targetWalletId) &&
+          draft.targetWalletId != _walletId) {
+        _targetWalletId = draft.targetWalletId;
+      }
+      _detailsExpanded =
+          _noteController.text.trim().isNotEmpty || _imagePath?.isNotEmpty == true;
+    });
+  }
+
+  List<Category> _suggestCategories(
+    BuildContext context, {
+    required List<Category> categories,
+    required List<FinanceTransaction> transactions,
+    required String note,
+    required int amount,
+    required TransactionType type,
+  }) {
+    if (categories.isEmpty) {
+      return [];
+    }
+
+    final tokens = note
+        .trim()
+        .toLowerCase()
+        .split(RegExp(r'\s+'))
+        .where((token) => token.length > 1)
+        .toSet();
+    final scores = <String, double>{
+      for (final category in categories) category.id: 0,
+    };
+
+    for (final category in categories) {
+      final label = category.displayName(context).toLowerCase();
+      final fallback = category.name.toLowerCase();
+      if (tokens.any((token) => label.contains(token) || fallback.contains(token))) {
+        scores[category.id] = (scores[category.id] ?? 0) + 3;
+      }
+    }
+
+    for (final transaction in transactions) {
+      if (transaction.type != type) {
+        continue;
+      }
+      if (!scores.containsKey(transaction.categoryId)) {
+        continue;
+      }
+
+      var score = scores[transaction.categoryId] ?? 0;
+      score += 0.2;
+
+      if (tokens.isNotEmpty && transaction.note != null) {
+        final noteLower = transaction.note!.toLowerCase();
+        if (tokens.any(noteLower.contains)) {
+          score += 1.0;
+        }
+      }
+
+      if (amount > 0) {
+        final delta = (transaction.amount - amount).abs();
+        if (delta <= amount * 0.12) {
+          score += 1.5;
+        }
+      }
+
+      scores[transaction.categoryId] = score;
+    }
+
+    final ranked = categories
+        .where((category) => (scores[category.id] ?? 0) > 0)
+        .toList()
+      ..sort(
+        (a, b) =>
+            (scores[b.id] ?? 0).compareTo(scores[a.id] ?? 0),
+      );
+
+    return ranked.take(3).toList();
+  }
+
   String _saveLabel(BuildContext context) => switch (_type) {
-        TransactionType.income => context.l10n.saveIncome,
-        TransactionType.expense => context.l10n.saveExpense,
-        TransactionType.transfer => context.l10n.saveTransfer,
+        TransactionType.income => _editingTransaction == null
+            ? context.l10n.saveIncome
+            : context.l10n.updateIncome,
+        TransactionType.expense => _editingTransaction == null
+            ? context.l10n.saveExpense
+            : context.l10n.updateExpense,
+        TransactionType.transfer => _editingTransaction == null
+            ? context.l10n.saveTransfer
+            : context.l10n.updateTransfer,
       };
+
+  String _formTitle(BuildContext context) {
+    if (_editingTransaction != null) {
+      return context.l10n.editTransaction;
+    }
+    return switch (_type) {
+      TransactionType.income => context.l10n.addIncome,
+      TransactionType.expense => context.l10n.addExpense,
+      TransactionType.transfer => context.l10n.transfer,
+    };
+  }
+}
+
+class _NaturalInputSheet extends ConsumerStatefulWidget {
+  const _NaturalInputSheet({
+    required this.initialText,
+    required this.wallets,
+    required this.categories,
+    required this.fallbackType,
+  });
+
+  final String initialText;
+  final List<Wallet> wallets;
+  final List<Category> categories;
+  final TransactionType fallbackType;
+
+  @override
+  ConsumerState<_NaturalInputSheet> createState() => _NaturalInputSheetState();
+}
+
+class _NaturalInputSheetState extends ConsumerState<_NaturalInputSheet> {
+  late final TextEditingController _controller;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialText);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 8,
+          bottom: 20 + MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: AppCard(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.aiNaturalEntry,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.l10n.aiNaturalEntrySubtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _controller,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: context.l10n.describeTransactionHint,
+                    prefixIcon: const Icon(Icons.edit_note_rounded),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton.icon(
+                    onPressed: _busy
+                        ? null
+                        : () async {
+                            setState(() => _busy = true);
+                            final focusScope = FocusScope.of(context);
+                            final navigator = Navigator.of(context);
+                            focusScope.unfocus();
+                            final result = await ref
+                                .read(financeAiServiceProvider)
+                                .parseNaturalLanguage(
+                                  input: _controller.text,
+                                  categories: widget.categories,
+                                  wallets: widget.wallets,
+                                  fallbackType: widget.fallbackType,
+                                  languageCode: languageCode,
+                                );
+                            if (!mounted) {
+                              return;
+                            }
+                            setState(() => _busy = false);
+                            navigator.pop(result);
+                          },
+                    icon: _busy
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.auto_awesome_rounded),
+                    label: Text(context.l10n.parseTransaction),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _HeaderText extends StatelessWidget {
@@ -786,23 +1338,12 @@ class _TransactionFormLoadingState extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.fromLTRB(
                 16,
-                embedded ? 12 : 8,
+                embedded ? 8 : 8,
                 16,
                 112 + safeBottomInset,
               ),
               children: [
-                if (embedded)
-                  Center(
-                    child: Container(
-                      width: 54,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD0D5DD),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ),
-                SizedBox(height: embedded ? 12 : 4),
+                SizedBox(height: embedded ? 4 : 4),
                 const SkeletonBox(width: 150, height: 28),
                 const SizedBox(height: 8),
                 const SkeletonBox(width: 240, height: 14),
@@ -858,7 +1399,7 @@ class _TransactionFormLoadingState extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + safeBottomInset),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 boxShadow: [
                   BoxShadow(

@@ -7,5 +7,5 @@ class SaveTransactionUseCase {
   final TransactionRepository _repository;
 
   Future<void> call(FinanceTransaction transaction) =>
-      _repository.addTransaction(transaction);
+      _repository.saveTransaction(transaction);
 }

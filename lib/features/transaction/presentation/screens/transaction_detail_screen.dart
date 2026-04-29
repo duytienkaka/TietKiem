@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/finance_enums.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/error_state.dart';
 import '../../../../shared/widgets/receipt_image.dart';
+import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/skeleton_box.dart';
 import '../../domain/entities/finance_transaction.dart';
 import '../../../category/presentation/providers/category_provider.dart';
@@ -29,9 +32,10 @@ class TransactionDetailScreen extends ConsumerWidget {
     final transactionsAsync = ref.watch(transactionProvider);
     final walletsAsync = ref.watch(walletProvider);
     final categoriesAsync = ref.watch(categoryProvider);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FB),
+      backgroundColor: scheme.surfaceContainerLowest,
       body: AsyncValueView(
         value: transactionsAsync,
         loadingBuilder: (_) => const _TransactionDetailLoadingState(),
@@ -78,93 +82,138 @@ class TransactionDetailScreen extends ConsumerWidget {
               final categoryName = transaction.type == TransactionType.transfer
                   ? context.l10n.transfer
                   : category?.displayName(context) ?? transaction.type.label(context);
-              final statusLabel = transaction.status == TransactionStatus.verified
-                  ? context.l10n.statusConfirmed
-                  : context.l10n.statusUnconfirmed;
 
-              return Scaffold(
-                backgroundColor: Colors.transparent,
-                body: Material(
-                  color: const Color(0xFFF5F6FB),
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        pinned: true,
-                        elevation: 0,
-                        backgroundColor: accent,
-                        expandedHeight: 330,
-                        leading: _TopActionButton(
-                          icon: Icons.arrow_back_rounded,
-                          onPressed: () => Navigator.of(context).maybePop(),
-                        ),
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: _HighlightHeader(
-                            transactionId: transaction.id,
-                            accent: accent,
-                            amountText:
-                                '$amountPrefix${formatCurrency(context, transaction.amount)}',
-                            categoryName: categoryName,
-                            iconName: iconName,
-                            typeLabel: transaction.type.label(context),
-                            statusLabel: statusLabel,
-                          ),
-                        ),
-                      ),
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
-                        sliver: SliverList(
-                          delegate: SliverChildListDelegate(
-                            [
-                              _InfoCard(
-                                transaction: transaction,
-                                walletName: wallet?.name ?? context.l10n.unknownWallet,
-                                targetWalletName: targetWallet?.name,
-                                categoryName: categoryName,
-                              ),
-                              if ((transaction.note ?? '').trim().isNotEmpty) ...[
-                                const SizedBox(height: 16),
-                                _SectionCard(
-                                  title: context.l10n.note,
-                                  child: Text(
-                                    transaction.note!.trim(),
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                          color: const Color(0xFF344054),
-                                        ),
+              return SafeArea(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CustomScrollView(
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                            sliver: SliverList(
+                              delegate: SliverChildListDelegate(
+                                [
+                                  _DetailHeader(
+                                    transaction: transaction,
+                                    accent: accent,
+                                    amountText:
+                                        '$amountPrefix${formatCurrency(context, transaction.amount)}',
+                                    categoryName: categoryName,
+                                    iconName: iconName,
+                                    onBack: () => Navigator.of(context).maybePop(),
                                   ),
-                                ),
-                              ],
-                              if (transaction.imagePath?.isNotEmpty == true) ...[
-                                const SizedBox(height: 16),
-                                _SectionCard(
-                                  title: context.l10n.receiptImage,
-                                  child: GestureDetector(
-                                    onTap: () => _openImagePreview(
-                                      context,
-                                      transaction.id,
-                                      transaction.imagePath!,
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(18),
-                                      child: Hero(
-                                        tag: transactionImageHeroTag(transaction.id),
-                                        transitionOnUserGestures: true,
-                                        child: ReceiptImage(
-                                          source: transaction.imagePath!,
-                                          height: 220,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                        ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    child: _SectionCard(
+                                      title: context.l10n.transactionInformation,
+                                      child: Column(
+                                        children: [
+                                          _InfoRow(
+                                            icon: Icons.account_balance_wallet_rounded,
+                                            title: context.l10n.wallet,
+                                            value:
+                                                wallet?.name ?? context.l10n.unknownWallet,
+                                          ),
+                                          const SizedBox(height: 14),
+                                          _InfoRow(
+                                            icon: transaction.type == TransactionType.transfer
+                                                ? Icons.swap_horiz_rounded
+                                                : Icons.grid_view_rounded,
+                                            title:
+                                                transaction.type == TransactionType.transfer
+                                                    ? context.l10n.targetWallet
+                                                    : context.l10n.category,
+                                            value:
+                                                transaction.type == TransactionType.transfer
+                                                    ? targetWallet?.name ??
+                                                        context.l10n.noTargetWallet
+                                                    : categoryName,
+                                          ),
+                                          const SizedBox(height: 14),
+                                          _InfoRow(
+                                            icon: Icons.schedule_rounded,
+                                            title: context.l10n.dateTime,
+                                            value: formatDateTime(
+                                              context,
+                                              transaction.createdAt,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    child: _StatusControlCard(
+                                      transaction: transaction,
+                                      onConfirm:
+                                          transaction.status == TransactionStatus.verified
+                                              ? null
+                                              : () => _confirmTransaction(
+                                                  context,
+                                                  ref,
+                                                  transaction,
+                                                ),
+                                    ),
+                                  ),
+                                  if ((transaction.note ?? '').trim().isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: _SectionCard(
+                                        title: context.l10n.note,
+                                        child: Text(
+                                          transaction.note!.trim(),
+                                          style: Theme.of(context).textTheme.bodyLarge,
+                                        ),
+                                      ),
+                                    ),
+                                  if (transaction.imagePath?.isNotEmpty == true)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: _SectionCard(
+                                        title: context.l10n.receiptImage,
+                                        child: GestureDetector(
+                                          onTap: () => _openImagePreview(
+                                            context,
+                                            transaction.id,
+                                            transaction.imagePath!,
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(18),
+                                            child: Hero(
+                                              tag: transactionImageHeroTag(
+                                                transaction.id,
+                                              ),
+                                              transitionOnUserGestures: true,
+                                              child: ReceiptImage(
+                                                source: transaction.imagePath!,
+                                                height: 220,
+                                                width: double.infinity,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    _DetailActionBar(
+                      onEdit: () => context.pushNamed(
+                        'editTransaction',
+                        pathParameters: {'id': transaction.id},
+                      ),
+                      onConfirm: transaction.status == TransactionStatus.verified
+                          ? null
+                          : () => _confirmTransaction(context, ref, transaction),
+                    ),
+                  ],
                 ),
               );
             },
@@ -172,6 +221,30 @@ class TransactionDetailScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _confirmTransaction(
+    BuildContext context,
+    WidgetRef ref,
+    FinanceTransaction transaction,
+  ) async {
+    await ref.read(transactionProvider.notifier).saveTransaction(
+          id: transaction.id,
+          type: transaction.type,
+          amount: transaction.amount,
+          walletId: transaction.walletId,
+          targetWalletId: transaction.targetWalletId,
+          categoryId: transaction.categoryId,
+          note: transaction.note,
+          imagePath: transaction.imagePath,
+          status: TransactionStatus.verified,
+          createdAt: transaction.createdAt,
+        );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.transactionConfirmed)),
+      );
+    }
   }
 
   void _openImagePreview(
@@ -208,222 +281,152 @@ class TransactionDetailScreen extends ConsumerWidget {
   }
 }
 
-class _TransactionDetailLoadingState extends StatelessWidget {
-  const _TransactionDetailLoadingState();
+class _DetailHeader extends StatelessWidget {
+  const _DetailHeader({
+    required this.transaction,
+    required this.accent,
+    required this.amountText,
+    required this.categoryName,
+    required this.iconName,
+    required this.onBack,
+  });
+
+  final FinanceTransaction transaction;
+  final Color accent;
+  final String amountText;
+  final String categoryName;
+  final String iconName;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            elevation: 0,
-            backgroundColor: AppTheme.primary,
-            expandedHeight: 330,
-            leading: const _TopActionButton(
-              icon: Icons.arrow_back_rounded,
-              onPressed: null,
-            ),
-            flexibleSpace: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFE11976), Color(0xFFB517F1), Color(0xFF151B36)],
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          accent,
+          Color.alphaBlend(Colors.white.withValues(alpha: 0.08), accent),
+          const Color(0xFF151B36),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 2),
+                child: _TopActionButton(
+                  icon: Icons.arrow_back_rounded,
+                  onPressed: onBack,
                 ),
               ),
-              child: const SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(24, 72, 24, 32),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SkeletonBox(height: 76, width: 76, shape: BoxShape.circle),
-                      SizedBox(height: 18),
-                      SkeletonBox(width: 160, height: 22, borderRadius: 999),
-                      SizedBox(height: 10),
-                      SkeletonBox(width: 190, height: 36, borderRadius: 16),
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SkeletonBox(width: 92, height: 32, borderRadius: 999),
-                          SizedBox(width: 8),
-                          SkeletonBox(width: 118, height: 32, borderRadius: 999),
-                        ],
-                      ),
-                    ],
-                  ),
+              const Spacer(),
+              _TransactionStatusBadge(
+                status: transaction.status,
+                heroTag: transactionStatusHeroTag(transaction.id),
+                light: true,
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Hero(
+            tag: transactionIconHeroTag(transaction.id),
+            transitionOnUserGestures: true,
+            child: Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.18),
                 ),
+              ),
+              child: Icon(resolveIcon(iconName), color: Colors.white, size: 34),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Hero(
+            tag: transactionTitleHeroTag(transaction.id),
+            transitionOnUserGestures: true,
+            child: Material(
+              color: Colors.transparent,
+              child: Text(
+                categoryName,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.96),
+                    ),
               ),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate(
-                const [
-                  _DetailSectionSkeleton(lines: 3),
-                  SizedBox(height: 16),
-                  _DetailSectionSkeleton(lines: 2),
-                  SizedBox(height: 16),
-                  _DetailImageSkeleton(),
-                ],
+          const SizedBox(height: 8),
+          Hero(
+            tag: transactionAmountHeroTag(transaction.id),
+            transitionOnUserGestures: true,
+            child: Material(
+              color: Colors.transparent,
+              child: Text(
+                amountText,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
               ),
             ),
           ),
+          const SizedBox(height: 14),
+          _HeaderTypeBadge(type: transaction.type),
         ],
       ),
     );
   }
 }
 
-class _HighlightHeader extends StatelessWidget {
-  const _HighlightHeader({
-    required this.transactionId,
-    required this.accent,
-    required this.amountText,
-    required this.categoryName,
-    required this.iconName,
-    required this.typeLabel,
-    required this.statusLabel,
+class _StatusControlCard extends StatelessWidget {
+  const _StatusControlCard({
+    required this.transaction,
+    required this.onConfirm,
   });
 
-  final String transactionId;
-  final Color accent;
-  final String amountText;
-  final String categoryName;
-  final String iconName;
-  final String typeLabel;
-  final String statusLabel;
+  final FinanceTransaction transaction;
+  final VoidCallback? onConfirm;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            accent,
-            Color.alphaBlend(Colors.white.withValues(alpha: 0.08), accent),
-            const Color(0xFF151B36),
+    return _SectionCard(
+      title: context.l10n.status,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TransactionStatusBadge(status: transaction.status),
+          if (onConfirm != null) ...[
+            const SizedBox(height: 14),
+            AppButton(
+              label: context.l10n.confirmTransaction,
+              icon: Icons.verified_rounded,
+              onPressed: onConfirm,
+            ),
           ],
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 72, 24, 32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Hero(
-                tag: transactionIconHeroTag(transactionId),
-                transitionOnUserGestures: true,
-                child: Container(
-                  width: 76,
-                  height: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.16),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.18),
-                    ),
-                  ),
-                  child: Icon(
-                    resolveIcon(iconName),
-                    color: Colors.white,
-                    size: 34,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Hero(
-                tag: transactionTitleHeroTag(transactionId),
-                transitionOnUserGestures: true,
-                child: Material(
-                  color: Colors.transparent,
-                  child: Text(
-                    categoryName,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.94),
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Hero(
-                tag: transactionAmountHeroTag(transactionId),
-                transitionOnUserGestures: true,
-                child: Material(
-                  color: Colors.transparent,
-                  child: Text(
-                    amountText,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-              TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: 1),
-                duration: const Duration(milliseconds: 260),
-                curve: Curves.easeOutCubic,
-                builder: (context, value, child) => Opacity(
-                  opacity: value,
-                  child: Transform.translate(
-                    offset: Offset(0, 10 * (1 - value)),
-                    child: child,
-                  ),
-                ),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    _HeaderBadge(
-                      icon: Icons.tune_rounded,
-                      label: typeLabel,
-                    ),
-                    _HeaderBadge(
-                      icon: Icons.verified_rounded,
-                      label: statusLabel,
-                      heroTag: transactionStatusHeroTag(transactionId),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
 }
 
-class _HeaderBadge extends StatelessWidget {
-  const _HeaderBadge({
-    required this.icon,
-    required this.label,
-    this.heroTag,
-  });
+class _HeaderTypeBadge extends StatelessWidget {
+  const _HeaderTypeBadge({required this.type});
 
-  final IconData icon;
-  final String label;
-  final String? heroTag;
+  final TransactionType type;
 
   @override
   Widget build(BuildContext context) {
-    final badge = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    final label = type.label(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(999),
@@ -431,19 +434,67 @@ class _HeaderBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.white),
+          const Icon(Icons.tune_rounded, size: 16, color: Colors.white),
           const SizedBox(width: 6),
-          Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              softWrap: false,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TransactionStatusBadge extends StatelessWidget {
+  const _TransactionStatusBadge({
+    required this.status,
+    this.heroTag,
+    this.light = false,
+  });
+
+  final TransactionStatus status;
+  final String? heroTag;
+  final bool light;
+
+  @override
+  Widget build(BuildContext context) {
+    final verified = status == TransactionStatus.verified;
+    final background = light
+        ? Colors.white.withValues(alpha: 0.14)
+        : verified
+            ? const Color(0xFFE8FFF3)
+            : const Color(0xFFFFF4E5);
+    final foreground = light
+        ? Colors.white
+        : verified
+            ? AppTheme.income
+            : const Color(0xFFB54708);
+
+    final badge = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            verified ? Icons.verified_rounded : Icons.hourglass_top_rounded,
+            size: 16,
+            color: foreground,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            verified ? context.l10n.statusConfirmed : context.l10n.statusUnconfirmed,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: foreground,
+                  fontWeight: FontWeight.w700,
+                ),
           ),
         ],
       ),
@@ -456,9 +507,240 @@ class _HeaderBadge extends StatelessWidget {
     return Hero(
       tag: heroTag!,
       transitionOnUserGestures: true,
-      child: Material(
-        color: Colors.transparent,
-        child: badge,
+      child: Material(color: Colors.transparent, child: badge),
+    );
+  }
+}
+
+class _DetailActionBar extends StatelessWidget {
+  const _DetailActionBar({
+    required this.onEdit,
+    required this.onConfirm,
+  });
+
+  final VoidCallback onEdit;
+  final VoidCallback? onConfirm;
+
+  @override
+  Widget build(BuildContext context) {
+    final safeBottom = MediaQuery.of(context).viewPadding.bottom;
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + safeBottom),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, -8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onEdit,
+              icon: const Icon(Icons.edit_rounded),
+              label: Text(context.l10n.edit),
+            ),
+          ),
+          if (onConfirm != null) ...[
+            const SizedBox(width: 12),
+            Expanded(
+              child: AppButton(
+                label: context.l10n.confirmTransaction,
+                icon: Icons.verified_rounded,
+                onPressed: onConfirm,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({
+    required this.title,
+    required this.child,
+  });
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(title: title),
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({
+    required this.icon,
+    required this.title,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: scheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(icon, size: 20, color: scheme.onSurfaceVariant),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                value,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TopActionButton extends StatelessWidget {
+  const _TopActionButton({
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton.filledTonal(
+      onPressed: onPressed,
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.white.withValues(alpha: 0.16),
+        foregroundColor: Colors.white,
+      ),
+      icon: Icon(icon),
+    );
+  }
+}
+
+class _TransactionDetailLoadingState extends StatelessWidget {
+  const _TransactionDetailLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        children: const [
+          AppCard(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFE11976), Color(0xFFB517F1), Color(0xFF151B36)],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SkeletonBox(height: 44, width: 44, borderRadius: 16),
+                    Spacer(),
+                    SkeletonBox(width: 118, height: 32, borderRadius: 999),
+                  ],
+                ),
+                SizedBox(height: 18),
+                SkeletonBox(height: 76, width: 76, shape: BoxShape.circle),
+                SizedBox(height: 18),
+                SkeletonBox(width: 160, height: 22, borderRadius: 999),
+                SizedBox(height: 10),
+                SkeletonBox(width: 190, height: 36, borderRadius: 16),
+                SizedBox(height: 16),
+                SkeletonBox(width: 92, height: 32, borderRadius: 999),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+          _DetailSectionSkeleton(lines: 3),
+          SizedBox(height: 16),
+          _DetailSectionSkeleton(lines: 2),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailSectionSkeleton extends StatelessWidget {
+  const _DetailSectionSkeleton({required this.lines});
+
+  final int lines;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SkeletonBox(width: 150, height: 18),
+          const SizedBox(height: 14),
+          for (var index = 0; index < lines; index++) ...[
+            Row(
+              children: [
+                const SkeletonBox(height: 40, width: 40, borderRadius: 14),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SkeletonBox(width: 80, height: 12),
+                      const SizedBox(height: 6),
+                      SkeletonBox(width: 160 - (index * 12), height: 16),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (index != lines - 1) const SizedBox(height: 14),
+          ],
+        ],
       ),
     );
   }
@@ -515,243 +797,17 @@ class _ImagePreviewPage extends StatelessWidget {
             top: 16,
             left: 16,
             child: SafeArea(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: 1),
-                duration: const Duration(milliseconds: 240),
-                curve: Curves.easeOutCubic,
-                builder: (context, value, child) => Opacity(
-                  opacity: value,
-                  child: Transform.scale(scale: 0.92 + (0.08 * value), child: child),
+              child: IconButton.filledTonal(
+                onPressed: () => Navigator.of(context).pop(),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withValues(alpha: 0.14),
+                  foregroundColor: Colors.white,
                 ),
-                child: IconButton.filledTonal(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.14),
-                    foregroundColor: Colors.white,
-                  ),
-                  icon: const Icon(Icons.close_rounded),
-                ),
+                icon: const Icon(Icons.close_rounded),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.transaction,
-    required this.walletName,
-    required this.targetWalletName,
-    required this.categoryName,
-  });
-
-  final FinanceTransaction transaction;
-  final String walletName;
-  final String? targetWalletName;
-  final String categoryName;
-
-  @override
-  Widget build(BuildContext context) {
-    return _SectionCard(
-      title: context.l10n.transactionInformation,
-      child: Column(
-        children: [
-          _InfoRow(
-            icon: Icons.account_balance_wallet_rounded,
-            title: context.l10n.wallet,
-            value: walletName,
-          ),
-          if (transaction.type == TransactionType.transfer) ...[
-            const SizedBox(height: 14),
-            _InfoRow(
-              icon: Icons.swap_horiz_rounded,
-              title: context.l10n.targetWallet,
-              value: targetWalletName ?? context.l10n.noTargetWallet,
-            ),
-          ] else ...[
-            const SizedBox(height: 14),
-            _InfoRow(
-              icon: Icons.grid_view_rounded,
-              title: context.l10n.category,
-              value: categoryName,
-            ),
-          ],
-          const SizedBox(height: 14),
-          _InfoRow(
-            icon: Icons.schedule_rounded,
-            title: context.l10n.dateTime,
-            value: formatDateTime(context, transaction.createdAt),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.title,
-    required this.child,
-  });
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 14),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _DetailSectionSkeleton extends StatelessWidget {
-  const _DetailSectionSkeleton({required this.lines});
-
-  final int lines;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SkeletonBox(width: 150, height: 18),
-          const SizedBox(height: 14),
-          for (var index = 0; index < lines; index++) ...[
-            Row(
-              children: [
-                const SkeletonBox(height: 40, width: 40, borderRadius: 14),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SkeletonBox(width: 80, height: 12),
-                      const SizedBox(height: 6),
-                      SkeletonBox(
-                        width: 160 - (index * 12),
-                        height: 16,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            if (index != lines - 1) const SizedBox(height: 14),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _DetailImageSkeleton extends StatelessWidget {
-  const _DetailImageSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      padding: const EdgeInsets.all(16),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SkeletonBox(width: 128, height: 18),
-          SizedBox(height: 14),
-          SkeletonBox(height: 220, borderRadius: 18),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String title;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(icon, size: 20, color: const Color(0xFF667085)),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: const Color(0xFF98A2B3),
-                    ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                value,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: const Color(0xFF101828),
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _TopActionButton extends StatelessWidget {
-  const _TopActionButton({
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: IconButton.filledTonal(
-          onPressed: onPressed,
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.white.withValues(alpha: 0.16),
-            foregroundColor: Colors.white,
-          ),
-          icon: Icon(icon),
-        ),
       ),
     );
   }

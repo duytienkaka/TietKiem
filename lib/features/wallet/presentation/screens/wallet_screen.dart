@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/l10n.dart';
@@ -6,9 +7,10 @@ import '../../../../shared/finance_enums.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/empty_state.dart';
-import '../../../../shared/widgets/section_header.dart';
+import '../../../../shared/widgets/screen_top_header.dart';
 import '../../../../shared/widgets/skeleton_box.dart';
 import '../../../../shared/widgets/wallet_card.dart';
+import '../../../../shared/utils/currency_input_formatter.dart';
 import '../../domain/entities/wallet.dart';
 import '../providers/wallet_provider.dart';
 
@@ -20,9 +22,9 @@ class WalletScreen extends ConsumerWidget {
     final walletsAsync = ref.watch(walletProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.walletsTitle)),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: AsyncValueView(
           value: walletsAsync,
           loadingBuilder: (_) => const _WalletsLoadingState(),
@@ -33,12 +35,14 @@ class WalletScreen extends ConsumerWidget {
             return ListView(
               padding: const EdgeInsets.only(bottom: 120),
               children: [
-                SectionHeader(
+                ScreenTopHeader(
+                  eyebrow: context.l10n.walletsTitle,
                   title: context.l10n.allWallets,
                   subtitle: context.l10n.walletsTotal(
                     wallets.length,
                     formatCurrency(context, totalBalance),
                   ),
+                  icon: Icons.account_balance_wallet_rounded,
                   actionLabel: context.l10n.add,
                   onAction: () => showWalletSheet(context),
                 ),
@@ -85,6 +89,7 @@ class WalletScreen extends ConsumerWidget {
           },
         ),
       ),
+      ),
     );
   }
 
@@ -118,9 +123,7 @@ class _WalletsLoadingState extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: 120),
       children: [
-        const SkeletonBox(width: 180, height: 24),
-        const SizedBox(height: 8),
-        const SkeletonBox(width: 220, height: 14),
+        const ScreenTopHeaderSkeleton(showAction: true),
         const SizedBox(height: 18),
         for (var index = 0; index < 3; index++) ...[
           Container(
@@ -199,6 +202,7 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
 
   late final TextEditingController _nameController;
   late final TextEditingController _balanceController;
+  final FocusNode _balanceFocusNode = FocusNode();
   late WalletType _type;
   late int _color;
   late String _icon;
@@ -209,9 +213,11 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
     super.initState();
     final wallet = widget.wallet;
     _nameController = TextEditingController(text: wallet?.name ?? '');
-    _balanceController = TextEditingController(
-      text: wallet == null ? '0' : wallet.balance.toStringAsFixed(2),
-    );
+    _balanceController = wallet == null
+        ? TextEditingController()
+        : TextEditingController.fromValue(
+            currencyEditingValueFromInt(wallet.balance.round()),
+          );
     _type = wallet?.type ?? WalletType.cash;
     _color = wallet?.color ?? _colors.first;
     _icon = wallet?.icon ?? _icons.first;
@@ -219,8 +225,10 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
 
   @override
   void dispose() {
+    _balanceFocusNode.unfocus();
     _nameController.dispose();
     _balanceController.dispose();
+    _balanceFocusNode.dispose();
     super.dispose();
   }
 
@@ -242,87 +250,110 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _nameController,
-                autofocus: widget.wallet == null,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(labelText: context.l10n.walletName),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _balanceController,
-                decoration: InputDecoration(labelText: context.l10n.openingBalance),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _save(),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<WalletType>(
-                initialValue: _type,
-                decoration: InputDecoration(labelText: context.l10n.walletType),
-                items: WalletType.values
-                    .map(
-                      (type) => DropdownMenuItem(
-                        value: type,
-                        child: Text(type.label(context)),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                elevation: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: _nameController,
+                        autofocus: widget.wallet == null,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(labelText: context.l10n.walletName),
                       ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _type = value);
-                  }
-                },
-              ),
-              const SizedBox(height: 14),
-              _ChoiceLabel(title: context.l10n.color),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _colors.map((color) {
-                  final selected = _color == color;
-                  return GestureDetector(
-                    onTap: () => setState(() => _color = color),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Color(color),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: selected ? Colors.black : Colors.white,
-                          width: selected ? 2.5 : 0,
-                        ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _balanceController,
+                        focusNode: _balanceFocusNode,
+                        decoration: InputDecoration(labelText: context.l10n.openingBalance),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          VietnameseCurrencyInputFormatter(),
+                        ],
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _save(),
                       ),
-                      child: selected
-                          ? const Icon(Icons.check_rounded, color: Colors.white)
-                          : null,
-                    ),
-                  );
-                }).toList(),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<WalletType>(
+                        initialValue: _type,
+                        decoration: InputDecoration(labelText: context.l10n.walletType),
+                        items: WalletType.values
+                            .map(
+                              (type) => DropdownMenuItem(
+                                value: type,
+                                child: Text(type.label(context)),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _type = value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      _ChoiceLabel(title: context.l10n.color),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: _colors.map((color) {
+                          final selected = _color == color;
+                          return GestureDetector(
+                            onTap: () => setState(() => _color = color),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Color(color),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: selected
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(context).colorScheme.surface,
+                                  width: selected ? 2.5 : 0,
+                                ),
+                              ),
+                              child: selected
+                                  ? const Icon(Icons.check_rounded, color: Colors.white)
+                                  : null,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 14),
+                      _ChoiceLabel(title: context.l10n.icon),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: _icons.map((icon) {
+                          final selected = _icon == icon;
+                          return ChoiceChip(
+                            label: Text(
+                              localizeIconLabel(context, icon),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            selected: selected,
+                            avatar: Icon(_resolveWalletIcon(icon)),
+                            onSelected: (_) => setState(() => _icon = icon),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 14),
-              _ChoiceLabel(title: context.l10n.icon),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _icons.map((icon) {
-                  final selected = _icon == icon;
-                  return ChoiceChip(
-                    label: Text(localizeIconLabel(context, icon)),
-                    selected: selected,
-                    avatar: Icon(_resolveWalletIcon(icon)),
-                    onSelected: (_) => setState(() => _icon = icon),
-                  );
-                }).toList(),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -350,8 +381,8 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
   }
 
   Future<void> _save() async {
-    final balance = double.tryParse(_balanceController.text.trim());
-    if (balance == null) {
+    final balance = parseVietnameseCurrency(_balanceController.text.trim()).toDouble();
+    if (_balanceController.text.trim().isEmpty && widget.wallet == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.enterValidOpeningBalance)),
       );
@@ -360,6 +391,7 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
 
     setState(() => _saving = true);
     try {
+      FocusScope.of(context).unfocus();
       await ref.read(walletProvider.notifier).saveWallet(
             id: widget.wallet?.id,
             name: _nameController.text,

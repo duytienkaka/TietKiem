@@ -75,6 +75,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: '/transactions/:id/edit',
+        name: 'editTransaction',
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final tween = Tween<Offset>(
+              begin: const Offset(0, 0.08),
+              end: Offset.zero,
+            ).chain(CurveTween(curve: Curves.easeOutCubic));
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(position: animation.drive(tween), child: child),
+            );
+          },
+          child: TransactionFormScreen(
+            transactionId: state.pathParameters['id'],
+          ),
+        ),
+      ),
+      GoRoute(
         path: '/transactions/:id',
         name: 'transactionDetail',
         pageBuilder: (context, state) => CustomTransitionPage<void>(

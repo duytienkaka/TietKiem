@@ -10,6 +10,7 @@ class SmoothBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: const Duration(milliseconds: 280),
@@ -24,9 +25,9 @@ class SmoothBottomSheet extends StatelessWidget {
         );
       },
       child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFFF1F2F8),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: child,
       ),

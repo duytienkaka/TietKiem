@@ -728,6 +728,12 @@ abstract class AppLocalizations {
   /// **'How much do you want to move?'**
   String get headlineTransfer;
 
+  /// No description provided for @calculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator'**
+  String get calculator;
+
   /// No description provided for @saveIncome.
   ///
   /// In en, this message translates to:
@@ -1291,6 +1297,408 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Control your experience'**
   String get settingsHeroTitle;
+
+  /// No description provided for @editTransactionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review details, adjust values, and save instantly.'**
+  String get editTransactionSubtitle;
+
+  /// No description provided for @confirmTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm transaction'**
+  String get confirmTransaction;
+
+  /// No description provided for @transactionConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction confirmed'**
+  String get transactionConfirmed;
+
+  /// No description provided for @pinConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN is configured and ready to use'**
+  String get pinConfigured;
+
+  /// No description provided for @setPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get setPin;
+
+  /// No description provided for @createPinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a 4-digit PIN to protect your finance app.'**
+  String get createPinSubtitle;
+
+  /// No description provided for @changePinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your 4-digit PIN for app lock.'**
+  String get changePinSubtitle;
+
+  /// No description provided for @enterPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
+  String get enterPin;
+
+  /// No description provided for @confirmPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm PIN'**
+  String get confirmPin;
+
+  /// No description provided for @pinMustBe4Digits.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN must contain exactly 4 digits.'**
+  String get pinMustBe4Digits;
+
+  /// No description provided for @pinDoesNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN confirmation does not match.'**
+  String get pinDoesNotMatch;
+
+  /// No description provided for @unlockApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock app'**
+  String get unlockApp;
+
+  /// No description provided for @enterPinContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your PIN to continue to PocketLedger.'**
+  String get enterPinContinue;
+
+  /// No description provided for @unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
+
+  /// No description provided for @invalidPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect PIN. Try again.'**
+  String get invalidPin;
+
+  /// No description provided for @smartSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart suggestions'**
+  String get smartSuggestions;
+
+  /// No description provided for @smartSuggestionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your amount and note'**
+  String get smartSuggestionsSubtitle;
+
+  /// No description provided for @noSmartSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note or amount to get suggestions.'**
+  String get noSmartSuggestions;
+
+  /// No description provided for @recurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring'**
+  String get recurring;
+
+  /// No description provided for @recurringHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create repeating transactions automatically'**
+  String get recurringHint;
+
+  /// No description provided for @enableRecurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable recurring'**
+  String get enableRecurring;
+
+  /// No description provided for @repeatEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat every'**
+  String get repeatEvery;
+
+  /// No description provided for @weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get weekly;
+
+  /// No description provided for @monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthly;
+
+  /// No description provided for @recurringTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring'**
+  String get recurringTitle;
+
+  /// No description provided for @recurringSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automate repeating transactions'**
+  String get recurringSubtitle;
+
+  /// No description provided for @noRecurringYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No recurring rules yet'**
+  String get noRecurringYet;
+
+  /// No description provided for @createRecurringHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create one from a new transaction'**
+  String get createRecurringHint;
+
+  /// No description provided for @nextRunLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next run'**
+  String get nextRunLabel;
+
+  /// No description provided for @budgetsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Budgets'**
+  String get budgetsTitle;
+
+  /// No description provided for @budgetsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay on track with category limits'**
+  String get budgetsSubtitle;
+
+  /// No description provided for @setBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Set budget'**
+  String get setBudget;
+
+  /// No description provided for @budgetAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget amount'**
+  String get budgetAmount;
+
+  /// No description provided for @monthlyBudgetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly limit for this category'**
+  String get monthlyBudgetHint;
+
+  /// No description provided for @spentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get spentLabel;
+
+  /// No description provided for @remainingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remainingLabel;
+
+  /// No description provided for @budgetExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Exceeded budget'**
+  String get budgetExceeded;
+
+  /// No description provided for @createBudgetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set budgets to see progress'**
+  String get createBudgetHint;
+
+  /// No description provided for @noBudgetsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No budgets yet'**
+  String get noBudgetsYet;
+
+  /// No description provided for @spendingInsightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending insights'**
+  String get spendingInsightsTitle;
+
+  /// No description provided for @topCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Top category'**
+  String get topCategory;
+
+  /// No description provided for @comparedToLastPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Compared to last month'**
+  String get comparedToLastPeriod;
+
+  /// No description provided for @noPreviousPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'No previous period data'**
+  String get noPreviousPeriod;
+
+  /// No description provided for @increase.
+  ///
+  /// In en, this message translates to:
+  /// **'Up'**
+  String get increase;
+
+  /// No description provided for @decrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Down'**
+  String get decrease;
+
+  /// No description provided for @same.
+  ///
+  /// In en, this message translates to:
+  /// **'No change'**
+  String get same;
+
+  /// No description provided for @aiAssistantSection.
+  ///
+  /// In en, this message translates to:
+  /// **'AI assistant'**
+  String get aiAssistantSection;
+
+  /// No description provided for @aiAssistantSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI-powered categorization, summaries, and natural input'**
+  String get aiAssistantSectionSubtitle;
+
+  /// No description provided for @aiFeatures.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable AI features'**
+  String get aiFeatures;
+
+  /// No description provided for @aiFeaturesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Gemini 2.5 Flash when a Google AI Studio API key is configured. Local fallback stays available.'**
+  String get aiFeaturesSubtitle;
+
+  /// No description provided for @openAiApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Google AI Studio API key'**
+  String get openAiApiKey;
+
+  /// No description provided for @openAiApiKeySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for Gemini 2.5 Flash. Stored only on this device. Recommended for personal use or testing.'**
+  String get openAiApiKeySubtitle;
+
+  /// No description provided for @configureApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure API key'**
+  String get configureApiKey;
+
+  /// No description provided for @apiKeyConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'API key configured'**
+  String get apiKeyConfigured;
+
+  /// No description provided for @apiKeyNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'API key not configured'**
+  String get apiKeyNotConfigured;
+
+  /// No description provided for @aiNaturalEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural input'**
+  String get aiNaturalEntry;
+
+  /// No description provided for @aiNaturalEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the transaction in one sentence'**
+  String get aiNaturalEntrySubtitle;
+
+  /// No description provided for @parseTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Parse transaction'**
+  String get parseTransaction;
+
+  /// No description provided for @describeTransactionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: lunch 45k from cash wallet'**
+  String get describeTransactionHint;
+
+  /// No description provided for @aiClassifyTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'AI classify'**
+  String get aiClassifyTransaction;
+
+  /// No description provided for @aiCategoryApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'AI suggestion applied'**
+  String get aiCategoryApplied;
+
+  /// No description provided for @aiSuggestionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not extract a useful suggestion.'**
+  String get aiSuggestionFailed;
+
+  /// No description provided for @aiSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly summary'**
+  String get aiSummaryTitle;
+
+  /// No description provided for @aiSummarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a concise spending recap for the selected month'**
+  String get aiSummarySubtitle;
+
+  /// No description provided for @generateSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate summary'**
+  String get generateSummary;
+
+  /// No description provided for @aiPowered.
+  ///
+  /// In en, this message translates to:
+  /// **'AI powered'**
+  String get aiPowered;
+
+  /// No description provided for @localFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Local fallback'**
+  String get localFallback;
 }
 
 class _AppLocalizationsDelegate

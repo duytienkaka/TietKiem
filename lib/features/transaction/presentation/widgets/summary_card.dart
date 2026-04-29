@@ -7,12 +7,14 @@ class SummaryCard extends StatelessWidget {
   const SummaryCard({
     super.key,
     required this.greeting,
-    required this.totalBalance,
+    required this.previousBalance,
+    required this.currentBalance,
     required this.walletCount,
   });
 
   final String greeting;
-  final double totalBalance;
+  final double previousBalance;
+  final double currentBalance;
   final int walletCount;
 
   @override
@@ -73,8 +75,11 @@ class SummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           AnimatedBalanceText(
-            value: totalBalance,
-            color: Colors.white,
+            previousBalance: previousBalance,
+            currentBalance: currentBalance,
+            neutralColor: Colors.white,
+            increaseColor: const Color(0xFFB9F8CF),
+            decreaseColor: const Color(0xFFFFD5D2),
             style: theme.textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   height: 1,

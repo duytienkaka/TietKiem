@@ -339,6 +339,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headlineTransfer => 'How much do you want to move?';
 
   @override
+  String get calculator => 'Calculator';
+
+  @override
   String get saveIncome => 'Save income';
 
   @override
@@ -630,4 +633,212 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsHeroTitle => 'Control your experience';
+
+  @override
+  String get editTransactionSubtitle =>
+      'Review details, adjust values, and save instantly.';
+
+  @override
+  String get confirmTransaction => 'Confirm transaction';
+
+  @override
+  String get transactionConfirmed => 'Transaction confirmed';
+
+  @override
+  String get pinConfigured => 'PIN is configured and ready to use';
+
+  @override
+  String get setPin => 'Set PIN';
+
+  @override
+  String get createPinSubtitle =>
+      'Create a 4-digit PIN to protect your finance app.';
+
+  @override
+  String get changePinSubtitle => 'Update your 4-digit PIN for app lock.';
+
+  @override
+  String get enterPin => 'Enter PIN';
+
+  @override
+  String get confirmPin => 'Confirm PIN';
+
+  @override
+  String get pinMustBe4Digits => 'PIN must contain exactly 4 digits.';
+
+  @override
+  String get pinDoesNotMatch => 'PIN confirmation does not match.';
+
+  @override
+  String get unlockApp => 'Unlock app';
+
+  @override
+  String get enterPinContinue => 'Enter your PIN to continue to PocketLedger.';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get invalidPin => 'Incorrect PIN. Try again.';
+
+  @override
+  String get smartSuggestions => 'Smart suggestions';
+
+  @override
+  String get smartSuggestionsSubtitle => 'Based on your amount and note';
+
+  @override
+  String get noSmartSuggestions => 'Add a note or amount to get suggestions.';
+
+  @override
+  String get recurring => 'Recurring';
+
+  @override
+  String get recurringHint => 'Create repeating transactions automatically';
+
+  @override
+  String get enableRecurring => 'Enable recurring';
+
+  @override
+  String get repeatEvery => 'Repeat every';
+
+  @override
+  String get weekly => 'Weekly';
+
+  @override
+  String get monthly => 'Monthly';
+
+  @override
+  String get recurringTitle => 'Recurring';
+
+  @override
+  String get recurringSubtitle => 'Automate repeating transactions';
+
+  @override
+  String get noRecurringYet => 'No recurring rules yet';
+
+  @override
+  String get createRecurringHint => 'Create one from a new transaction';
+
+  @override
+  String get nextRunLabel => 'Next run';
+
+  @override
+  String get budgetsTitle => 'Budgets';
+
+  @override
+  String get budgetsSubtitle => 'Stay on track with category limits';
+
+  @override
+  String get setBudget => 'Set budget';
+
+  @override
+  String get budgetAmount => 'Budget amount';
+
+  @override
+  String get monthlyBudgetHint => 'Monthly limit for this category';
+
+  @override
+  String get spentLabel => 'Spent';
+
+  @override
+  String get remainingLabel => 'Remaining';
+
+  @override
+  String get budgetExceeded => 'Exceeded budget';
+
+  @override
+  String get createBudgetHint => 'Set budgets to see progress';
+
+  @override
+  String get noBudgetsYet => 'No budgets yet';
+
+  @override
+  String get spendingInsightsTitle => 'Spending insights';
+
+  @override
+  String get topCategory => 'Top category';
+
+  @override
+  String get comparedToLastPeriod => 'Compared to last month';
+
+  @override
+  String get noPreviousPeriod => 'No previous period data';
+
+  @override
+  String get increase => 'Up';
+
+  @override
+  String get decrease => 'Down';
+
+  @override
+  String get same => 'No change';
+
+  @override
+  String get aiAssistantSection => 'AI assistant';
+
+  @override
+  String get aiAssistantSectionSubtitle =>
+      'AI-powered categorization, summaries, and natural input';
+
+  @override
+  String get aiFeatures => 'Enable AI features';
+
+  @override
+  String get aiFeaturesSubtitle =>
+      'Use Gemini 2.5 Flash when a Google AI Studio API key is configured. Local fallback stays available.';
+
+  @override
+  String get openAiApiKey => 'Google AI Studio API key';
+
+  @override
+  String get openAiApiKeySubtitle =>
+      'Used for Gemini 2.5 Flash. Stored only on this device. Recommended for personal use or testing.';
+
+  @override
+  String get configureApiKey => 'Configure API key';
+
+  @override
+  String get apiKeyConfigured => 'API key configured';
+
+  @override
+  String get apiKeyNotConfigured => 'API key not configured';
+
+  @override
+  String get aiNaturalEntry => 'Natural input';
+
+  @override
+  String get aiNaturalEntrySubtitle =>
+      'Describe the transaction in one sentence';
+
+  @override
+  String get parseTransaction => 'Parse transaction';
+
+  @override
+  String get describeTransactionHint => 'Example: lunch 45k from cash wallet';
+
+  @override
+  String get aiClassifyTransaction => 'AI classify';
+
+  @override
+  String get aiCategoryApplied => 'AI suggestion applied';
+
+  @override
+  String get aiSuggestionFailed => 'Could not extract a useful suggestion.';
+
+  @override
+  String get aiSummaryTitle => 'Monthly summary';
+
+  @override
+  String get aiSummarySubtitle =>
+      'Get a concise spending recap for the selected month';
+
+  @override
+  String get generateSummary => 'Generate summary';
+
+  @override
+  String get aiPowered => 'AI powered';
+
+  @override
+  String get localFallback => 'Local fallback';
 }

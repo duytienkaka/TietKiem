@@ -20,7 +20,7 @@ String localeName(BuildContext context) {
 
 String formatCurrency(BuildContext context, num value) {
   final formatter = NumberFormat.decimalPattern(localeName(context));
-  return '${formatter.format(value)} đ';
+  return '${formatter.format(value)} VND';
 }
 
 String formatDateTime(BuildContext context, DateTime value) {
@@ -52,6 +52,13 @@ extension TransactionStatusL10n on TransactionStatus {
         TransactionStatus.pending => context.l10n.pending,
         TransactionStatus.verified => context.l10n.verified,
         TransactionStatus.review => context.l10n.review,
+      };
+}
+
+extension RecurringIntervalL10n on RecurringInterval {
+  String label(BuildContext context) => switch (this) {
+        RecurringInterval.weekly => context.l10n.weekly,
+        RecurringInterval.monthly => context.l10n.monthly,
       };
 }
 

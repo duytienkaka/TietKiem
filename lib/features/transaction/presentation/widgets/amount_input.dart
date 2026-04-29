@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/utils/currency_input_formatter.dart';
-import 'calculator_bottom_sheet.dart';
 
 class AmountInput extends StatelessWidget {
   const AmountInput({
@@ -26,7 +25,6 @@ class AmountInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
 
     return TextFormField(
       controller: controller,
@@ -34,7 +32,8 @@ class AmountInput extends StatelessWidget {
       onChanged: (value) => onChanged?.call(parseVietnameseCurrency(value)),
       onFieldSubmitted: onFieldSubmitted,
       keyboardType: TextInputType.number,
-      inputFormatters: const <TextInputFormatter>[
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.digitsOnly,
         VietnameseCurrencyInputFormatter(),
       ],
       textAlign: TextAlign.center,
@@ -43,24 +42,9 @@ class AmountInput extends StatelessWidget {
       ),
       decoration: InputDecoration(
         hintText: '0',
-        suffixText: ' đ',
+        suffixText: ' VND',
         suffixStyle: theme.textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w700,
-          color: scheme.onSurfaceVariant,
-        ),
-        suffixIcon: IconButton(
-          tooltip: 'Mở máy tính',
-          onPressed: () async {
-            final result = await showAmountCalculatorSheet(
-              context,
-              initialValue: rawValue,
-            );
-            if (result == null) {
-              return;
-            }
-            onCalculated?.call(result);
-          },
-          icon: const Icon(Icons.calculate_rounded),
         ),
         border: InputBorder.none,
         enabledBorder: InputBorder.none,

@@ -33,7 +33,8 @@ class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
     return initial;
   }
 
-  Future<void> addTransaction({
+  Future<void> saveTransaction({
+    required String? id,
     required TransactionType type,
     required double amount,
     required String walletId,
@@ -42,13 +43,18 @@ class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
     String? note,
     String? imagePath,
     required TransactionStatus status,
+    DateTime? createdAt,
   }) async {
     if (amount <= 0) {
       throw const AppException('Amount must be greater than zero.');
     }
 
+    final existing = id == null
+        ? null
+        : state.valueOrNull?.where((item) => item.id == id).firstOrNull;
+
     final transaction = FinanceTransaction(
-      id: const Uuid().v4(),
+      id: id ?? const Uuid().v4(),
       type: type,
       amount: amount,
       walletId: walletId,
@@ -57,9 +63,11 @@ class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
       note: note?.trim().isEmpty == true ? null : note?.trim(),
       imagePath: imagePath,
       status: status,
-      createdAt: DateTime.now(),
+      createdAt: createdAt ?? existing?.createdAt ?? DateTime.now(),
     );
 
-    await _repository.addTransaction(transaction);
+    await _repository.saveTransaction(transaction);
   }
+
+  Future<void> deleteTransaction(String id) => _repository.deleteTransaction(id);
 }

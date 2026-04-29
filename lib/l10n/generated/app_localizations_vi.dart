@@ -340,6 +340,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get headlineTransfer => 'Bạn muốn chuyển bao nhiêu?';
 
   @override
+  String get calculator => 'Calculator';
+
+  @override
   String get saveIncome => 'Lưu thu nhập';
 
   @override
@@ -632,4 +635,211 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsHeroTitle => 'Tùy chỉnh trải nghiệm';
+
+  @override
+  String get editTransactionSubtitle =>
+      'Review details, adjust values, and save instantly.';
+
+  @override
+  String get confirmTransaction => 'Confirm transaction';
+
+  @override
+  String get transactionConfirmed => 'Transaction confirmed';
+
+  @override
+  String get pinConfigured => 'PIN is configured and ready to use';
+
+  @override
+  String get setPin => 'Set PIN';
+
+  @override
+  String get createPinSubtitle =>
+      'Create a 4-digit PIN to protect your finance app.';
+
+  @override
+  String get changePinSubtitle => 'Update your 4-digit PIN for app lock.';
+
+  @override
+  String get enterPin => 'Enter PIN';
+
+  @override
+  String get confirmPin => 'Confirm PIN';
+
+  @override
+  String get pinMustBe4Digits => 'PIN must contain exactly 4 digits.';
+
+  @override
+  String get pinDoesNotMatch => 'PIN confirmation does not match.';
+
+  @override
+  String get unlockApp => 'Unlock app';
+
+  @override
+  String get enterPinContinue => 'Enter your PIN to continue to PocketLedger.';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get invalidPin => 'Incorrect PIN. Try again.';
+
+  @override
+  String get smartSuggestions => 'Gợi ý thông minh';
+
+  @override
+  String get smartSuggestionsSubtitle => 'Dựa trên số tiền và ghi chú';
+
+  @override
+  String get noSmartSuggestions => 'Thêm ghi chú hoặc số tiền để xem gợi ý.';
+
+  @override
+  String get recurring => 'Lặp lại';
+
+  @override
+  String get recurringHint => 'Tự động tạo giao dịch định kỳ';
+
+  @override
+  String get enableRecurring => 'Bật lặp lại';
+
+  @override
+  String get repeatEvery => 'Lặp mỗi';
+
+  @override
+  String get weekly => 'Hàng tuần';
+
+  @override
+  String get monthly => 'Hàng tháng';
+
+  @override
+  String get recurringTitle => 'Định kỳ';
+
+  @override
+  String get recurringSubtitle => 'Tự động hóa giao dịch lặp lại';
+
+  @override
+  String get noRecurringYet => 'Chưa có giao dịch định kỳ';
+
+  @override
+  String get createRecurringHint => 'Tạo từ giao dịch mới';
+
+  @override
+  String get nextRunLabel => 'Lần kế tiếp';
+
+  @override
+  String get budgetsTitle => 'Ngân sách';
+
+  @override
+  String get budgetsSubtitle => 'Theo dõi giới hạn chi theo danh mục';
+
+  @override
+  String get setBudget => 'Đặt ngân sách';
+
+  @override
+  String get budgetAmount => 'Số tiền ngân sách';
+
+  @override
+  String get monthlyBudgetHint => 'Giới hạn theo tháng cho danh mục';
+
+  @override
+  String get spentLabel => 'Đã chi';
+
+  @override
+  String get remainingLabel => 'Còn lại';
+
+  @override
+  String get budgetExceeded => 'Vượt ngân sách';
+
+  @override
+  String get createBudgetHint => 'Đặt ngân sách để theo dõi tiến độ';
+
+  @override
+  String get noBudgetsYet => 'Ưua có ngân sách nào';
+
+  @override
+  String get spendingInsightsTitle => 'Phân tích chi tiêu';
+
+  @override
+  String get topCategory => 'Danh mục cao nhất';
+
+  @override
+  String get comparedToLastPeriod => 'So với tháng trước';
+
+  @override
+  String get noPreviousPeriod => 'Chưa có dữ liệu kỳ trước';
+
+  @override
+  String get increase => 'Tăng';
+
+  @override
+  String get decrease => 'Giảm';
+
+  @override
+  String get same => 'Không đổi';
+
+  @override
+  String get aiAssistantSection => 'Trợ lý AI';
+
+  @override
+  String get aiAssistantSectionSubtitle =>
+      'Phân loại giao dịch, tóm tắt tháng và nhập tự nhiên';
+
+  @override
+  String get aiFeatures => 'Bật tính năng AI';
+
+  @override
+  String get aiFeaturesSubtitle =>
+      'Dùng Gemini 2.5 Flash khi có API key từ Google AI Studio. Vẫn có fallback local khi chưa cấu hình.';
+
+  @override
+  String get openAiApiKey => 'Google AI Studio API key';
+
+  @override
+  String get openAiApiKeySubtitle =>
+      'Dùng cho Gemini 2.5 Flash. Chỉ lưu trên thiết bị này. Phù hợp cho cá nhân hoặc mục đích test.';
+
+  @override
+  String get configureApiKey => 'Cấu hình API key';
+
+  @override
+  String get apiKeyConfigured => 'Đã cấu hình API key';
+
+  @override
+  String get apiKeyNotConfigured => 'Chưa cấu hình API key';
+
+  @override
+  String get aiNaturalEntry => 'Nhập tự nhiên';
+
+  @override
+  String get aiNaturalEntrySubtitle => 'Mô tả giao dịch bằng một câu';
+
+  @override
+  String get parseTransaction => 'Phân tích giao dịch';
+
+  @override
+  String get describeTransactionHint => 'Ví dụ: ăn trưa 45k từ ví tiền mặt';
+
+  @override
+  String get aiClassifyTransaction => 'AI phân loại';
+
+  @override
+  String get aiCategoryApplied => 'Đã áp dụng gợi ý AI';
+
+  @override
+  String get aiSuggestionFailed => 'AI chưa trích xuất được gợi ý hợp lệ.';
+
+  @override
+  String get aiSummaryTitle => 'Tóm tắt tháng';
+
+  @override
+  String get aiSummarySubtitle =>
+      'Nhận tóm tắt chi tiêu ngắn gọn cho tháng đang chọn';
+
+  @override
+  String get generateSummary => 'Tạo tóm tắt';
+
+  @override
+  String get aiPowered => 'AI hỗ trợ';
+
+  @override
+  String get localFallback => 'Fallback local';
 }

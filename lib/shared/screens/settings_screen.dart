@@ -11,6 +11,8 @@ import '../../features/transaction/presentation/providers/transaction_provider.d
 import '../../features/wallet/domain/entities/wallet.dart';
 import '../../features/wallet/presentation/providers/wallet_provider.dart';
 import '../../l10n/l10n.dart';
+import '../models/app_preferences_state.dart';
+import '../providers/app_lock_provider.dart';
 import '../providers/app_preferences_provider.dart';
 import '../services/app_data_maintenance_service.dart';
 import '../widgets/animated_reveal.dart';
@@ -18,6 +20,7 @@ import '../widgets/app_card.dart';
 import '../widgets/async_value_view.dart';
 import '../widgets/section_header.dart';
 import '../widgets/setting_item.dart';
+import '../widgets/skeleton_box.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -27,12 +30,15 @@ class SettingsScreen extends ConsumerWidget {
     final preferencesAsync = ref.watch(appPreferencesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.settingsTitle)),
-      body: AsyncValueView(
-        value: preferencesAsync,
-        data: (preferences) => SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+      appBar: AppBar(
+        title: Text(context.l10n.settingsTitle),
+      ),
+      body: SafeArea(
+        child: AsyncValueView(
+          value: preferencesAsync,
+          loadingBuilder: (_) => const _SettingsLoadingState(),
+          data: (preferences) => ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
             children: [
               AnimatedReveal(
                 child: _SettingsHeroCard(
@@ -61,10 +67,7 @@ class SettingsScreen extends ConsumerWidget {
                       icon: Icons.payments_rounded,
                       title: context.l10n.currency,
                       subtitle: context.l10n.vndCurrency,
-                      trailing: Text(
-                        'VND',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      trailing: Text('VND', style: Theme.of(context).textTheme.bodyMedium),
                     ),
                   ],
                 ),
@@ -127,27 +130,34 @@ class SettingsScreen extends ConsumerWidget {
               AnimatedReveal(
                 delay: const Duration(milliseconds: 120),
                 child: _SettingsSection(
-                  title: context.l10n.securitySection,
-                  subtitle: context.l10n.securitySectionSubtitle,
+                  title: context.l10n.aiAssistantSection,
+                  subtitle: context.l10n.aiAssistantSectionSubtitle,
                   children: [
                     SettingItem(
-                      icon: Icons.lock_rounded,
-                      title: context.l10n.appLock,
-                      subtitle: context.l10n.appLockSubtitle,
+                      icon: Icons.auto_awesome_rounded,
+                      title: context.l10n.aiFeatures,
+                      subtitle: context.l10n.aiFeaturesSubtitle,
                       trailing: Switch(
-                        value: preferences.appLockEnabled,
+                        value: preferences.aiAssistantEnabled,
                         onChanged: (value) => ref
                             .read(appPreferencesProvider.notifier)
-                            .updateAppLock(value),
+                            .updateAiAssistant(value),
                       ),
                     ),
                     SettingItem(
-                      icon: Icons.pin_outlined,
-                      title: context.l10n.pinSetup,
-                      subtitle: context.l10n.pinSetupSubtitle,
+                      icon: Icons.key_rounded,
+                      title: context.l10n.openAiApiKey,
+                      subtitle: context.l10n.openAiApiKeySubtitle,
                       trailing: Text(
-                        context.l10n.comingSoon,
+                        preferences.openAiApiKey?.isNotEmpty == true
+                            ? context.l10n.apiKeyConfigured
+                            : context.l10n.apiKeyNotConfigured,
                         style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      onTap: () => _showOpenAiApiKeySheet(
+                        context,
+                        ref,
+                        existingApiKey: preferences.openAiApiKey,
                       ),
                     ),
                   ],
@@ -157,16 +167,51 @@ class SettingsScreen extends ConsumerWidget {
               AnimatedReveal(
                 delay: const Duration(milliseconds: 150),
                 child: _SettingsSection(
+                  title: context.l10n.securitySection,
+                  subtitle: context.l10n.securitySectionSubtitle,
+                  children: [
+                    SettingItem(
+                      icon: Icons.lock_rounded,
+                      title: context.l10n.appLock,
+                      subtitle: context.l10n.appLockSubtitle,
+                      trailing: Switch(
+                        value: preferences.appLockEnabled,
+                        onChanged: (value) =>
+                            _handleAppLockToggle(context, ref, preferences, value),
+                      ),
+                    ),
+                    SettingItem(
+                      icon: Icons.pin_outlined,
+                      title: context.l10n.pinSetup,
+                      subtitle: preferences.pinCode?.isNotEmpty == true
+                          ? context.l10n.pinConfigured
+                          : context.l10n.pinSetupSubtitle,
+                      onTap: () => _showPinSetupSheet(
+                        context,
+                        ref,
+                        existingPin: preferences.pinCode,
+                      ),
+                      trailing: Text(
+                        preferences.pinCode?.isNotEmpty == true
+                            ? '****'
+                            : context.l10n.setPin,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              AnimatedReveal(
+                delay: const Duration(milliseconds: 180),
+                child: _SettingsSection(
                   title: context.l10n.aboutSection,
                   subtitle: context.l10n.aboutSectionSubtitle,
                   children: [
                     SettingItem(
                       icon: Icons.info_outline_rounded,
                       title: context.l10n.appVersion,
-                      trailing: Text(
-                        '1.0.0',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      trailing: Text('1.0.0', style: Theme.of(context).textTheme.bodyMedium),
                     ),
                     SettingItem(
                       icon: Icons.code_rounded,
@@ -204,7 +249,9 @@ class SettingsScreen extends ConsumerWidget {
       useSafeArea: true,
       isDismissible: true,
       enableDrag: true,
-      barrierColor: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.42 : 0.34),
+      barrierColor: Colors.black.withValues(
+        alpha: theme.brightness == Brightness.dark ? 0.42 : 0.34,
+      ),
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => SafeArea(
         child: Padding(
@@ -325,9 +372,10 @@ class SettingsScreen extends ConsumerWidget {
     WidgetRef ref, {
     required _ExportFormat format,
   }) async {
-    final wallets = ref.read(walletProvider).valueOrNull ?? const [];
-    final transactions = ref.read(transactionProvider).valueOrNull ?? const [];
-    final categories = ref.read(categoryProvider).valueOrNull ?? const [];
+    final wallets = ref.read(walletProvider).valueOrNull ?? const <Wallet>[];
+    final transactions =
+        ref.read(transactionProvider).valueOrNull ?? const <FinanceTransaction>[];
+    final categories = ref.read(categoryProvider).valueOrNull ?? const <Category>[];
 
     final payload = switch (format) {
       _ExportFormat.json => const JsonEncoder.withIndent('  ').convert({
@@ -515,6 +563,314 @@ class SettingsScreen extends ConsumerWidget {
       );
     }
   }
+
+  Future<void> _handleAppLockToggle(
+    BuildContext context,
+    WidgetRef ref,
+    AppPreferencesState preferences,
+    bool enabled,
+  ) async {
+    if (!enabled) {
+      await ref.read(appPreferencesProvider.notifier).updateAppLock(false);
+      ref.read(appLockSessionProvider.notifier).unlock();
+      return;
+    }
+
+    if (preferences.pinCode?.isEmpty ?? true) {
+      final configured = await _showPinSetupSheet(context, ref);
+      if (configured != true) {
+        return;
+      }
+    }
+
+    await ref.read(appPreferencesProvider.notifier).updateAppLock(true);
+    ref.read(appLockSessionProvider.notifier).lock();
+  }
+
+  Future<bool?> _showPinSetupSheet(
+    BuildContext context,
+    WidgetRef ref, {
+    String? existingPin,
+  }) {
+    final pinController = TextEditingController();
+    final confirmController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 8,
+            bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: AppCard(
+                padding: const EdgeInsets.all(20),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.l10n.pinSetup,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        existingPin?.isNotEmpty == true
+                            ? context.l10n.changePinSubtitle
+                            : context.l10n.createPinSubtitle,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: pinController,
+                        maxLength: 4,
+                        obscureText: true,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        decoration: InputDecoration(
+                          labelText: context.l10n.enterPin,
+                          counterText: '',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.length != 4) {
+                            return context.l10n.pinMustBe4Digits;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: confirmController,
+                        maxLength: 4,
+                        obscureText: true,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        decoration: InputDecoration(
+                          labelText: context.l10n.confirmPin,
+                          counterText: '',
+                        ),
+                        validator: (value) {
+                          if (value != pinController.text) {
+                            return context.l10n.pinDoesNotMatch;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 18),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          if (formKey.currentState?.validate() != true) {
+                            return;
+                          }
+                          await ref.read(appPreferencesProvider.notifier).updatePinCode(
+                                pinController.text,
+                              );
+                          if (sheetContext.mounted) {
+                            Navigator.of(sheetContext).pop(true);
+                          }
+                        },
+                        icon: const Icon(Icons.check_rounded),
+                        label: Text(context.l10n.save),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ).whenComplete(() {
+      pinController.dispose();
+      confirmController.dispose();
+    });
+  }
+
+  Future<void> _showOpenAiApiKeySheet(
+    BuildContext context,
+    WidgetRef ref, {
+    String? existingApiKey,
+  }) {
+    final controller = TextEditingController(text: existingApiKey ?? '');
+    final formKey = GlobalKey<FormState>();
+    var obscure = true;
+
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 8,
+                bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
+                  child: AppCard(
+                    padding: const EdgeInsets.all(20),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.l10n.openAiApiKey,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            context.l10n.openAiApiKeySubtitle,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: controller,
+                            obscureText: obscure,
+                            decoration: InputDecoration(
+                              labelText: context.l10n.openAiApiKey,
+                              hintText: 'sk-...',
+                              prefixIcon: const Icon(Icons.key_rounded),
+                              suffixIcon: IconButton(
+                                onPressed: () =>
+                                    setSheetState(() => obscure = !obscure),
+                                icon: Icon(
+                                  obscure
+                                      ? Icons.visibility_rounded
+                                      : Icons.visibility_off_rounded,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Row(
+                            children: [
+                              TextButton(
+                                onPressed: () async {
+                                  await ref
+                                      .read(appPreferencesProvider.notifier)
+                                      .updateOpenAiApiKey(null);
+                                  if (sheetContext.mounted) {
+                                    Navigator.of(sheetContext).pop();
+                                  }
+                                },
+                                child: Text(context.l10n.remove),
+                              ),
+                              const Spacer(),
+                              FilledButton.icon(
+                                onPressed: () async {
+                                  if (formKey.currentState?.validate() != true) {
+                                    return;
+                                  }
+                                  await ref
+                                      .read(appPreferencesProvider.notifier)
+                                      .updateOpenAiApiKey(controller.text.trim());
+                                  if (sheetContext.mounted) {
+                                    Navigator.of(sheetContext).pop();
+                                  }
+                                },
+                                icon: const Icon(Icons.check_rounded),
+                                label: Text(context.l10n.save),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    ).whenComplete(controller.dispose);
+  }
+}
+
+class _SettingsLoadingState extends StatelessWidget {
+  const _SettingsLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: const Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SkeletonBox(width: 180, height: 24),
+                    SizedBox(height: 8),
+                    SkeletonBox(width: 220, height: 14),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16),
+              SkeletonBox(width: 56, height: 56, borderRadius: 18),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+        for (var index = 0; index < 4; index++) ...[
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SkeletonBox(width: 120, height: 18),
+                SizedBox(height: 8),
+                SkeletonBox(width: 180, height: 14),
+                SizedBox(height: 16),
+                SkeletonBox(height: 56, borderRadius: 18),
+                SizedBox(height: 12),
+                SkeletonBox(height: 56, borderRadius: 18),
+              ],
+            ),
+          ),
+          if (index != 3) const SizedBox(height: 18),
+        ],
+      ],
+    );
+  }
 }
 
 class _SettingsHeroCard extends StatelessWidget {
@@ -666,11 +1022,7 @@ class _LanguageOptionTile extends StatelessWidget {
                   ),
                 ),
                 if (selected)
-                  Icon(
-                    Icons.check_rounded,
-                    color: scheme.primary,
-                    size: 20,
-                  ),
+                  Icon(Icons.check_rounded, color: scheme.primary, size: 20),
               ],
             ),
           ),

@@ -35,19 +35,34 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<void> addTransaction(FinanceTransaction transaction) async {
+  Future<void> saveTransaction(FinanceTransaction transaction) async {
     _validateTransaction(transaction);
 
     await _database.transaction(() async {
-      final existing = await _localDataSource.getTransactionById(transaction.id);
-      if (existing != null) {
-        throw const AppException('Transactions cannot be edited after creation.');
+      final existingData = await _localDataSource.getTransactionById(transaction.id);
+      if (existingData != null) {
+        final existing = TransactionModel.fromData(existingData).toEntity();
+        await _applyBalanceImpact(existing, reverse: true);
       }
 
       await _applyBalanceImpact(transaction);
-      await _localDataSource.insertTransaction(
+      await _localDataSource.upsertTransaction(
         TransactionModel.fromEntity(transaction).toCompanion(),
       );
+    });
+  }
+
+  @override
+  Future<void> deleteTransaction(String id) async {
+    await _database.transaction(() async {
+      final existingData = await _localDataSource.getTransactionById(id);
+      if (existingData == null) {
+        return;
+      }
+
+      final existing = TransactionModel.fromData(existingData).toEntity();
+      await _applyBalanceImpact(existing, reverse: true);
+      await _localDataSource.deleteTransaction(id);
     });
   }
 

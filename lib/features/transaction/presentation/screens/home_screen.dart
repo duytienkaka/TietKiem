@@ -13,6 +13,7 @@ import '../../../../shared/widgets/skeleton_box.dart';
 import '../../../../shared/widgets/transaction_type_badge.dart';
 import '../../../../shared/widgets/wallet_card.dart';
 import '../../../category/presentation/providers/category_provider.dart';
+import '../../../recurring/presentation/providers/recurring_provider.dart';
 import '../../../wallet/presentation/providers/wallet_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/transaction_card_surface.dart';
@@ -30,6 +31,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   late final ScrollController _scrollController;
   bool _collapsedHeader = false;
+  bool _hasTrackedBalance = false;
+  double _previousTotalBalance = 0;
+  double _currentTotalBalance = 0;
 
   @override
   void initState() {
@@ -51,6 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(recurringProcessorProvider);
     final walletsAsync = ref.watch(walletProvider);
     final transactionsAsync = ref.watch(transactionProvider);
     final categoriesAsync = ref.watch(categoryProvider);
@@ -71,6 +76,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 data: (categories) {
                   final totalBalance =
                       wallets.fold<double>(0, (sum, item) => sum + item.balance);
+                  if (!_hasTrackedBalance) {
+                    _hasTrackedBalance = true;
+                    _previousTotalBalance = totalBalance;
+                    _currentTotalBalance = totalBalance;
+                  } else if (totalBalance != _currentTotalBalance) {
+                    _previousTotalBalance = _currentTotalBalance;
+                    _currentTotalBalance = totalBalance;
+                  }
                   final recentTransactions = transactions.take(5).toList();
                   final now = DateTime.now();
 
@@ -88,7 +101,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       AnimatedReveal(
                         child: SummaryCard(
                           greeting: _greetingForHour(context, now.hour),
-                          totalBalance: totalBalance,
+                          previousBalance: _previousTotalBalance,
+                          currentBalance: _currentTotalBalance,
                           walletCount: wallets.length,
                         ),
                       ),
@@ -101,47 +115,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       const SizedBox(height: 12),
                       AnimatedReveal(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _QuickActionButton(
-                                label: context.l10n.addIncome,
-                                icon: Icons.arrow_downward_rounded,
-                                color: const Color(0xFFE8FFF3),
-                                foreground: const Color(0xFF17B26A),
-                                onTap: () => showTransactionEntrySheet(
-                                  context,
-                                  initialType: TransactionType.income,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final itemWidth = (constraints.maxWidth - 20) / 3;
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: _QuickActionButton(
+                                    label: context.l10n.addIncome,
+                                    icon: Icons.arrow_downward_rounded,
+                                    color: const Color(0xFFE8FFF3),
+                                    foreground: const Color(0xFF17B26A),
+                                    minHeight: itemWidth.clamp(104, 136).toDouble(),
+                                    onTap: () => showTransactionEntrySheet(
+                                      context,
+                                      initialType: TransactionType.income,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _QuickActionButton(
-                                label: context.l10n.addExpense,
-                                icon: Icons.arrow_upward_rounded,
-                                color: const Color(0xFFFFEBEA),
-                                foreground: const Color(0xFFF04438),
-                                onTap: () => showTransactionEntrySheet(
-                                  context,
-                                  initialType: TransactionType.expense,
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: _QuickActionButton(
+                                    label: context.l10n.addExpense,
+                                    icon: Icons.arrow_upward_rounded,
+                                    color: const Color(0xFFFFEBEA),
+                                    foreground: const Color(0xFFF04438),
+                                    minHeight: itemWidth.clamp(104, 136).toDouble(),
+                                    onTap: () => showTransactionEntrySheet(
+                                      context,
+                                      initialType: TransactionType.expense,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _QuickActionButton(
-                                label: context.l10n.transfer,
-                                icon: Icons.swap_horiz_rounded,
-                                color: const Color(0xFFEAF4FF),
-                                foreground: const Color(0xFF2E90FA),
-                                onTap: () => showTransactionEntrySheet(
-                                  context,
-                                  initialType: TransactionType.transfer,
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: _QuickActionButton(
+                                    label: context.l10n.transfer,
+                                    icon: Icons.swap_horiz_rounded,
+                                    color: const Color(0xFFEAF4FF),
+                                    foreground: const Color(0xFF2E90FA),
+                                    minHeight: itemWidth.clamp(104, 136).toDouble(),
+                                    onTap: () => showTransactionEntrySheet(
+                                      context,
+                                      initialType: TransactionType.transfer,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              ],
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -741,6 +763,7 @@ class _QuickActionButton extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.foreground,
+    required this.minHeight,
     required this.onTap,
   });
 
@@ -748,29 +771,36 @@ class _QuickActionButton extends StatelessWidget {
   final IconData icon;
   final Color color;
   final Color foreground;
+  final double minHeight;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: color,
-            child: Icon(icon, color: foreground),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: minHeight),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: color,
+              child: Icon(icon, color: foreground),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

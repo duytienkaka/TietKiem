@@ -1,7 +1,12 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 class VietnameseCurrencyInputFormatter extends TextInputFormatter {
-  const VietnameseCurrencyInputFormatter();
+  const VietnameseCurrencyInputFormatter({
+    this.separator = '.',
+  });
+
+  final String separator;
 
   @override
   TextEditingValue formatEditUpdate(
@@ -13,44 +18,20 @@ class VietnameseCurrencyInputFormatter extends TextInputFormatter {
       return const TextEditingValue(
         text: '',
         selection: TextSelection.collapsed(offset: 0),
+        composing: TextRange.empty,
       );
     }
 
-    final formatted = formatVietnameseCurrency(digits);
-    final digitsToRight = _countDigitsToRight(newValue);
-    final selectionOffset = _resolveSelectionOffset(formatted, digitsToRight);
+    final formatted = formatGroupedDigits(
+      digits,
+      separator: separator,
+    );
 
     return TextEditingValue(
       text: formatted,
-      selection: TextSelection.collapsed(offset: selectionOffset),
+      selection: TextSelection.collapsed(offset: formatted.length),
+      composing: TextRange.empty,
     );
-  }
-
-  int _countDigitsToRight(TextEditingValue value) {
-    if (!value.selection.isValid) {
-      return 0;
-    }
-
-    final rightSide = value.text.substring(value.selection.end);
-    return _countDigits(rightSide);
-  }
-
-  int _resolveSelectionOffset(String formatted, int digitsToRight) {
-    if (digitsToRight <= 0) {
-      return formatted.length;
-    }
-
-    var offset = formatted.length;
-    var seenDigits = 0;
-
-    while (offset > 0 && seenDigits < digitsToRight) {
-      offset--;
-      if (_isDigit(formatted.codeUnitAt(offset))) {
-        seenDigits++;
-      }
-    }
-
-    return offset;
   }
 }
 
@@ -66,10 +47,13 @@ String formatVietnameseCurrencyFromInt(int value) {
     return '';
   }
 
-  return formatVietnameseCurrency(value.toString());
+  return formatGroupedDigits(value.toString(), separator: '.');
 }
 
-String formatVietnameseCurrency(String digits) {
+String formatGroupedDigits(
+  String digits, {
+  String separator = ',',
+}) {
   final normalized = digits.replaceFirst(RegExp(r'^0+'), '');
   final source = normalized.isEmpty ? '0' : normalized;
   final buffer = StringBuffer();
@@ -78,21 +62,29 @@ String formatVietnameseCurrency(String digits) {
     buffer.write(source[index]);
     final remaining = source.length - index - 1;
     if (remaining > 0 && remaining % 3 == 0) {
-      buffer.write('.');
+      buffer.write(separator);
     }
   }
 
   return buffer.toString();
 }
 
-bool _isDigit(int codeUnit) => codeUnit >= 48 && codeUnit <= 57;
+String formatVietnameseCurrency(String digits) =>
+    formatGroupedDigits(digits, separator: '.');
 
-int _countDigits(String input) {
-  var count = 0;
-  for (final codeUnit in input.codeUnits) {
-    if (_isDigit(codeUnit)) {
-      count++;
-    }
-  }
-  return count;
+TextEditingValue currencyEditingValueFromInt(int value) {
+  final normalized = value < 0 ? 0 : value;
+  final formatted = formatVietnameseCurrencyFromInt(normalized);
+  return TextEditingValue(
+    text: formatted,
+    selection: TextSelection.collapsed(offset: formatted.length),
+    composing: TextRange.empty,
+  );
+}
+
+void applyCurrencyEditingValue(
+  TextEditingController controller,
+  int value,
+) {
+  controller.value = currencyEditingValueFromInt(value);
 }

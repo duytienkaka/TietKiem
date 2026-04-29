@@ -7,5 +7,7 @@ abstract class TransactionRepository {
 
   Future<FinanceTransaction?> getTransactionById(String id);
 
-  Future<void> addTransaction(FinanceTransaction transaction);
+  Future<void> saveTransaction(FinanceTransaction transaction);
+
+  Future<void> deleteTransaction(String id);
 }

@@ -22,7 +22,11 @@ class TransactionDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
-  Future<void> insertTransaction(TransactionsCompanion transaction) async {
-    await into(transactions).insert(transaction);
+  Future<void> upsertTransaction(TransactionsCompanion transaction) async {
+    await into(transactions).insertOnConflictUpdate(transaction);
+  }
+
+  Future<int> deleteTransactionById(String id) {
+    return (delete(transactions)..where((tbl) => tbl.id.equals(id))).go();
   }
 }

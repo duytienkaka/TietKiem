@@ -6,7 +6,9 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'shared/models/app_preferences_state.dart';
+import 'shared/providers/app_lock_provider.dart';
 import 'shared/providers/app_preferences_provider.dart';
+import 'shared/screens/app_lock_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +37,16 @@ class FinanceApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      builder: (context, child) {
+        final content = child ?? const SizedBox.shrink();
+        final lockRequired = ref.watch(appLockRequiredProvider);
+        return Stack(
+          children: [
+            content,
+            if (lockRequired) const Positioned.fill(child: AppLockScreen()),
+          ],
+        );
+      },
       routerConfig: router,
     );
   }

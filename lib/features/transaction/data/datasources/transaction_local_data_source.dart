@@ -11,6 +11,8 @@ class TransactionLocalDataSource {
 
   Future<Transaction?> getTransactionById(String id) => _dao.getTransactionById(id);
 
-  Future<void> insertTransaction(TransactionsCompanion transaction) =>
-      _dao.insertTransaction(transaction);
+  Future<void> upsertTransaction(TransactionsCompanion transaction) =>
+      _dao.upsertTransaction(transaction);
+
+  Future<void> deleteTransaction(String id) => _dao.deleteTransactionById(id);
 }
