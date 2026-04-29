@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
-
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -50,11 +48,11 @@ class SyncManager {
     required SupabaseRemoteDataSource remote,
     required SyncQueueService queue,
     required WalletBootstrapService bootstrap,
-  })  : _database = database,
-        _client = client,
-        _remote = remote,
-        _queue = queue,
-        _bootstrap = bootstrap;
+  }) : _database = database,
+       _client = client,
+       _remote = remote,
+       _queue = queue,
+       _bootstrap = bootstrap;
 
   final AppDatabase _database;
   final SupabaseClient _client;
@@ -88,13 +86,18 @@ class SyncManager {
       await _database.walletDao.upsertWallet(_walletCompanionFromJson(row));
     }
 
-    final walletIds = wallets.map((row) => row['id'] as String).toSet().toList();
+    final walletIds = wallets
+        .map((row) => row['id'] as String)
+        .toSet()
+        .toList();
     final seenTransactionIds = <String>{};
 
     for (final walletId in walletIds) {
       final categories = await _remote.fetchCategories(walletId);
       for (final row in categories) {
-        await _database.categoryDao.upsertCategory(_categoryCompanionFromJson(row));
+        await _database.categoryDao.upsertCategory(
+          _categoryCompanionFromJson(row),
+        );
       }
       if (categories.isEmpty) {
         await _bootstrap.ensureDefaultCategories(walletId);
@@ -113,9 +116,9 @@ class SyncManager {
 
       final budgets = await _remote.fetchBudgets(walletId);
       for (final row in budgets) {
-        await _database.into(_database.budgets).insertOnConflictUpdate(
-              _budgetCompanionFromJson(row),
-            );
+        await _database
+            .into(_database.budgets)
+            .insertOnConflictUpdate(_budgetCompanionFromJson(row));
       }
     }
 
@@ -180,15 +183,17 @@ class SyncManager {
       case 'wallets':
         await _database.walletDao.upsertWallet(_walletCompanionFromJson(row));
       case 'categories':
-        await _database.categoryDao.upsertCategory(_categoryCompanionFromJson(row));
+        await _database.categoryDao.upsertCategory(
+          _categoryCompanionFromJson(row),
+        );
       case 'transactions':
         await _database.transactionDao.upsertTransaction(
           _transactionCompanionFromJson(row),
         );
       case 'budgets':
-        await _database.into(_database.budgets).insertOnConflictUpdate(
-              _budgetCompanionFromJson(row),
-            );
+        await _database
+            .into(_database.budgets)
+            .insertOnConflictUpdate(_budgetCompanionFromJson(row));
     }
   }
 
@@ -208,11 +213,6 @@ class SyncManager {
           );
           await _queue.acknowledge(job.id);
         } catch (error) {
-          developer.log(
-            'Sync queue job failed',
-            name: 'SyncManager',
-            error: error,
-          );
           await _queue.markFailure(job, error);
         }
       }
@@ -249,7 +249,9 @@ class SyncManager {
     ).toCompanion();
   }
 
-  TransactionsCompanion _transactionCompanionFromJson(Map<String, dynamic> row) {
+  TransactionsCompanion _transactionCompanionFromJson(
+    Map<String, dynamic> row,
+  ) {
     final walletId = row['wallet_id'] as String;
     return TransactionModel(
       id: row['id'] as String,

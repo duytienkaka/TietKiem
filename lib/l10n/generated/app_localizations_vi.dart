@@ -464,7 +464,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get tryAgain => 'Thử lại';
 
   @override
-  String get helloUser => 'Xin chào, Bạn';
+  String get helloUser => 'Xin chào';
 
   @override
   String get profileTitle => 'Hồ sơ';
@@ -911,4 +911,59 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get authGenericError => 'Đăng nhập thất bại. Hãy thử lại.';
+
+  @override
+  String get inviteUser => 'Mời người dùng';
+
+  @override
+  String inviteUserTitle(String walletName) {
+    return 'Mời người dùng vào $walletName';
+  }
+
+  @override
+  String get inviteUserSubtitle =>
+      'Nhập email của người bạn muốn mời vào ví này.';
+
+  @override
+  String invitationSent(String email) {
+    return 'Đã gửi lời mời tới $email';
+  }
+
+  @override
+  String get authSignUpLead =>
+      'Tạo tài khoản để đồng bộ ví trên nhiều thiết bị.';
+
+  @override
+  String get authSignInLead =>
+      'Đăng nhập để tiếp tục với các ví và giao dịch của bạn.';
+
+  @override
+  String get authToggleToSignIn => 'Đã có tài khoản? Đăng nhập';
+
+  @override
+  String get authToggleToSignUp => 'Chưa có tài khoản? Đăng ký';
+
+  @override
+  String get authFooterSignUp =>
+      'Sau khi đăng ký, bạn có thể tạo ví riêng hoặc tham gia ví chia sẻ qua lời mời.';
+
+  @override
+  String get authFooterSignIn =>
+      'Dữ liệu local hiển thị ngay lập tức. Đồng bộ nền giữ các ví luôn cập nhật trên nhiều thiết bị.';
+
+  @override
+  String get authFeatureLocalFirst =>
+      'Luôn lưu cục bộ trước, nên dữ liệu vẫn dùng được khi offline.';
+
+  @override
+  String get authFeatureSharedWallets =>
+      'Có thể tham gia ví chia sẻ sau qua lời mời.';
+
+  @override
+  String get authFeatureSync =>
+      'Đồng bộ ví và giao dịch giữa các thiết bị ở chế độ nền.';
+
+  @override
+  String get authFeatureAccessControl =>
+      'Quyền truy cập ví được bảo vệ theo thành viên của từng ví.';
 }

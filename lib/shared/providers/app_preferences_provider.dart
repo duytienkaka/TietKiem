@@ -7,8 +7,10 @@ final sharedPreferencesProvider = FutureProvider<SharedPreferences>(
   (ref) => SharedPreferences.getInstance(),
 );
 
-final appPreferencesProvider = AsyncNotifierProvider<AppPreferencesNotifier,
-    AppPreferencesState>(AppPreferencesNotifier.new);
+final appPreferencesProvider =
+    AsyncNotifierProvider<AppPreferencesNotifier, AppPreferencesState>(
+      AppPreferencesNotifier.new,
+    );
 
 class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
   static const _languageCodeKey = 'prefs.languageCode';
@@ -36,8 +38,8 @@ class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
       aiAssistantEnabled: prefs.getBool(_aiAssistantKey) ?? false,
       pinCode: prefs.getString(_pinCodeKey),
       openAiApiKey: prefs.getString(_openAiApiKeyKey),
-      profileName: prefs.getString(_profileNameKey) ?? 'Alex Tran',
-      profileEmail: prefs.getString(_profileEmailKey) ?? 'alex@pocketledger.app',
+      profileName: prefs.getString(_profileNameKey) ?? '',
+      profileEmail: prefs.getString(_profileEmailKey) ?? '',
       avatarPath: prefs.getString(_avatarPathKey),
     );
   }
@@ -58,23 +60,20 @@ class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
       _save((current) => current.copyWith(aiAssistantEnabled: enabled));
 
   Future<void> updatePinCode(String? pinCode) => _save(
-        (current) => current.copyWith(
-          pinCode: pinCode,
-          clearPin: pinCode == null || pinCode.isEmpty,
-        ),
-      );
+    (current) => current.copyWith(
+      pinCode: pinCode,
+      clearPin: pinCode == null || pinCode.isEmpty,
+    ),
+  );
 
   Future<void> updateOpenAiApiKey(String? apiKey) => _save(
-        (current) => current.copyWith(
-          openAiApiKey: apiKey?.trim(),
-          clearOpenAiApiKey: apiKey == null || apiKey.trim().isEmpty,
-        ),
-      );
+    (current) => current.copyWith(
+      openAiApiKey: apiKey?.trim(),
+      clearOpenAiApiKey: apiKey == null || apiKey.trim().isEmpty,
+    ),
+  );
 
-  Future<void> updateProfile({
-    required String name,
-    required String email,
-  }) {
+  Future<void> updateProfile({required String name, required String email}) {
     return _save(
       (current) => current.copyWith(
         profileName: name.trim(),

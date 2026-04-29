@@ -22,14 +22,15 @@ Offline-first Flutter finance app with Drift as on-device source of truth and Su
 
 1. Create a Supabase project.
 2. Run the SQL migration in [supabase/migrations/002_wallet_sharing_refactor.sql](supabase/migrations/002_wallet_sharing_refactor.sql).
-3. Create a `.env` file in the project root:
+3. Copy [.env.example](.env.example) to `.env` in the project root and fill in your own values:
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 ```
 
-4. Make sure Email + Password auth is enabled in Supabase Auth.
+4. Keep `.env` local only. It is gitignored and must not be committed.
+5. Make sure Email + Password auth is enabled in Supabase Auth.
 
 ## Flutter setup
 
@@ -59,3 +60,8 @@ flutter run
 ```bash
 flutter build apk --release
 ```
+
+## Public repo notes
+
+- Do not commit `.env`, API keys, access tokens, or local CLI state.
+- The client uses the Supabase anon key only. Never use a service role key in the app.

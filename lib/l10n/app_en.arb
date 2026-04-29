@@ -169,7 +169,7 @@
   "statusUnconfirmed": "Unconfirmed",
   "errorTitle": "Something went wrong",
   "tryAgain": "Try again",
-  "helloUser": "Hello, Alex",
+  "helloUser": "Hello",
   "profileTitle": "Profile",
   "settingsTitle": "Settings",
   "profilePlaceholder": "Your profile area is ready for account details, identity, and preferences.",
@@ -313,5 +313,33 @@
   "authEmailNotConfirmed": "Confirm your email before signing in.",
   "authUserExists": "This email is already registered.",
   "authNetworkError": "Network error. Check your connection and try again.",
-  "authGenericError": "Authentication failed. Try again."
+  "authGenericError": "Authentication failed. Try again.",
+  "inviteUser": "Invite user",
+  "inviteUserTitle": "Invite user to {walletName}",
+  "@inviteUserTitle": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteUserSubtitle": "Enter the email address of the person you want to invite to this wallet.",
+  "invitationSent": "Invitation sent to {email}",
+  "@invitationSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authSignUpLead": "Create an account to sync your wallets across devices.",
+  "authSignInLead": "Sign in to continue with your wallets and transactions.",
+  "authToggleToSignIn": "Already have an account? Sign in",
+  "authToggleToSignUp": "Don't have an account? Sign up",
+  "authFooterSignUp": "After signing up, you can create your own wallet or join a shared wallet by invitation.",
+  "authFooterSignIn": "Local data appears instantly. Background sync keeps your wallets updated across devices.",
+  "authFeatureLocalFirst": "Saves locally first, so your data remains available offline.",
+  "authFeatureSharedWallets": "Shared wallets can be joined later by invitation.",
+  "authFeatureSync": "Syncs wallets and transactions across devices in the background.",
+  "authFeatureAccessControl": "Wallet access is protected by wallet member permissions."
 }

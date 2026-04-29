@@ -93,8 +93,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   const SizedBox(height: 22),
                                   Text(
                                     _isSignUp
-                                        ? 'Tạo tài khoản để đồng bộ dữ liệu trên nhiều thiết bị'
-                                        : 'Đăng nhập để tiếp tục theo dõi ví và giao dịch của bạn',
+                                        ? context.l10n.authSignUpLead
+                                        : context.l10n.authSignInLead,
                                     style: theme.textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.w800,
                                       color: const Color(0xFF111827),
@@ -119,10 +119,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     autofillHints: const [
                                       AutofillHints.username,
                                     ],
-                                    decoration: const InputDecoration(
-                                      labelText: 'Email',
-                                      hintText: 'you@example.com',
-                                      prefixIcon: Icon(
+                                    decoration: InputDecoration(
+                                      labelText: context.l10n.emailAddress,
+                                      prefixIcon: const Icon(
                                         Icons.mail_outline_rounded,
                                       ),
                                     ),
@@ -201,8 +200,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                             },
                                       child: Text(
                                         _isSignUp
-                                            ? 'Đã có tài khoản? Đăng nhập'
-                                            : 'Chưa có tài khoản? Đăng ký',
+                                            ? context.l10n.authToggleToSignIn
+                                            : context.l10n.authToggleToSignUp,
                                       ),
                                     ),
                                   ),
@@ -216,8 +215,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     const SizedBox(height: 16),
                     _AuthFooter(
                       text: _isSignUp
-                          ? 'Sau khi đăng ký, bạn có thể tạo ví riêng hoặc được mời vào ví chia sẻ.'
-                          : 'Dữ liệu vẫn hiển thị tức thì từ local database, đồng bộ được thực hiện nền.',
+                          ? context.l10n.authFooterSignUp
+                          : context.l10n.authFooterSignIn,
                     ),
                   ],
                 ),
@@ -376,7 +375,7 @@ class _AuthHero extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tiết Kiệm',
+                      context.l10n.appTitle,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFF111827),
@@ -384,7 +383,7 @@ class _AuthHero extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Quản lý tài chính cá nhân, offline-first và đồng bộ an toàn',
+                      context.l10n.authHeroSubtitle,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: const Color(0xFF667085),
                         height: 1.35,
@@ -531,28 +530,28 @@ class _TrustPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = isSignUp
-        ? const [
+        ? [
             (
               Icons.offline_bolt_rounded,
-              'Lưu cục bộ ngay lập tức, không chờ mạng',
-              Color(0xFF2E90FA),
+              context.l10n.authFeatureLocalFirst,
+              const Color(0xFF2E90FA),
             ),
             (
               Icons.groups_rounded,
-              'Có thể được mời vào ví chia sẻ sau khi đăng ký',
-              Color(0xFF16B364),
+              context.l10n.authFeatureSharedWallets,
+              const Color(0xFF16B364),
             ),
           ]
-        : const [
+        : [
             (
               Icons.sync_rounded,
-              'Đồng bộ nền với Supabase trên nhiều thiết bị',
-              Color(0xFF7A5AF8),
+              context.l10n.authFeatureSync,
+              const Color(0xFF7A5AF8),
             ),
             (
               Icons.lock_rounded,
-              'Truy cập dữ liệu theo quyền của từng ví',
-              Color(0xFFE11976),
+              context.l10n.authFeatureAccessControl,
+              const Color(0xFFE11976),
             ),
           ];
 

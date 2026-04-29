@@ -16,16 +16,16 @@ class AppPreferencesState {
   });
 
   const AppPreferencesState.defaults()
-      : languageCode = 'vi',
-        darkModeEnabled = false,
-        notificationsEnabled = true,
-        appLockEnabled = false,
-        aiAssistantEnabled = false,
-        pinCode = null,
-        openAiApiKey = null,
-        profileName = 'Alex Tran',
-        profileEmail = 'alex@pocketledger.app',
-        avatarPath = null;
+    : languageCode = 'vi',
+      darkModeEnabled = false,
+      notificationsEnabled = true,
+      appLockEnabled = false,
+      aiAssistantEnabled = false,
+      pinCode = null,
+      openAiApiKey = null,
+      profileName = '',
+      profileEmail = '',
+      avatarPath = null;
 
   final String languageCode;
   final bool darkModeEnabled;
@@ -62,8 +62,9 @@ class AppPreferencesState {
       appLockEnabled: appLockEnabled ?? this.appLockEnabled,
       aiAssistantEnabled: aiAssistantEnabled ?? this.aiAssistantEnabled,
       pinCode: clearPin ? null : pinCode ?? this.pinCode,
-      openAiApiKey:
-          clearOpenAiApiKey ? null : openAiApiKey ?? this.openAiApiKey,
+      openAiApiKey: clearOpenAiApiKey
+          ? null
+          : openAiApiKey ?? this.openAiApiKey,
       profileName: profileName ?? this.profileName,
       profileEmail: profileEmail ?? this.profileEmail,
       avatarPath: clearAvatar ? null : avatarPath ?? this.avatarPath,

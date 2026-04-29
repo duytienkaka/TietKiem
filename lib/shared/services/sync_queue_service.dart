@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -27,11 +26,6 @@ class SyncQueueService {
     required String recordId,
     required Map<String, dynamic> payload,
   }) async {
-    developer.log(
-      'Enqueue upsert for $tableName/$recordId',
-      name: 'SyncQueueService',
-      error: payload,
-    );
     await _database.syncQueueDao.enqueue(
       SyncQueueItemsCompanion.insert(
         id: const Uuid().v4(),

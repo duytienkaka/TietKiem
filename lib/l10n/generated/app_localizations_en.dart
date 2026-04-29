@@ -462,7 +462,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tryAgain => 'Try again';
 
   @override
-  String get helloUser => 'Hello, Alex';
+  String get helloUser => 'Hello';
 
   @override
   String get profileTitle => 'Profile';
@@ -909,4 +909,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authGenericError => 'Authentication failed. Try again.';
+
+  @override
+  String get inviteUser => 'Invite user';
+
+  @override
+  String inviteUserTitle(String walletName) {
+    return 'Invite user to $walletName';
+  }
+
+  @override
+  String get inviteUserSubtitle =>
+      'Enter the email address of the person you want to invite to this wallet.';
+
+  @override
+  String invitationSent(String email) {
+    return 'Invitation sent to $email';
+  }
+
+  @override
+  String get authSignUpLead =>
+      'Create an account to sync your wallets across devices.';
+
+  @override
+  String get authSignInLead =>
+      'Sign in to continue with your wallets and transactions.';
+
+  @override
+  String get authToggleToSignIn => 'Already have an account? Sign in';
+
+  @override
+  String get authToggleToSignUp => 'Don\'t have an account? Sign up';
+
+  @override
+  String get authFooterSignUp =>
+      'After signing up, you can create your own wallet or join a shared wallet by invitation.';
+
+  @override
+  String get authFooterSignIn =>
+      'Local data appears instantly. Background sync keeps your wallets updated across devices.';
+
+  @override
+  String get authFeatureLocalFirst =>
+      'Saves locally first, so your data remains available offline.';
+
+  @override
+  String get authFeatureSharedWallets =>
+      'Shared wallets can be joined later by invitation.';
+
+  @override
+  String get authFeatureSync =>
+      'Syncs wallets and transactions across devices in the background.';
+
+  @override
+  String get authFeatureAccessControl =>
+      'Wallet access is protected by wallet member permissions.';
 }

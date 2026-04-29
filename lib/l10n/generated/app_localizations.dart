@@ -971,7 +971,7 @@ abstract class AppLocalizations {
   /// No description provided for @helloUser.
   ///
   /// In en, this message translates to:
-  /// **'Hello, Alex'**
+  /// **'Hello'**
   String get helloUser;
 
   /// No description provided for @profileTitle.
@@ -1831,6 +1831,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Authentication failed. Try again.'**
   String get authGenericError;
+
+  /// No description provided for @inviteUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite user'**
+  String get inviteUser;
+
+  /// No description provided for @inviteUserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite user to {walletName}'**
+  String inviteUserTitle(String walletName);
+
+  /// No description provided for @inviteUserSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email address of the person you want to invite to this wallet.'**
+  String get inviteUserSubtitle;
+
+  /// No description provided for @invitationSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent to {email}'**
+  String invitationSent(String email);
+
+  /// No description provided for @authSignUpLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to sync your wallets across devices.'**
+  String get authSignUpLead;
+
+  /// No description provided for @authSignInLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to continue with your wallets and transactions.'**
+  String get authSignInLead;
+
+  /// No description provided for @authToggleToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get authToggleToSignIn;
+
+  /// No description provided for @authToggleToSignUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Sign up'**
+  String get authToggleToSignUp;
+
+  /// No description provided for @authFooterSignUp.
+  ///
+  /// In en, this message translates to:
+  /// **'After signing up, you can create your own wallet or join a shared wallet by invitation.'**
+  String get authFooterSignUp;
+
+  /// No description provided for @authFooterSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data appears instantly. Background sync keeps your wallets updated across devices.'**
+  String get authFooterSignIn;
+
+  /// No description provided for @authFeatureLocalFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves locally first, so your data remains available offline.'**
+  String get authFeatureLocalFirst;
+
+  /// No description provided for @authFeatureSharedWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared wallets can be joined later by invitation.'**
+  String get authFeatureSharedWallets;
+
+  /// No description provided for @authFeatureSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncs wallets and transactions across devices in the background.'**
+  String get authFeatureSync;
+
+  /// No description provided for @authFeatureAccessControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet access is protected by wallet member permissions.'**
+  String get authFeatureAccessControl;
 }
 
 class _AppLocalizationsDelegate

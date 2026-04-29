@@ -106,7 +106,7 @@ class WalletScreen extends ConsumerWidget {
                                 icon: const Icon(
                                   Icons.person_add_alt_1_rounded,
                                 ),
-                                label: const Text('Invite user'),
+                                label: Text(context.l10n.inviteUser),
                               ),
                             ],
                           ),
@@ -174,12 +174,12 @@ class WalletScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Invite user to ${wallet.name}',
+                      context.l10n.inviteUserTitle(wallet.name),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Enter the email address of the user you want to share this wallet with.',
+                      context.l10n.inviteUserSubtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -189,9 +189,9 @@ class WalletScreen extends ConsumerWidget {
                       controller: controller,
                       keyboardType: TextInputType.emailAddress,
                       autofocus: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.emailAddress,
+                        prefixIcon: const Icon(Icons.email_outlined),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -222,7 +222,7 @@ class WalletScreen extends ConsumerWidget {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          'Invitation sent to $email',
+                                          context.l10n.invitationSent(email),
                                         ),
                                       ),
                                     );
@@ -230,7 +230,11 @@ class WalletScreen extends ConsumerWidget {
                                 } catch (error) {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(error.toString())),
+                                      SnackBar(
+                                        content: Text(
+                                          localizeError(context, error),
+                                        ),
+                                      ),
                                     );
                                   }
                                 } finally {
@@ -248,7 +252,7 @@ class WalletScreen extends ConsumerWidget {
                                 ),
                               )
                             : const Icon(Icons.send_rounded),
-                        label: const Text('Invite'),
+                        label: Text(context.l10n.inviteUser),
                       ),
                     ),
                   ],

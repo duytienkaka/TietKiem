@@ -78,7 +78,11 @@ class ProfileHeader extends StatelessWidget {
                   onTap: onAvatarTap,
                   child: const Padding(
                     padding: EdgeInsets.all(10),
-                    child: Icon(Icons.camera_alt_rounded, size: 18, color: Colors.white),
+                    child: Icon(
+                      Icons.camera_alt_rounded,
+                      size: 18,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -89,7 +93,9 @@ class ProfileHeader extends StatelessWidget {
         Text(
           name,
           textAlign: TextAlign.center,
-          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
         ),
         if (email.trim().isNotEmpty) ...[
           const SizedBox(height: 6),
@@ -106,13 +112,18 @@ class ProfileHeader extends StatelessWidget {
   }
 
   String _initials(String value) {
-    final words = value.trim().split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
+    final words = value
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
     if (words.isEmpty) {
-      return 'PL';
+      return 'TK';
     }
     if (words.length == 1) {
       return words.first.substring(0, 1).toUpperCase();
     }
-    return '${words.first.substring(0, 1)}${words.last.substring(0, 1)}'.toUpperCase();
+    return '${words.first.substring(0, 1)}${words.last.substring(0, 1)}'
+        .toUpperCase();
   }
 }

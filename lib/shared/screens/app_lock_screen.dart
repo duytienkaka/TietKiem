@@ -28,7 +28,9 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
   Widget build(BuildContext context) {
     final preferences = ref.watch(appPreferencesProvider).valueOrNull;
     final scheme = Theme.of(context).colorScheme;
-    final name = preferences?.profileName ?? 'Alex Tran';
+    final name = (preferences?.profileName.trim().isNotEmpty ?? false)
+        ? preferences!.profileName.trim()
+        : context.l10n.appTitle;
 
     return ColoredBox(
       color: Colors.black.withValues(alpha: 0.38),
@@ -45,7 +47,11 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFFE11976), Color(0xFF7B3FF2), Color(0xFF151B36)],
+                      colors: [
+                        Color(0xFFE11976),
+                        Color(0xFF7B3FF2),
+                        Color(0xFF151B36),
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
@@ -74,7 +80,8 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
                           alignment: Alignment.center,
                           child: Text(
                             _initials(name),
-                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -83,7 +90,8 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
                         const SizedBox(height: 18),
                         Text(
                           context.l10n.unlockApp,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -93,7 +101,8 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
                         Text(
                           context.l10n.enterPinContinue,
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
                                 color: Colors.white.withValues(alpha: 0.82),
                               ),
                         ),
@@ -108,7 +117,8 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
                                 color: scheme.onSurface,
                                 letterSpacing: 10,
                               ),
@@ -118,8 +128,10 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
                             fillColor: Colors.white,
                             hintText: '• • • •',
                             errorText: _errorText,
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 16,
+                            ),
                           ),
                           onChanged: (value) {
                             if (_errorText != null) {
@@ -161,13 +173,17 @@ class _AppLockScreenState extends ConsumerState<AppLockScreen> {
   }
 
   String _initials(String value) {
-    final words = value.split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
+    final words = value
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
     if (words.isEmpty) {
-      return 'PL';
+      return 'TK';
     }
     if (words.length == 1) {
       return words.first.substring(0, 1).toUpperCase();
     }
-    return '${words.first.substring(0, 1)}${words.last.substring(0, 1)}'.toUpperCase();
+    return '${words.first.substring(0, 1)}${words.last.substring(0, 1)}'
+        .toUpperCase();
   }
 }
