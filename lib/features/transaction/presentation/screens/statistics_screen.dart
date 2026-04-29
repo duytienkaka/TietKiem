@@ -1,13 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/finance_enums.dart';
-import '../../../../shared/utils/currency_input_formatter.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -17,8 +15,6 @@ import '../../../../shared/widgets/skeleton_box.dart';
 import '../../../../shared/widgets/state_transition_switcher.dart';
 import '../../../ai/domain/entities/monthly_spending_summary.dart';
 import '../../../ai/presentation/providers/finance_ai_provider.dart';
-import '../../../budget/domain/entities/budget.dart';
-import '../../../budget/presentation/providers/budget_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../../category/presentation/providers/category_provider.dart';
 import '../../../wallet/presentation/providers/wallet_provider.dart';
@@ -53,32 +49,30 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     final transactionsAsync = ref.watch(transactionProvider);
     final categoriesAsync = ref.watch(categoryProvider);
     final walletsAsync = ref.watch(walletProvider);
-    final budgetsAsync = ref.watch(budgetProvider);
 
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        child: AsyncValueView(
-          value: transactionsAsync,
-          loadingBuilder: (_) => const _StatisticsLoadingState(),
-          data: (transactions) => AsyncValueView(
-            value: categoriesAsync,
+          child: AsyncValueView(
+            value: transactionsAsync,
             loadingBuilder: (_) => const _StatisticsLoadingState(),
-            data: (categories) => AsyncValueView(
-              value: walletsAsync,
+            data: (transactions) => AsyncValueView(
+              value: categoriesAsync,
               loadingBuilder: (_) => const _StatisticsLoadingState(),
-              data: (wallets) => AsyncValueView(
-                value: budgetsAsync,
+              data: (categories) => AsyncValueView(
+                value: walletsAsync,
                 loadingBuilder: (_) => const _StatisticsLoadingState(),
-                data: (budgets) {
-                  final monthKeys = transactions
-                      .map((item) => _monthKey(item.createdAt))
-                      .toSet()
-                      .toList()
-                    ..sort((a, b) => b.compareTo(a));
-                  _selectedMonthKey ??=
-                      monthKeys.isNotEmpty ? monthKeys.first : null;
+                data: (wallets) {
+                  final monthKeys =
+                      transactions
+                          .map((item) => _monthKey(item.createdAt))
+                          .toSet()
+                          .toList()
+                        ..sort((a, b) => b.compareTo(a));
+                  _selectedMonthKey ??= monthKeys.isNotEmpty
+                      ? monthKeys.first
+                      : null;
                   final activeMonthKey =
                       _selectedMonthKey ?? _monthKey(DateTime.now());
 
@@ -111,9 +105,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
                   final sections = expenseByCategory.entries.toList();
                   final balanceDelta = totalIncome - totalExpense;
-                  final switcherKey = ValueKey(_selectedMonthKey ?? 'all-months');
-                  final drilldownTransactions =
-                      scopedTransactions.take(5).toList();
+                  final switcherKey = ValueKey(
+                    _selectedMonthKey ?? 'all-months',
+                  );
+                  final drilldownTransactions = scopedTransactions
+                      .take(5)
+                      .toList();
                   final selectedDate = _selectedMonthKey == null
                       ? null
                       : DateTime.parse('${_selectedMonthKey!}-01');
@@ -125,22 +122,22 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   final previousTransactions = previousKey == null
                       ? <FinanceTransaction>[]
                       : transactions
-                          .where((item) => _monthKey(item.createdAt) == previousKey)
-                          .toList();
+                            .where(
+                              (item) =>
+                                  _monthKey(item.createdAt) == previousKey,
+                            )
+                            .toList();
                   final previousExpense = previousTransactions
                       .where((item) => item.type == TransactionType.expense)
                       .fold<double>(0, (sum, item) => sum + item.amount);
                   final topCategoryEntry = expenseByCategory.entries
                       .fold<MapEntry<String, double>?>(
-                    null,
-                    (current, entry) =>
-                        current == null || entry.value > current.value
+                        null,
+                        (current, entry) =>
+                            current == null || entry.value > current.value
                             ? entry
                             : current,
-                  );
-                  final budgetsForMonth = budgets
-                      .where((budget) => budget.monthKey == activeMonthKey)
-                      .toList();
+                      );
 
                   return ListView(
                     padding: const EdgeInsets.only(bottom: 120),
@@ -158,7 +155,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: monthKeys.length,
-                            separatorBuilder: (_, _) => const SizedBox(width: 8),
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(width: 8),
                             itemBuilder: (context, index) {
                               final key = monthKeys[index];
                               final date = DateTime.parse('$key-01');
@@ -176,14 +174,14 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                     vertical: 10,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: selected ? AppTheme.primary : Colors.white,
+                                    color: selected
+                                        ? AppTheme.primary
+                                        : Colors.white,
                                     borderRadius: BorderRadius.circular(999),
                                   ),
                                   child: Text(
                                     formatMonthYear(context, date),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
+                                    style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
                                           color: selected
                                               ? Colors.white
@@ -215,14 +213,18 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                       value: topCategoryEntry == null
                                           ? context.l10n.noDataToChart
                                           : categories
-                                                  .where((category) =>
-                                                      category.id ==
-                                                      topCategoryEntry.key)
-                                                  .firstOrNull
-                                                  ?.displayName(context) ??
-                                              context.l10n.unknown,
+                                                    .where(
+                                                      (category) =>
+                                                          category.id ==
+                                                          topCategoryEntry.key,
+                                                    )
+                                                    .firstOrNull
+                                                    ?.displayName(context) ??
+                                                context.l10n.unknown,
                                       subtitle: topCategoryEntry == null
-                                          ? context.l10n.addIncomeExpenseToReports
+                                          ? context
+                                                .l10n
+                                                .addIncomeExpenseToReports
                                           : formatCurrency(
                                               context,
                                               topCategoryEntry.value,
@@ -283,7 +285,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                           child: _MetricCard(
                                             title: context.l10n.income,
                                             value: formatCurrency(
-                                                context, totalIncome),
+                                              context,
+                                              totalIncome,
+                                            ),
                                             color: AppTheme.income,
                                           ),
                                         ),
@@ -292,7 +296,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                           child: _MetricCard(
                                             title: context.l10n.expense,
                                             value: formatCurrency(
-                                                context, totalExpense),
+                                              context,
+                                              totalExpense,
+                                            ),
                                             color: AppTheme.expense,
                                           ),
                                         ),
@@ -301,7 +307,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                           child: _MetricCard(
                                             title: context.l10n.net,
                                             value: formatCurrency(
-                                                context, balanceDelta),
+                                              context,
+                                              balanceDelta,
+                                            ),
                                             color: balanceDelta >= 0
                                                 ? AppTheme.transfer
                                                 : AppTheme.expense,
@@ -317,9 +325,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                         children: [
                                           Text(
                                             context.l10n.expenseBreakdown,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge,
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge,
                                           ),
                                           const SizedBox(height: 18),
                                           SizedBox(
@@ -329,29 +337,40 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                                 PieChartData(
                                                   sectionsSpace: 4,
                                                   centerSpaceRadius: 56,
-                                                  pieTouchData:
-                                                      PieTouchData(enabled: true),
+                                                  pieTouchData: PieTouchData(
+                                                    enabled: true,
+                                                  ),
                                                   sections: [
-                                                    for (var i = 0;
-                                                        i < sections.length;
-                                                        i++)
+                                                    for (
+                                                      var i = 0;
+                                                      i < sections.length;
+                                                      i++
+                                                    )
                                                       PieChartSectionData(
-                                                        value: sections[i].value,
+                                                        value:
+                                                            sections[i].value,
                                                         title:
                                                             '${((sections[i].value / totalExpense) * 100).round()}%',
                                                         radius: 92,
-                                                        color: _chartColors[
-                                                            i % _chartColors.length],
-                                                        titleStyle: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight: FontWeight.w800,
-                                                          fontSize: 12,
-                                                        ),
+                                                        color:
+                                                            _chartColors[i %
+                                                                _chartColors
+                                                                    .length],
+                                                        titleStyle:
+                                                            const TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w800,
+                                                              fontSize: 12,
+                                                            ),
                                                       ),
                                                   ],
                                                 ),
-                                                duration:
-                                                    const Duration(milliseconds: 280),
+                                                duration: const Duration(
+                                                  milliseconds: 280,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -360,12 +379,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                             spacing: 10,
                                             runSpacing: 10,
                                             children: [
-                                              for (var i = 0;
-                                                  i < sections.length;
-                                                  i++)
+                                              for (
+                                                var i = 0;
+                                                i < sections.length;
+                                                i++
+                                              )
                                                 _LegendChip(
-                                                  color: _chartColors[
-                                                      i % _chartColors.length],
+                                                  color:
+                                                      _chartColors[i %
+                                                          _chartColors.length],
                                                   label: categories
                                                       .firstWhere(
                                                         (category) =>
@@ -389,9 +411,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                         children: [
                                           Text(
                                             context.l10n.incomeVsExpense,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge,
+                                            style: Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge,
                                           ),
                                           const SizedBox(height: 18),
                                           SizedBox(
@@ -399,9 +421,11 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                             child: RepaintBoundary(
                                               child: BarChart(
                                                 BarChartData(
-                                                  alignment:
-                                                      BarChartAlignment.spaceAround,
-                                                  maxY: (totalIncome > totalExpense
+                                                  alignment: BarChartAlignment
+                                                      .spaceAround,
+                                                  maxY:
+                                                      (totalIncome >
+                                                              totalExpense
                                                           ? totalIncome
                                                           : totalExpense) *
                                                       1.2,
@@ -410,38 +434,57 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                                     drawVerticalLine: false,
                                                     horizontalInterval:
                                                         ((totalIncome > totalExpense
-                                                                            ? totalIncome
-                                                                            : totalExpense) /
-                                                                        4)
-                                                            .clamp(1, double.infinity)
+                                                                    ? totalIncome
+                                                                    : totalExpense) /
+                                                                4)
+                                                            .clamp(
+                                                              1,
+                                                              double.infinity,
+                                                            )
                                                             .toDouble(),
                                                   ),
-                                                  borderData:
-                                                      FlBorderData(show: false),
+                                                  borderData: FlBorderData(
+                                                    show: false,
+                                                  ),
                                                   titlesData: FlTitlesData(
                                                     topTitles: const AxisTitles(
                                                       sideTitles: SideTitles(
-                                                          showTitles: false),
+                                                        showTitles: false,
+                                                      ),
                                                     ),
-                                                    rightTitles: const AxisTitles(
-                                                      sideTitles: SideTitles(
-                                                          showTitles: false),
-                                                    ),
-                                                    leftTitles: const AxisTitles(
-                                                      sideTitles: SideTitles(
-                                                          showTitles: false),
-                                                    ),
+                                                    rightTitles:
+                                                        const AxisTitles(
+                                                          sideTitles:
+                                                              SideTitles(
+                                                                showTitles:
+                                                                    false,
+                                                              ),
+                                                        ),
+                                                    leftTitles:
+                                                        const AxisTitles(
+                                                          sideTitles:
+                                                              SideTitles(
+                                                                showTitles:
+                                                                    false,
+                                                              ),
+                                                        ),
                                                     bottomTitles: AxisTitles(
                                                       sideTitles: SideTitles(
                                                         showTitles: true,
                                                         getTitlesWidget: (value, meta) {
                                                           return Padding(
                                                             padding:
-                                                                const EdgeInsets.only(top: 8),
+                                                                const EdgeInsets.only(
+                                                                  top: 8,
+                                                                ),
                                                             child: Text(
                                                               value == 0
-                                                                  ? context.l10n.income
-                                                                  : context.l10n.expense,
+                                                                  ? context
+                                                                        .l10n
+                                                                        .income
+                                                                  : context
+                                                                        .l10n
+                                                                        .expense,
                                                             ),
                                                           );
                                                         },
@@ -454,10 +497,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                                       barRods: [
                                                         BarChartRodData(
                                                           toY: totalIncome,
-                                                          color: AppTheme.income,
+                                                          color:
+                                                              AppTheme.income,
                                                           width: 30,
                                                           borderRadius:
-                                                              BorderRadius.circular(12),
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
                                                         ),
                                                       ],
                                                     ),
@@ -466,17 +512,21 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                                       barRods: [
                                                         BarChartRodData(
                                                           toY: totalExpense,
-                                                          color: AppTheme.expense,
+                                                          color:
+                                                              AppTheme.expense,
                                                           width: 30,
                                                           borderRadius:
-                                                              BorderRadius.circular(12),
+                                                              BorderRadius.circular(
+                                                                12,
+                                                              ),
                                                         ),
                                                       ],
                                                     ),
                                                   ],
                                                 ),
-                                                duration:
-                                                    const Duration(milliseconds: 280),
+                                                duration: const Duration(
+                                                  milliseconds: 280,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -497,114 +547,66 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         onAction: reportTransactions.isEmpty
                             ? null
                             : () => _generateMonthlySummary(
-                                  context,
-                                  activeMonthKey: activeMonthKey,
-                                  month: selectedDate ?? DateTime.now(),
-                                  transactions: reportTransactions,
-                                  categories: categories,
-                                ),
+                                context,
+                                activeMonthKey: activeMonthKey,
+                                month: selectedDate ?? DateTime.now(),
+                                transactions: reportTransactions,
+                                categories: categories,
+                              ),
                       ),
                       const SizedBox(height: 12),
                       AppCard(
-                        child: _summaryLoading && _summaryMonthKey == activeMonthKey
+                        child:
+                            _summaryLoading &&
+                                _summaryMonthKey == activeMonthKey
                             ? const _AiSummaryLoading()
                             : _monthlySummary != null &&
-                                    _summaryMonthKey == activeMonthKey
-                                ? _AiSummaryCard(summary: _monthlySummary!)
-                                : Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        reportTransactions.isEmpty
-                                            ? context.l10n.noDataToChart
-                                            : context.l10n.generateSummary,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        reportTransactions.isEmpty
-                                            ? context.l10n.addIncomeExpenseToReports
-                                            : context.l10n.aiSummarySubtitle,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                            ),
-                                      ),
-                                      if (reportTransactions.isNotEmpty) ...[
-                                        const SizedBox(height: 14),
-                                        FilledButton.icon(
-                                          onPressed: () => _generateMonthlySummary(
-                                            context,
-                                            activeMonthKey: activeMonthKey,
-                                            month: selectedDate ?? DateTime.now(),
-                                            transactions: reportTransactions,
-                                            categories: categories,
-                                          ),
-                                          icon: const Icon(Icons.auto_awesome_rounded),
-                                          label: Text(context.l10n.generateSummary),
-                                        ),
-                                      ],
-                                    ],
+                                  _summaryMonthKey == activeMonthKey
+                            ? _AiSummaryCard(summary: _monthlySummary!)
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    reportTransactions.isEmpty
+                                        ? context.l10n.noDataToChart
+                                        : context.l10n.generateSummary,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
-                      ),
-                      const SizedBox(height: 16),
-                      SectionHeader(
-                        title: context.l10n.budgetsTitle,
-                        subtitle: context.l10n.budgetsSubtitle,
-                        actionLabel: context.l10n.setBudget,
-                        onAction: () => _showBudgetEditor(
-                          context,
-                          categories: categories,
-                          budgets: budgetsForMonth,
-                          monthKey: activeMonthKey,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (budgetsForMonth.isEmpty)
-                        EmptyState(
-                          title: context.l10n.noBudgetsYet,
-                          message: context.l10n.createBudgetHint,
-                          icon: Icons.savings_outlined,
-                          actionLabel: context.l10n.setBudget,
-                          onAction: () => _showBudgetEditor(
-                            context,
-                            categories: categories,
-                            budgets: budgetsForMonth,
-                            monthKey: activeMonthKey,
-                          ),
-                        )
-                      else
-                        Column(
-                          children: [
-                            for (final budget in budgetsForMonth) ...[
-                              _BudgetProgressCard(
-                                budget: budget,
-                                spent:
-                                    expenseByCategory[budget.categoryId] ?? 0,
-                                category: categories
-                                        .where(
-                                          (item) => item.id == budget.categoryId,
-                                        )
-                                        .firstOrNull ??
-                                    categories.first,
-                                onEdit: () => _showBudgetEditor(
-                                  context,
-                                  categories: categories,
-                                  budgets: budgetsForMonth,
-                                  monthKey: activeMonthKey,
-                                  initialCategoryId: budget.categoryId,
-                                ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    reportTransactions.isEmpty
+                                        ? context.l10n.addIncomeExpenseToReports
+                                        : context.l10n.aiSummarySubtitle,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
+                                  ),
+                                  if (reportTransactions.isNotEmpty) ...[
+                                    const SizedBox(height: 14),
+                                    FilledButton.icon(
+                                      onPressed: () => _generateMonthlySummary(
+                                        context,
+                                        activeMonthKey: activeMonthKey,
+                                        month: selectedDate ?? DateTime.now(),
+                                        transactions: reportTransactions,
+                                        categories: categories,
+                                      ),
+                                      icon: const Icon(
+                                        Icons.auto_awesome_rounded,
+                                      ),
+                                      label: Text(context.l10n.generateSummary),
+                                    ),
+                                  ],
+                                ],
                               ),
-                              const SizedBox(height: 10),
-                            ],
-                          ],
-                        ),
+                      ),
                       if (drilldownTransactions.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         SectionHeader(
@@ -616,26 +618,32 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         const SizedBox(height: 12),
                         Column(
                           children: [
-                            for (var index = 0;
-                                index < drilldownTransactions.length;
-                                index++) ...[
+                            for (
+                              var index = 0;
+                              index < drilldownTransactions.length;
+                              index++
+                            ) ...[
                               Builder(
                                 builder: (context) {
-                                  final transaction = drilldownTransactions[index];
+                                  final transaction =
+                                      drilldownTransactions[index];
                                   final wallet = wallets
                                       .where(
-                                        (item) => item.id == transaction.walletId,
+                                        (item) =>
+                                            item.id == transaction.walletId,
                                       )
                                       .firstOrNull;
                                   final targetWallet = wallets
                                       .where(
                                         (item) =>
-                                            item.id == transaction.targetWalletId,
+                                            item.id ==
+                                            transaction.targetWalletId,
                                       )
                                       .firstOrNull;
                                   final category = categories
                                       .where(
-                                        (item) => item.id == transaction.categoryId,
+                                        (item) =>
+                                            item.id == transaction.categoryId,
                                       )
                                       .firstOrNull;
 
@@ -668,7 +676,6 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           ),
         ),
       ),
-      ),
     );
   }
 
@@ -690,8 +697,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     final direction = delta > 0
         ? context.l10n.increase
         : delta < 0
-            ? context.l10n.decrease
-            : context.l10n.same;
+        ? context.l10n.decrease
+        : context.l10n.same;
     final percent = delta.abs().toStringAsFixed(0);
     return '$direction $percent%';
   }
@@ -710,7 +717,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     });
 
     try {
-      final summary = await ref.read(financeAiServiceProvider).summarizeMonth(
+      final summary = await ref
+          .read(financeAiServiceProvider)
+          .summarizeMonth(
             transactions: transactions,
             categories: categories,
             month: month,
@@ -726,184 +735,14 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(this.context).showSnackBar(
-        SnackBar(content: Text(this.context.l10n.tryAgain)),
-      );
+      ScaffoldMessenger.of(
+        this.context,
+      ).showSnackBar(SnackBar(content: Text(this.context.l10n.tryAgain)));
     } finally {
       if (mounted) {
         setState(() => _summaryLoading = false);
       }
     }
-  }
-
-  Future<void> _showBudgetEditor(
-    BuildContext context, {
-    required List<Category> categories,
-    required List<Budget> budgets,
-    required String? monthKey,
-    String? initialCategoryId,
-  }) async {
-    final scopedMonthKey = monthKey ?? _monthKey(DateTime.now());
-    final expenseCategories = categories
-        .where((category) =>
-            category.type == TransactionType.expense &&
-            category.id != 'transfer')
-        .toList();
-    if (expenseCategories.isEmpty) {
-      return;
-    }
-
-    final controller = TextEditingController();
-    final amountFocusNode = FocusNode();
-    var selectedCategoryId = initialCategoryId ?? expenseCategories.first.id;
-    final existingBudget = budgets
-        .where((budget) =>
-            budget.categoryId == selectedCategoryId &&
-            budget.monthKey == scopedMonthKey)
-        .firstOrNull;
-    if (existingBudget != null) {
-      applyCurrencyEditingValue(
-        controller,
-        existingBudget.amount.round(),
-      );
-    }
-
-    await showModalBottomSheet<void>(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      isDismissible: true,
-      enableDrag: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        final mediaQuery = MediaQuery.of(context);
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              12,
-              16,
-              16 + mediaQuery.viewInsets.bottom,
-            ),
-            child: StatefulBuilder(
-              builder: (context, setModalState) {
-                final budgetForCategory = budgets
-                    .where((budget) =>
-                        budget.categoryId == selectedCategoryId &&
-                        budget.monthKey == scopedMonthKey)
-                    .firstOrNull;
-                return AppCard(
-                  padding: const EdgeInsets.all(16),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.l10n.setBudget,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          initialValue: selectedCategoryId,
-                          decoration: InputDecoration(
-                            labelText: context.l10n.category,
-                            prefixIcon: const Icon(Icons.category_rounded),
-                          ),
-                          items: expenseCategories
-                              .map(
-                                (category) => DropdownMenuItem(
-                                  value: category.id,
-                                  child: Text(category.displayName(context)),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) {
-                            if (value == null) {
-                              return;
-                            }
-                            setModalState(() {
-                              selectedCategoryId = value;
-                              final nextBudget = budgets
-                                  .where((budget) =>
-                                      budget.categoryId == value &&
-                                      budget.monthKey == scopedMonthKey)
-                                  .firstOrNull;
-                              if (nextBudget == null) {
-                                amountFocusNode.unfocus();
-                                controller.clear();
-                              } else {
-                                amountFocusNode.unfocus();
-                                applyCurrencyEditingValue(
-                                  controller,
-                                  nextBudget.amount.round(),
-                                );
-                              }
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: controller,
-                          focusNode: amountFocusNode,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            VietnameseCurrencyInputFormatter(),
-                          ],
-                          decoration: InputDecoration(
-                            labelText: context.l10n.budgetAmount,
-                            hintText: context.l10n.monthlyBudgetHint,
-                            prefixIcon: const Icon(Icons.payments_rounded),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            if (budgetForCategory != null)
-                              TextButton(
-                                onPressed: () {
-                                  FocusScope.of(context).unfocus();
-                                  ref.read(budgetProvider.notifier).saveBudget(
-                                        categoryId: selectedCategoryId,
-                                        monthKey: scopedMonthKey,
-                                        amount: 0,
-                                      );
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(context.l10n.remove),
-                              ),
-                            const Spacer(),
-                            ElevatedButton(
-                              onPressed: () {
-                                FocusScope.of(context).unfocus();
-                                final amount =
-                                    parseVietnameseCurrency(controller.text).toDouble();
-                                ref.read(budgetProvider.notifier).saveBudget(
-                                      categoryId: selectedCategoryId,
-                                      monthKey: scopedMonthKey,
-                                      amount: amount,
-                                    );
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(context.l10n.saveChanges),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-    amountFocusNode.dispose();
-    controller.dispose();
   }
 }
 
@@ -1003,9 +842,9 @@ class _AiSummaryCard extends StatelessWidget {
                     ? context.l10n.aiPowered
                     : context.l10n.localFallback,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: scheme.onPrimaryContainer,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  color: scheme.onPrimaryContainer,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
@@ -1014,9 +853,9 @@ class _AiSummaryCard extends StatelessWidget {
         Text(
           summary.summary,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: scheme.onSurfaceVariant,
-                height: 1.45,
-              ),
+            color: scheme.onSurfaceVariant,
+            height: 1.45,
+          ),
         ),
         if (summary.bullets.isNotEmpty) ...[
           const SizedBox(height: 14),
@@ -1130,9 +969,9 @@ class _MetricCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             value,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
         ],
       ),
@@ -1196,109 +1035,22 @@ class _InsightTile extends StatelessWidget {
           Text(
             title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
             value,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 4),
           Text(
             subtitle,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BudgetProgressCard extends StatelessWidget {
-  const _BudgetProgressCard({
-    required this.budget,
-    required this.spent,
-    required this.category,
-    required this.onEdit,
-  });
-
-  final Budget budget;
-  final double spent;
-  final Category category;
-  final VoidCallback onEdit;
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = budget.amount <= 0 ? 0 : (spent / budget.amount);
-    final clamped = progress.clamp(0, 1).toDouble();
-    final exceeded = spent > budget.amount;
-    final remaining = budget.amount - spent;
-
-    return AppCard(
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  category.displayName(context),
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ),
-              TextButton(
-                onPressed: onEdit,
-                child: Text(context.l10n.edit),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Text(
-                '${context.l10n.spentLabel}: ${formatCurrency(context, spent)}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              const Spacer(),
-              Text(
-                '${context.l10n.budgetAmount}: ${formatCurrency(context, budget.amount)}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: clamped,
-              minHeight: 8,
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                exceeded ? const Color(0xFFF04438) : const Color(0xFF2E90FA),
-              ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            exceeded
-                ? context.l10n.budgetExceeded
-                : '${context.l10n.remainingLabel}: ${formatCurrency(context, remaining)}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: exceeded
-                      ? const Color(0xFFF04438)
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
           ),
         ],
       ),

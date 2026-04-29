@@ -5,12 +5,16 @@ class WalletDao extends DatabaseAccessor<AppDatabase> with _$WalletDaoMixin {
   WalletDao(super.db);
 
   Stream<List<Wallet>> watchWallets() {
-    return (select(wallets)..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+    return (select(wallets)
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
         .watch();
   }
 
   Future<List<Wallet>> getWallets() {
-    return (select(wallets)..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+    return (select(wallets)
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
         .get();
   }
 

@@ -520,7 +520,7 @@ Write a short headline, one summary paragraph, and up to 3 action bullets.
         continue;
       }
 
-      final keywords = keywordMap[category.id] ?? const <String>[];
+      final keywords = keywordMap[category.name] ?? const <String>[];
       if (keywords.any(input.contains)) {
         return category.id;
       }

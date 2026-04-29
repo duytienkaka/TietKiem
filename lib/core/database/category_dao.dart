@@ -5,12 +5,23 @@ class CategoryDao extends DatabaseAccessor<AppDatabase> with _$CategoryDaoMixin 
   CategoryDao(super.db);
 
   Stream<List<Category>> watchCategories() {
-    return (select(categories)..orderBy([(t) => OrderingTerm.asc(t.name)]))
+    return (select(categories)
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .watch();
   }
 
   Future<List<Category>> getCategories() {
-    return (select(categories)..orderBy([(t) => OrderingTerm.asc(t.name)]))
+    return (select(categories)
+          ..where((t) => t.deletedAt.isNull())
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+        .get();
+  }
+
+  Future<List<Category>> getCategoriesForScope(String scopeId) {
+    return (select(categories)
+          ..where((t) => t.workspaceId.equals(scopeId) & t.deletedAt.isNull())
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .get();
   }
 

@@ -675,7 +675,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get unlockApp => 'Unlock app';
 
   @override
-  String get enterPinContinue => 'Enter your PIN to continue to PocketLedger.';
+  String get enterPinContinue => 'Nhập PIN để tiếp tục vào Tiết Kiệm.';
 
   @override
   String get unlock => 'Unlock';
@@ -842,4 +842,73 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get localFallback => 'Fallback local';
+
+  @override
+  String get authHeroTitle => 'Đăng nhập để đồng bộ dữ liệu tài chính';
+
+  @override
+  String get authHeroSubtitle =>
+      'Đăng nhập bằng email Supabase trước, sau đó tạo ví mới hoặc tham gia ví được mời để bắt đầu đồng bộ.';
+
+  @override
+  String get signInTitle => 'Đăng nhập';
+
+  @override
+  String get signUpTitle => 'Đăng ký';
+
+  @override
+  String get signInSubtitle => 'Tiếp tục với tài khoản hiện có';
+
+  @override
+  String get signUpSubtitle =>
+      'Tạo tài khoản mới để truy cập các ví dùng chung';
+
+  @override
+  String get emailAddress => 'Địa chỉ email';
+
+  @override
+  String get password => 'Mật khẩu';
+
+  @override
+  String get emailRequired => 'Vui lòng nhập email.';
+
+  @override
+  String get emailInvalid => 'Email không hợp lệ.';
+
+  @override
+  String get passwordRequired => 'Vui lòng nhập mật khẩu.';
+
+  @override
+  String get passwordMinLength => 'Mật khẩu phải có ít nhất 6 ký tự.';
+
+  @override
+  String get signInAction => 'Đăng nhập';
+
+  @override
+  String get signUpAction => 'Tạo tài khoản';
+
+  @override
+  String get signOutAction => 'Đăng xuất';
+
+  @override
+  String get signUpSuccess =>
+      'Tạo tài khoản thành công. Hãy đăng nhập để tiếp tục.';
+
+  @override
+  String get signedOut => 'Đã đăng xuất';
+
+  @override
+  String get authInvalidCredentials => 'Sai email hoặc mật khẩu.';
+
+  @override
+  String get authEmailNotConfirmed => 'Hãy xác nhận email trước khi đăng nhập.';
+
+  @override
+  String get authUserExists => 'Email này đã được đăng ký.';
+
+  @override
+  String get authNetworkError => 'Lỗi mạng. Hãy kiểm tra kết nối rồi thử lại.';
+
+  @override
+  String get authGenericError => 'Đăng nhập thất bại. Hãy thử lại.';
 }

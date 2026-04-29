@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/finance_enums.dart';
-import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_icon.dart';
 import '../../../../shared/widgets/async_value_view.dart';
@@ -147,14 +145,13 @@ class TransactionDetailScreen extends ConsumerWidget {
                                     padding: const EdgeInsets.only(top: 16),
                                     child: _StatusControlCard(
                                       transaction: transaction,
-                                      onConfirm:
-                                          transaction.status == TransactionStatus.verified
-                                              ? null
-                                              : () => _confirmTransaction(
-                                                  context,
-                                                  ref,
-                                                  transaction,
-                                                ),
+                                      onConfirm: transaction.status == TransactionStatus.verified
+                                          ? null
+                                          : () => _confirmTransaction(
+                                                context,
+                                                ref,
+                                                transaction,
+                                              ),
                                     ),
                                   ),
                                   if ((transaction.note ?? '').trim().isNotEmpty)
@@ -204,15 +201,6 @@ class TransactionDetailScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    _DetailActionBar(
-                      onEdit: () => context.pushNamed(
-                        'editTransaction',
-                        pathParameters: {'id': transaction.id},
-                      ),
-                      onConfirm: transaction.status == TransactionStatus.verified
-                          ? null
-                          : () => _confirmTransaction(context, ref, transaction),
-                    ),
                   ],
                 ),
               );
@@ -228,22 +216,22 @@ class TransactionDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     FinanceTransaction transaction,
   ) async {
-    await ref.read(transactionProvider.notifier).saveTransaction(
-          id: transaction.id,
-          type: transaction.type,
-          amount: transaction.amount,
-          walletId: transaction.walletId,
-          targetWalletId: transaction.targetWalletId,
-          categoryId: transaction.categoryId,
-          note: transaction.note,
-          imagePath: transaction.imagePath,
-          status: TransactionStatus.verified,
-          createdAt: transaction.createdAt,
+    try {
+      await ref.read(transactionProvider.notifier).updateTransactionStatus(
+            transaction.id,
+            TransactionStatus.verified,
+          );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.transactionConfirmed)),
         );
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.transactionConfirmed)),
-      );
+      }
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(localizeError(context, error))),
+        );
+      }
     }
   }
 
@@ -404,11 +392,11 @@ class _StatusControlCard extends StatelessWidget {
         children: [
           _TransactionStatusBadge(status: transaction.status),
           if (onConfirm != null) ...[
-            const SizedBox(height: 14),
-            AppButton(
-              label: context.l10n.confirmTransaction,
-              icon: Icons.verified_rounded,
+            const SizedBox(height: 12),
+            FilledButton.icon(
               onPressed: onConfirm,
+              icon: const Icon(Icons.verified_rounded),
+              label: Text(context.l10n.confirmTransaction),
             ),
           ],
         ],
@@ -508,56 +496,6 @@ class _TransactionStatusBadge extends StatelessWidget {
       tag: heroTag!,
       transitionOnUserGestures: true,
       child: Material(color: Colors.transparent, child: badge),
-    );
-  }
-}
-
-class _DetailActionBar extends StatelessWidget {
-  const _DetailActionBar({
-    required this.onEdit,
-    required this.onConfirm,
-  });
-
-  final VoidCallback onEdit;
-  final VoidCallback? onConfirm;
-
-  @override
-  Widget build(BuildContext context) {
-    final safeBottom = MediaQuery.of(context).viewPadding.bottom;
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + safeBottom),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, -8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: onEdit,
-              icon: const Icon(Icons.edit_rounded),
-              label: Text(context.l10n.edit),
-            ),
-          ),
-          if (onConfirm != null) ...[
-            const SizedBox(width: 12),
-            Expanded(
-              child: AppButton(
-                label: context.l10n.confirmTransaction,
-                icon: Icons.verified_rounded,
-                onPressed: onConfirm,
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }

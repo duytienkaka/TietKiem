@@ -297,4 +297,46 @@
 "generateSummary": "T\u1ea1o t\u00f3m t\u1eaft",
 "aiPowered": "AI h\u1ed7 tr\u1ee3",
 "localFallback": "Fallback local"
+  ,
+  "workspaceTitle": "Không gian làm việc",
+  "workspaces": "Không gian",
+  "workspaceSubtitle": "Chuyển giữa các không gian tài chính dùng chung",
+  "createWorkspace": "Tạo không gian",
+  "workspaceName": "Tên không gian",
+  "createWorkspaceAction": "Tạo không gian",
+  "noWorkspacesYet": "Chưa có không gian nào",
+  "workspaceCreatedAt": "Tạo lúc {date}",
+  "@workspaceCreatedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "activeWorkspace": "Đang dùng",
+  "selectWorkspace": "Chọn"
+,
+  "authHeroTitle": "\u0110\u0103ng nh\u1eadp \u0111\u1ec3 \u0111\u1ed3ng b\u1ed9 d\u1eef li\u1ec7u t\u00e0i ch\u00ednh",
+  "authHeroSubtitle": "\u0110\u0103ng nh\u1eadp b\u1eb1ng email Supabase tr\u01b0\u1edbc, sau \u0111\u00f3 t\u1ea1o v\u00ed m\u1edbi ho\u1eb7c tham gia v\u00ed \u0111\u01b0\u1ee3c m\u1eddi \u0111\u1ec3 b\u1eaft \u0111\u1ea7u \u0111\u1ed3ng b\u1ed9.",
+  "signInTitle": "\u0110\u0103ng nh\u1eadp",
+  "signUpTitle": "\u0110\u0103ng k\u00fd",
+  "signInSubtitle": "Ti\u1ebfp t\u1ee5c v\u1edbi t\u00e0i kho\u1ea3n hi\u1ec7n c\u00f3",
+  "signUpSubtitle": "T\u1ea1o t\u00e0i kho\u1ea3n m\u1edbi \u0111\u1ec3 truy c\u1eadp c\u00e1c v\u00ed d\u00f9ng chung",
+  "emailAddress": "\u0110\u1ecba ch\u1ec9 email",
+  "password": "M\u1eadt kh\u1ea9u",
+  "emailRequired": "Vui l\u00f2ng nh\u1eadp email.",
+  "emailInvalid": "Email kh\u00f4ng h\u1ee3p l\u1ec7.",
+  "passwordRequired": "Vui l\u00f2ng nh\u1eadp m\u1eadt kh\u1ea9u.",
+  "passwordMinLength": "M\u1eadt kh\u1ea9u ph\u1ea3i c\u00f3 \u00edt nh\u1ea5t 6 k\u00fd t\u1ef1.",
+  "signInAction": "\u0110\u0103ng nh\u1eadp",
+  "signUpAction": "T\u1ea1o t\u00e0i kho\u1ea3n",
+  "signOutAction": "\u0110\u0103ng xu\u1ea5t",
+  "signUpSuccess": "T\u1ea1o t\u00e0i kho\u1ea3n th\u00e0nh c\u00f4ng. H\u00e3y \u0111\u0103ng nh\u1eadp \u0111\u1ec3 ti\u1ebfp t\u1ee5c.",
+  "signedOut": "\u0110\u00e3 \u0111\u0103ng xu\u1ea5t",
+  "authInvalidCredentials": "Sai email ho\u1eb7c m\u1eadt kh\u1ea9u.",
+  "authEmailNotConfirmed": "H\u00e3y x\u00e1c nh\u1eadn email tr\u01b0\u1edbc khi \u0111\u0103ng nh\u1eadp.",
+  "authUserExists": "Email n\u00e0y \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u0103ng k\u00fd.",
+  "authNetworkError": "L\u1ed7i m\u1ea1ng. H\u00e3y ki\u1ec3m tra k\u1ebft n\u1ed1i r\u1ed3i th\u1eed l\u1ea1i.",
+  "authGenericError": "\u0110\u0103ng nh\u1eadp th\u1ea5t b\u1ea1i. H\u00e3y th\u1eed l\u1ea1i.",
+  "enterPinContinue": "Nh\u1eadp PIN \u0111\u1ec3 ti\u1ebfp t\u1ee5c v\u00e0o Ti\u1ebft Ki\u1ec7m."
 }

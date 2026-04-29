@@ -18,10 +18,11 @@ final transactionProvider = AsyncNotifierProvider<TransactionNotifier,
 class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
   StreamSubscription<List<FinanceTransaction>>? _subscription;
 
-  TransactionRepository get _repository => ref.read(transactionRepositoryProvider);
+  TransactionRepository get _repository => ref.watch(transactionRepositoryProvider);
 
   @override
   Future<List<FinanceTransaction>> build() async {
+    await _subscription?.cancel();
     final initial = await _repository.getTransactions();
     _subscription = _repository.watchTransactions().listen(
       (transactions) => state = AsyncData(transactions),
@@ -52,9 +53,11 @@ class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
     final existing = id == null
         ? null
         : state.valueOrNull?.where((item) => item.id == id).firstOrNull;
+    final now = DateTime.now().toUtc();
 
     final transaction = FinanceTransaction(
       id: id ?? const Uuid().v4(),
+      workspaceId: existing?.workspaceId ?? '',
       type: type,
       amount: amount,
       walletId: walletId,
@@ -63,10 +66,28 @@ class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
       note: note?.trim().isEmpty == true ? null : note?.trim(),
       imagePath: imagePath,
       status: status,
-      createdAt: createdAt ?? existing?.createdAt ?? DateTime.now(),
+      createdAt: createdAt ?? existing?.createdAt ?? now,
+      updatedAt: now,
     );
 
     await _repository.saveTransaction(transaction);
+  }
+
+  Future<void> updateTransactionStatus(
+    String id,
+    TransactionStatus status,
+  ) async {
+    final existing = state.valueOrNull?.where((item) => item.id == id).firstOrNull;
+    if (existing == null) {
+      throw const AppException('Transaction not found.');
+    }
+
+    await _repository.saveTransaction(
+      existing.copyWith(
+        status: status,
+        updatedAt: DateTime.now().toUtc(),
+      ),
+    );
   }
 
   Future<void> deleteTransaction(String id) => _repository.deleteTransaction(id);

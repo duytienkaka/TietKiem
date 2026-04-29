@@ -26,9 +26,7 @@ class ProfileScreen extends ConsumerWidget {
     final transactionsAsync = ref.watch(transactionProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.profileTitle),
-      ),
+      appBar: AppBar(title: Text(context.l10n.profileTitle)),
       body: SafeArea(
         child: AsyncValueView(
           value: preferencesAsync,
@@ -53,7 +51,11 @@ class ProfileScreen extends ConsumerWidget {
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFFE11976), Color(0xFF7B3FF2), Color(0xFF151B36)],
+                          colors: [
+                            Color(0xFFE11976),
+                            Color(0xFF7B3FF2),
+                            Color(0xFF151B36),
+                          ],
                         ),
                         padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
                         child: Column(
@@ -86,9 +88,7 @@ class ProfileScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SectionHeader(
-                              title: context.l10n.quickOverview,
-                            ),
+                            SectionHeader(title: context.l10n.quickOverview),
                             const SizedBox(height: 16),
                             Row(
                               children: [
@@ -96,7 +96,10 @@ class ProfileScreen extends ConsumerWidget {
                                   child: _ProfileStatCard(
                                     icon: Icons.account_balance_wallet_rounded,
                                     label: context.l10n.totalBalance,
-                                    value: formatCurrency(context, totalBalance),
+                                    value: formatCurrency(
+                                      context,
+                                      totalBalance,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -120,7 +123,9 @@ class ProfileScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SectionHeader(title: context.l10n.personalInformation),
+                            SectionHeader(
+                              title: context.l10n.personalInformation,
+                            ),
                             const SizedBox(height: 16),
                             _InfoTile(
                               icon: Icons.person_rounded,
@@ -154,28 +159,36 @@ class ProfileScreen extends ConsumerWidget {
     final selection = await showModalBottomSheet<_AvatarSelection>(
       context: context,
       showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      barrierColor: Colors.black.withValues(alpha: 0.36),
       builder: (sheetContext) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_camera_rounded),
-                title: Text(context.l10n.camera),
-                onTap: () => Navigator.of(sheetContext).pop(_AvatarSelection.camera),
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library_rounded),
-                title: Text(context.l10n.gallery),
-                onTap: () => Navigator.of(sheetContext).pop(_AvatarSelection.gallery),
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline_rounded),
-                title: Text(context.l10n.removeAvatar),
-                onTap: () => Navigator.of(sheetContext).pop(_AvatarSelection.remove),
-              ),
-            ],
+          child: Material(
+            color: Theme.of(context).colorScheme.surface,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_camera_rounded),
+                  title: Text(context.l10n.camera),
+                  onTap: () =>
+                      Navigator.of(sheetContext).pop(_AvatarSelection.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_rounded),
+                  title: Text(context.l10n.gallery),
+                  onTap: () =>
+                      Navigator.of(sheetContext).pop(_AvatarSelection.gallery),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete_outline_rounded),
+                  title: Text(context.l10n.removeAvatar),
+                  onTap: () =>
+                      Navigator.of(sheetContext).pop(_AvatarSelection.remove),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -211,7 +224,9 @@ class ProfileScreen extends ConsumerWidget {
     AppPreferencesState preferences,
   ) async {
     final nameController = TextEditingController(text: preferences.profileName);
-    final emailController = TextEditingController(text: preferences.profileEmail);
+    final emailController = TextEditingController(
+      text: preferences.profileEmail,
+    );
     final formKey = GlobalKey<FormState>();
 
     await showModalBottomSheet<void>(
@@ -245,8 +260,11 @@ class ProfileScreen extends ConsumerWidget {
                       TextFormField(
                         controller: nameController,
                         textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(labelText: context.l10n.fullName),
-                        validator: (value) => value == null || value.trim().isEmpty
+                        decoration: InputDecoration(
+                          labelText: context.l10n.fullName,
+                        ),
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
                             ? context.l10n.fullNameRequired
                             : null,
                       ),
@@ -255,7 +273,9 @@ class ProfileScreen extends ConsumerWidget {
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(labelText: context.l10n.emailOptional),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.emailOptional,
+                        ),
                       ),
                       const SizedBox(height: 18),
                       AppButton(
@@ -265,7 +285,9 @@ class ProfileScreen extends ConsumerWidget {
                           if (formKey.currentState?.validate() != true) {
                             return;
                           }
-                          await ref.read(appPreferencesProvider.notifier).updateProfile(
+                          await ref
+                              .read(appPreferencesProvider.notifier)
+                              .updateProfile(
                                 name: nameController.text,
                                 email: emailController.text,
                               );

@@ -2,16 +2,22 @@ import 'package:drift/drift.dart' as drift;
 
 import '../../../../core/database/app_database.dart' as db;
 import '../../../../core/error/app_exception.dart';
+import '../../../../shared/services/sync_queue_service.dart';
 import '../../domain/entities/wallet.dart' as entity;
 import '../../domain/repositories/wallet_repository.dart';
 import '../datasources/wallet_local_data_source.dart';
 import '../models/wallet_model.dart';
 
 class WalletRepositoryImpl implements WalletRepository {
-  const WalletRepositoryImpl(this._database, this._localDataSource);
+  const WalletRepositoryImpl(
+    this._database,
+    this._localDataSource,
+    this._syncQueueService,
+  );
 
   final db.AppDatabase _database;
   final WalletLocalDataSource _localDataSource;
+  final SyncQueueService _syncQueueService;
 
   @override
   Stream<List<entity.Wallet>> watchWallets() {
@@ -38,7 +44,20 @@ class WalletRepositoryImpl implements WalletRepository {
       throw const AppException('Wallet name is required.');
     }
 
-    await _localDataSource.upsertWallet(WalletModel.fromEntity(wallet).toCompanion());
+    final now = DateTime.now().toUtc();
+    final nextWallet = wallet.copyWith(
+      workspaceId: wallet.workspaceId.isEmpty ? wallet.id : wallet.workspaceId,
+      updatedAt: now,
+      clearDeletedAt: true,
+    );
+    final model = WalletModel.fromEntity(nextWallet);
+    await _localDataSource.upsertWallet(model.toCompanion());
+    await _syncQueueService.enqueueUpsert(
+      workspaceId: nextWallet.id,
+      tableName: 'wallets',
+      recordId: nextWallet.id,
+      payload: model.toRemoteJson(),
+    );
   }
 
   @override
@@ -47,7 +66,7 @@ class WalletRepositoryImpl implements WalletRepository {
           ..where((tbl) => drift.Expression.or([
                 tbl.walletId.equals(id),
                 tbl.targetWalletId.equalsNullable(id),
-              ])))
+              ]) & tbl.deletedAt.isNull()))
         .get();
     if (linkedTransactions.isNotEmpty) {
       throw const AppException(
@@ -55,6 +74,22 @@ class WalletRepositoryImpl implements WalletRepository {
       );
     }
 
-    await _localDataSource.deleteWallet(id);
+    final existing = await getWalletById(id);
+    if (existing == null) {
+      return;
+    }
+    final deletedWallet = existing.copyWith(
+      workspaceId: existing.workspaceId.isEmpty ? existing.id : existing.workspaceId,
+      updatedAt: DateTime.now().toUtc(),
+      deletedAt: DateTime.now().toUtc(),
+    );
+    final model = WalletModel.fromEntity(deletedWallet);
+    await _localDataSource.upsertWallet(model.toCompanion());
+    await _syncQueueService.enqueueUpsert(
+      workspaceId: deletedWallet.id,
+      tableName: 'wallets',
+      recordId: id,
+      payload: model.toRemoteJson(),
+    );
   }
 }

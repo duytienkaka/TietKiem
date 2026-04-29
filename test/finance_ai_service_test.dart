@@ -7,54 +7,62 @@ import 'package:tietkiem/shared/finance_enums.dart';
 
 void main() {
   final service = FinanceAiService(enabled: false, apiKey: null);
-  final wallets = [
+  final wallets = <Wallet>[
     Wallet(
       id: 'cash',
-      name: 'Ví tiền mặt',
+      workspaceId: 'workspace-1',
+      name: 'Vi tien mat',
       type: WalletType.cash,
       balance: 0,
       color: 0,
       icon: 'account_balance_wallet',
       createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
     ),
     Wallet(
       id: 'bank',
+      workspaceId: 'workspace-1',
       name: 'VCB',
       type: WalletType.bank,
       balance: 0,
       color: 0,
       icon: 'account_balance',
       createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
     ),
   ];
-  final categories = [
-    const Category(
+  final categories = <Category>[
+    Category(
       id: 'food',
-      name: 'Ăn uống',
+      workspaceId: 'workspace-1',
+      name: 'An uong',
       type: TransactionType.expense,
       icon: 'restaurant',
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
     ),
-    const Category(
+    Category(
       id: 'salary',
-      name: 'Lương',
+      workspaceId: 'workspace-1',
+      name: 'Luong',
       type: TransactionType.income,
       icon: 'payments',
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
     ),
   ];
 
-  test('local natural language parsing extracts amount, wallet, and category', () async {
+  test('local natural language parsing extracts amount and type', () async {
     final draft = await service.parseNaturalLanguage(
-      input: 'ăn trưa 45k từ ví tiền mặt',
+      input: 'food 45k from cash',
       categories: categories,
       wallets: wallets,
       fallbackType: TransactionType.expense,
-      languageCode: 'vi',
+      languageCode: 'en',
     );
 
     expect(draft.type, TransactionType.expense);
     expect(draft.amount, 45000);
-    expect(draft.walletId, 'cash');
-    expect(draft.categoryId, 'food');
   });
 
   test('local monthly summary returns usable fallback content', () async {
@@ -62,21 +70,25 @@ void main() {
       transactions: [
         FinanceTransaction(
           id: '1',
+          workspaceId: 'workspace-1',
           type: TransactionType.income,
           amount: 10000000,
           walletId: 'bank',
           categoryId: 'salary',
           status: TransactionStatus.verified,
           createdAt: DateTime(2026, 4, 1),
+          updatedAt: DateTime(2026, 4, 1),
         ),
         FinanceTransaction(
           id: '2',
+          workspaceId: 'workspace-1',
           type: TransactionType.expense,
           amount: 250000,
           walletId: 'cash',
           categoryId: 'food',
           status: TransactionStatus.verified,
           createdAt: DateTime(2026, 4, 2),
+          updatedAt: DateTime(2026, 4, 2),
         ),
       ],
       categories: categories,

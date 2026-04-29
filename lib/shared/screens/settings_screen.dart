@@ -217,7 +217,7 @@ class SettingsScreen extends ConsumerWidget {
                       icon: Icons.code_rounded,
                       title: context.l10n.developer,
                       trailing: Text(
-                        'PocketLedger Studio',
+                        'Tiet Kiem',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
@@ -906,7 +906,7 @@ class _SettingsHeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${context.l10n.language}: $languageLabel • '
+                  '${context.l10n.language}: $languageLabel - '
                   '${darkModeEnabled ? context.l10n.darkMode : context.l10n.lightMode}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.84),

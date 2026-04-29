@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/finance_enums.dart';
+import '../../../../shared/services/supabase_remote_data_source.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -25,70 +25,99 @@ class WalletScreen extends ConsumerWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        child: AsyncValueView(
-          value: walletsAsync,
-          loadingBuilder: (_) => const _WalletsLoadingState(),
-          data: (wallets) {
-            final totalBalance =
-                wallets.fold<double>(0, (sum, wallet) => sum + wallet.balance);
+          child: AsyncValueView(
+            value: walletsAsync,
+            loadingBuilder: (_) => const _WalletsLoadingState(),
+            data: (wallets) {
+              final totalBalance = wallets.fold<double>(
+                0,
+                (sum, wallet) => sum + wallet.balance,
+              );
 
-            return ListView(
-              padding: const EdgeInsets.only(bottom: 120),
-              children: [
-                ScreenTopHeader(
-                  eyebrow: context.l10n.walletsTitle,
-                  title: context.l10n.allWallets,
-                  subtitle: context.l10n.walletsTotal(
-                    wallets.length,
-                    formatCurrency(context, totalBalance),
-                  ),
-                  icon: Icons.account_balance_wallet_rounded,
-                  actionLabel: context.l10n.add,
-                  onAction: () => showWalletSheet(context),
-                ),
-                const SizedBox(height: 14),
-                if (wallets.isEmpty)
-                  EmptyState(
-                    title: context.l10n.noWalletsCreated,
-                    message: context.l10n.addCashBankSavingWallet,
+              return ListView(
+                padding: const EdgeInsets.only(bottom: 120),
+                children: [
+                  ScreenTopHeader(
+                    eyebrow: context.l10n.walletsTitle,
+                    title: context.l10n.allWallets,
+                    subtitle: context.l10n.walletsTotal(
+                      wallets.length,
+                      formatCurrency(context, totalBalance),
+                    ),
                     icon: Icons.account_balance_wallet_rounded,
-                    actionLabel: context.l10n.createWallet,
-                    onAction: () => showWalletSheet(context),
-                  )
-                else
-                  ...wallets.map(
-                    (wallet) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Dismissible(
-                        key: ValueKey(wallet.id),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.errorContainer,
-                            borderRadius: BorderRadius.circular(22),
+                  ),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: () => showWalletSheet(context),
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(context.l10n.add),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  if (wallets.isEmpty)
+                    EmptyState(
+                      title: context.l10n.noWalletsCreated,
+                      message: context.l10n.addCashBankSavingWallet,
+                      icon: Icons.account_balance_wallet_rounded,
+                      actionLabel: context.l10n.createWallet,
+                      onAction: () => showWalletSheet(context),
+                    )
+                  else
+                    ...wallets.map(
+                      (wallet) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Dismissible(
+                          key: ValueKey(wallet.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            decoration: BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.errorContainer,
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            child: Icon(
+                              Icons.delete_outline_rounded,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
                           ),
-                          child: Icon(
-                            Icons.delete_outline_rounded,
-                            color: Theme.of(context).colorScheme.error,
+                          onDismissed: (_) =>
+                              _deleteWallet(context, ref, wallet.id),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              WalletCard(
+                                wallet: wallet,
+                                compact: true,
+                                onTap: () =>
+                                    showWalletSheet(context, wallet: wallet),
+                              ),
+                              const SizedBox(height: 8),
+                              FilledButton.tonalIcon(
+                                onPressed: () => _showInviteWalletSheet(
+                                  context,
+                                  ref,
+                                  wallet,
+                                ),
+                                icon: const Icon(
+                                  Icons.person_add_alt_1_rounded,
+                                ),
+                                label: const Text('Invite user'),
+                              ),
+                            ],
                           ),
-                        ),
-                        onDismissed: (_) =>
-                            _deleteWallet(context, ref, wallet.id),
-                        child: WalletCard(
-                          wallet: wallet,
-                          compact: true,
-                          onTap: () => showWalletSheet(context, wallet: wallet),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
-      ),
       ),
     );
   }
@@ -101,17 +130,137 @@ class WalletScreen extends ConsumerWidget {
     try {
       await ref.read(walletProvider.notifier).deleteWallet(walletId);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.walletDeleted)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.walletDeleted)));
       }
     } catch (error) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(localizeError(context, error))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(localizeError(context, error))));
       }
     }
+  }
+
+  Future<void> _showInviteWalletSheet(
+    BuildContext context,
+    WidgetRef ref,
+    Wallet wallet,
+  ) async {
+    final controller = TextEditingController();
+    var inviting = false;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      barrierColor: Colors.black.withValues(alpha: 0.36),
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          return SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                8,
+                20,
+                20 + MediaQuery.of(sheetContext).viewInsets.bottom,
+              ),
+              child: Material(
+                color: Theme.of(context).colorScheme.surface,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Invite user to ${wallet.name}',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Enter the email address of the user you want to share this wallet with.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.emailAddress,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FilledButton.icon(
+                        onPressed: inviting
+                            ? null
+                            : () async {
+                                final email = controller.text
+                                    .trim()
+                                    .toLowerCase();
+                                if (email.isEmpty) {
+                                  return;
+                                }
+                                setSheetState(() => inviting = true);
+                                try {
+                                  await ref
+                                      .read(supabaseRemoteDataSourceProvider)
+                                      .inviteUserToWallet(
+                                        walletId: wallet.id,
+                                        email: email,
+                                      );
+                                  if (sheetContext.mounted) {
+                                    Navigator.of(sheetContext).pop();
+                                  }
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Invitation sent to $email',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } catch (error) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(error.toString())),
+                                    );
+                                  }
+                                } finally {
+                                  if (sheetContext.mounted) {
+                                    setSheetState(() => inviting = false);
+                                  }
+                                }
+                              },
+                        icon: inviting
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.send_rounded),
+                        label: const Text('Invite'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    controller.dispose();
   }
 }
 
@@ -161,11 +310,17 @@ class _WalletsLoadingState extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: narrow ? 12 : 16),
-                    SkeletonBox(width: narrow ? 108 : 120, height: narrow ? 16 : 18),
+                    SkeletonBox(
+                      width: narrow ? 108 : 120,
+                      height: narrow ? 16 : 18,
+                    ),
                     const SizedBox(height: 8),
                     SkeletonBox(width: narrow ? 82 : 90, height: 14),
                     SizedBox(height: narrow ? 14 : 18),
-                    SkeletonBox(width: narrow ? 122 : 140, height: narrow ? 22 : 26),
+                    SkeletonBox(
+                      width: narrow ? 122 : 140,
+                      height: narrow ? 22 : 26,
+                    ),
                   ],
                 );
               },
@@ -198,7 +353,11 @@ class WalletSheet extends ConsumerStatefulWidget {
 
 class _WalletSheetState extends ConsumerState<WalletSheet> {
   static const _colors = [0xFFE11976, 0xFF2E90FA, 0xFF7A5AF8, 0xFF16B364];
-  static const _icons = ['account_balance_wallet', 'account_balance', 'savings'];
+  static const _icons = [
+    'account_balance_wallet',
+    'account_balance',
+    'savings',
+  ];
 
   late final TextEditingController _nameController;
   late final TextEditingController _balanceController;
@@ -254,7 +413,9 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 560),
               child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 elevation: 0,
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -265,25 +426,28 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
                         controller: _nameController,
                         autofocus: widget.wallet == null,
                         textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(labelText: context.l10n.walletName),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.walletName,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       TextField(
                         controller: _balanceController,
                         focusNode: _balanceFocusNode,
-                        decoration: InputDecoration(labelText: context.l10n.openingBalance),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.openingBalance,
+                        ),
                         keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          VietnameseCurrencyInputFormatter(),
-                        ],
+                        inputFormatters: [VietnameseCurrencyInputFormatter()],
                         textInputAction: TextInputAction.done,
                         onSubmitted: (_) => _save(),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<WalletType>(
                         initialValue: _type,
-                        decoration: InputDecoration(labelText: context.l10n.walletType),
+                        decoration: InputDecoration(
+                          labelText: context.l10n.walletType,
+                        ),
                         items: WalletType.values
                             .map(
                               (type) => DropdownMenuItem(
@@ -323,7 +487,10 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
                                 ),
                               ),
                               child: selected
-                                  ? const Icon(Icons.check_rounded, color: Colors.white)
+                                  ? const Icon(
+                                      Icons.check_rounded,
+                                      color: Colors.white,
+                                    )
                                   : null,
                             ),
                           );
@@ -381,7 +548,9 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
   }
 
   Future<void> _save() async {
-    final balance = parseVietnameseCurrency(_balanceController.text.trim()).toDouble();
+    final balance = parseVietnameseCurrency(
+      _balanceController.text.trim(),
+    ).toDouble();
     if (_balanceController.text.trim().isEmpty && widget.wallet == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.enterValidOpeningBalance)),
@@ -392,7 +561,9 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
     setState(() => _saving = true);
     try {
       FocusScope.of(context).unfocus();
-      await ref.read(walletProvider.notifier).saveWallet(
+      await ref
+          .read(walletProvider.notifier)
+          .saveWallet(
             id: widget.wallet?.id,
             name: _nameController.text,
             type: _type,
@@ -405,9 +576,9 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(localizeError(context, error))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(localizeError(context, error))));
       }
     } finally {
       if (mounted) {
@@ -417,11 +588,11 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
   }
 
   IconData _resolveWalletIcon(String icon) => switch (icon) {
-        'account_balance_wallet' => Icons.account_balance_wallet_rounded,
-        'account_balance' => Icons.account_balance_rounded,
-        'savings' => Icons.savings_rounded,
-        _ => Icons.wallet_rounded,
-      };
+    'account_balance_wallet' => Icons.account_balance_wallet_rounded,
+    'account_balance' => Icons.account_balance_rounded,
+    'savings' => Icons.savings_rounded,
+    _ => Icons.wallet_rounded,
+  };
 }
 
 class _ChoiceLabel extends StatelessWidget {

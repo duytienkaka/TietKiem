@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Tiết Kiệm';
+  String get appTitle => 'Tiet Kiem';
 
   @override
   String get homeTab => 'Home';
@@ -673,7 +673,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockApp => 'Unlock app';
 
   @override
-  String get enterPinContinue => 'Enter your PIN to continue to PocketLedger.';
+  String get enterPinContinue => 'Enter your PIN to continue to Tiet Kiem.';
 
   @override
   String get unlock => 'Unlock';
@@ -841,4 +841,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get localFallback => 'Local fallback';
+
+  @override
+  String get authHeroTitle => 'Sign in to sync your finance data';
+
+  @override
+  String get authHeroSubtitle =>
+      'Use Supabase email login first, then create a wallet or join one by invitation to start syncing across devices.';
+
+  @override
+  String get signInTitle => 'Sign in';
+
+  @override
+  String get signUpTitle => 'Sign up';
+
+  @override
+  String get signInSubtitle => 'Continue with your existing account';
+
+  @override
+  String get signUpSubtitle => 'Create a new account to access shared wallets';
+
+  @override
+  String get emailAddress => 'Email address';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get emailRequired => 'Email is required.';
+
+  @override
+  String get emailInvalid => 'Enter a valid email address.';
+
+  @override
+  String get passwordRequired => 'Password is required.';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters.';
+
+  @override
+  String get signInAction => 'Sign in';
+
+  @override
+  String get signUpAction => 'Create account';
+
+  @override
+  String get signOutAction => 'Sign out';
+
+  @override
+  String get signUpSuccess => 'Account created. Sign in to continue.';
+
+  @override
+  String get signedOut => 'Signed out';
+
+  @override
+  String get authInvalidCredentials => 'Incorrect email or password.';
+
+  @override
+  String get authEmailNotConfirmed => 'Confirm your email before signing in.';
+
+  @override
+  String get authUserExists => 'This email is already registered.';
+
+  @override
+  String get authNetworkError =>
+      'Network error. Check your connection and try again.';
+
+  @override
+  String get authGenericError => 'Authentication failed. Try again.';
 }

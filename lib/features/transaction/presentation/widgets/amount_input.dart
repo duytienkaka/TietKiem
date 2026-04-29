@@ -33,7 +33,6 @@ class AmountInput extends StatelessWidget {
       onFieldSubmitted: onFieldSubmitted,
       keyboardType: TextInputType.number,
       inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.digitsOnly,
         VietnameseCurrencyInputFormatter(),
       ],
       textAlign: TextAlign.center,

@@ -57,3 +57,12 @@ app.*.map.json
 key.properties
 google-services.json
 **/GoogleService-Info.plist
+
+# Local tooling and machine-specific state
+.tools/
+.vscode/
+android/.kotlin/
+supabase/.temp/
+chrome_*.log
+chrome_*.err
+devtools_options.yaml

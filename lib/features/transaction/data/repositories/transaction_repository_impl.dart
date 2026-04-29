@@ -1,6 +1,7 @@
 import '../../../../core/database/app_database.dart' as db;
 import '../../../../core/error/app_exception.dart';
 import '../../../../shared/finance_enums.dart';
+import '../../../../shared/services/sync_queue_service.dart';
 import '../../../wallet/data/models/wallet_model.dart';
 import '../../domain/entities/finance_transaction.dart';
 import '../../domain/repositories/transaction_repository.dart';
@@ -8,10 +9,15 @@ import '../datasources/transaction_local_data_source.dart';
 import '../models/transaction_model.dart';
 
 class TransactionRepositoryImpl implements TransactionRepository {
-  const TransactionRepositoryImpl(this._database, this._localDataSource);
+  const TransactionRepositoryImpl(
+    this._database,
+    this._localDataSource,
+    this._syncQueueService,
+  );
 
   final db.AppDatabase _database;
   final TransactionLocalDataSource _localDataSource;
+  final SyncQueueService _syncQueueService;
 
   @override
   Stream<List<FinanceTransaction>> watchTransactions() {
@@ -45,9 +51,19 @@ class TransactionRepositoryImpl implements TransactionRepository {
         await _applyBalanceImpact(existing, reverse: true);
       }
 
-      await _applyBalanceImpact(transaction);
-      await _localDataSource.upsertTransaction(
-        TransactionModel.fromEntity(transaction).toCompanion(),
+      final nextTransaction = transaction.copyWith(
+        workspaceId: transaction.walletId,
+        updatedAt: DateTime.now().toUtc(),
+        clearDeletedAt: true,
+      );
+      await _applyBalanceImpact(nextTransaction);
+      final model = TransactionModel.fromEntity(nextTransaction);
+      await _localDataSource.upsertTransaction(model.toCompanion());
+      await _syncQueueService.enqueueUpsert(
+        workspaceId: nextTransaction.walletId,
+        tableName: 'transactions',
+        recordId: nextTransaction.id,
+        payload: model.toRemoteJson(),
       );
     });
   }
@@ -62,7 +78,19 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
       final existing = TransactionModel.fromData(existingData).toEntity();
       await _applyBalanceImpact(existing, reverse: true);
-      await _localDataSource.deleteTransaction(id);
+      final deletedTransaction = existing.copyWith(
+        workspaceId: existing.walletId,
+        updatedAt: DateTime.now().toUtc(),
+        deletedAt: DateTime.now().toUtc(),
+      );
+      final model = TransactionModel.fromEntity(deletedTransaction);
+      await _localDataSource.upsertTransaction(model.toCompanion());
+      await _syncQueueService.enqueueUpsert(
+        workspaceId: existing.walletId,
+        tableName: 'transactions',
+        recordId: id,
+        payload: model.toRemoteJson(),
+      );
     });
   }
 
@@ -118,7 +146,17 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   Future<void> _updateWalletBalance(db.Wallet dbWallet, double nextBalance) async {
-    final entity = WalletModel.fromData(dbWallet).toEntity().copyWith(balance: nextBalance);
-    await _database.walletDao.upsertWallet(WalletModel.fromEntity(entity).toCompanion());
+    final entity = WalletModel.fromData(dbWallet).toEntity().copyWith(
+          balance: nextBalance,
+          updatedAt: DateTime.now().toUtc(),
+        );
+    final model = WalletModel.fromEntity(entity);
+    await _database.walletDao.upsertWallet(model.toCompanion());
+    await _syncQueueService.enqueueUpsert(
+      workspaceId: entity.workspaceId,
+      tableName: 'wallets',
+      recordId: entity.id,
+      payload: model.toRemoteJson(),
+    );
   }
 }

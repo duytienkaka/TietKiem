@@ -9,6 +9,8 @@ class CategoryLocalDataSource {
 
   Future<List<Category>> getCategories() => _dao.getCategories();
 
+  Future<List<Category>> getCategoriesForScope(String scopeId) => _dao.getCategoriesForScope(scopeId);
+
   Future<Category?> getCategoryById(String id) => _dao.getCategoryById(id);
 
   Future<void> upsertCategory(CategoriesCompanion category) =>

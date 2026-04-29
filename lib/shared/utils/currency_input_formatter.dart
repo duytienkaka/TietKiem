@@ -26,10 +26,23 @@ class VietnameseCurrencyInputFormatter extends TextInputFormatter {
       digits,
       separator: separator,
     );
+    final safeSelectionOffset = newValue.selection.extentOffset < 0
+        ? newValue.text.length
+        : newValue.selection.extentOffset.clamp(0, newValue.text.length);
+    final digitsBeforeCursor = extractDigits(
+      newValue.text.substring(
+        0,
+        safeSelectionOffset,
+      ),
+    ).length;
+    final nextOffset = _offsetForDigitPosition(
+      formatted,
+      digitsBeforeCursor,
+    );
 
     return TextEditingValue(
       text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
+      selection: TextSelection.collapsed(offset: nextOffset),
       composing: TextRange.empty,
     );
   }
@@ -87,4 +100,23 @@ void applyCurrencyEditingValue(
   int value,
 ) {
   controller.value = currencyEditingValueFromInt(value);
+}
+
+int _offsetForDigitPosition(String formatted, int digitPosition) {
+  if (digitPosition <= 0) {
+    return 0;
+  }
+
+  var seenDigits = 0;
+  for (var index = 0; index < formatted.length; index++) {
+    final char = formatted[index];
+    if (RegExp(r'\d').hasMatch(char)) {
+      seenDigits += 1;
+      if (seenDigits == digitPosition) {
+        return index + 1;
+      }
+    }
+  }
+
+  return formatted.length;
 }

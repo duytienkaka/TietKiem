@@ -63,7 +63,7 @@ extension RecurringIntervalL10n on RecurringInterval {
 }
 
 extension CategoryL10n on Category {
-  String displayName(BuildContext context) => switch (id) {
+  String displayName(BuildContext context) => switch (name) {
         'salary' => context.l10n.categorySalary,
         'gift' => context.l10n.categoryGift,
         'bonus' => context.l10n.categoryBonus,
@@ -91,10 +91,28 @@ String localizeError(BuildContext context, Object error) {
     'This wallet has transactions and cannot be deleted.' =>
       context.l10n.walletHasTransactionsCannotDelete,
     'Amount must be greater than zero.' => context.l10n.amountMustBeGreaterThanZero,
+    'Transaction not found.' => context.l10n.transactionNotFound,
     'Select a target wallet for transfer.' => context.l10n.selectTargetWallet,
     'Transfer wallets must be different.' => context.l10n.transferWalletsDifferent,
     'Source wallet not found.' => context.l10n.sourceWalletNotFound,
     'Target wallet not found.' => context.l10n.targetWalletNotFound,
     _ => message,
   };
+}
+
+String localizeAuthError(BuildContext context, Object error) {
+  final message = error.toString().toLowerCase();
+  if (message.contains('invalid login credentials')) {
+    return context.l10n.authInvalidCredentials;
+  }
+  if (message.contains('email not confirmed')) {
+    return context.l10n.authEmailNotConfirmed;
+  }
+  if (message.contains('user already registered')) {
+    return context.l10n.authUserExists;
+  }
+  if (message.contains('network')) {
+    return context.l10n.authNetworkError;
+  }
+  return context.l10n.authGenericError;
 }

@@ -7,12 +7,14 @@ class TransactionDao extends DatabaseAccessor<AppDatabase>
 
   Stream<List<Transaction>> watchTransactions() {
     return (select(transactions)
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .watch();
   }
 
   Future<List<Transaction>> getTransactions() {
     return (select(transactions)
+          ..where((t) => t.deletedAt.isNull())
           ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
         .get();
   }
