@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Tiet Kiem'**
+  /// **'Tiết Kiệm'**
   String get appTitle;
 
   /// No description provided for @homeTab.
@@ -127,6 +127,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wallets'**
   String get walletsTab;
+
+  /// No description provided for @moreTab.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreTab;
 
   /// No description provided for @quickAdd.
   ///
@@ -344,6 +350,18 @@ abstract class AppLocalizations {
   /// **'Wallet type'**
   String get walletType;
 
+  /// No description provided for @transactionTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction type'**
+  String get transactionTypeLabel;
+
+  /// No description provided for @amountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amountLabel;
+
   /// No description provided for @color.
   ///
   /// In en, this message translates to:
@@ -488,6 +506,54 @@ abstract class AppLocalizations {
   /// **'Statistics'**
   String get statisticsTitle;
 
+  /// No description provided for @moreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get moreTitle;
+
+  /// No description provided for @moreSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools and automation in one place'**
+  String get moreSubtitle;
+
+  /// No description provided for @toolsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools'**
+  String get toolsSection;
+
+  /// No description provided for @toolsSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator, recurring rules, and budgets'**
+  String get toolsSectionSubtitle;
+
+  /// No description provided for @openCalculator.
+  ///
+  /// In en, this message translates to:
+  /// **'Open calculator'**
+  String get openCalculator;
+
+  /// No description provided for @calculatorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick calculations for amounts before saving'**
+  String get calculatorHint;
+
+  /// No description provided for @automationSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage repeating transactions'**
+  String get automationSectionSubtitle;
+
+  /// No description provided for @planningSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set limits by category and month'**
+  String get planningSectionSubtitle;
+
   /// No description provided for @noDataToChart.
   ///
   /// In en, this message translates to:
@@ -559,18 +625,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create wallet and continue'**
   String get createWalletContinue;
-
-  /// No description provided for @quickAddTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick add'**
-  String get quickAddTitle;
-
-  /// No description provided for @quickEditTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick edit'**
-  String get quickEditTitle;
 
   /// No description provided for @coreFieldsFirst.
   ///
@@ -932,18 +986,6 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
-  /// No description provided for @deleteTransaction.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete transaction'**
-  String get deleteTransaction;
-
-  /// No description provided for @deleteTransactionPrompt.
-  ///
-  /// In en, this message translates to:
-  /// **'This transaction will be removed permanently. Do you want to continue?'**
-  String get deleteTransactionPrompt;
-
   /// No description provided for @statusConfirmed.
   ///
   /// In en, this message translates to:
@@ -962,16 +1004,10 @@ abstract class AppLocalizations {
   /// **'Something went wrong'**
   String get errorTitle;
 
-  /// No description provided for @tryAgain.
-  ///
-  /// In en, this message translates to:
-  /// **'Try again'**
-  String get tryAgain;
-
   /// No description provided for @helloUser.
   ///
   /// In en, this message translates to:
-  /// **'Hello'**
+  /// **'Hello, Alex'**
   String get helloUser;
 
   /// No description provided for @profileTitle.
@@ -986,18 +1022,6 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
-  /// No description provided for @profilePlaceholder.
-  ///
-  /// In en, this message translates to:
-  /// **'Your profile area is ready for account details, identity, and preferences.'**
-  String get profilePlaceholder;
-
-  /// No description provided for @settingsPlaceholder.
-  ///
-  /// In en, this message translates to:
-  /// **'This settings area is ready for language, notifications, and app preferences.'**
-  String get settingsPlaceholder;
-
   /// No description provided for @editProfile.
   ///
   /// In en, this message translates to:
@@ -1009,12 +1033,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quick overview'**
   String get quickOverview;
-
-  /// No description provided for @financeSnapshot.
-  ///
-  /// In en, this message translates to:
-  /// **'A fast snapshot of your account activity'**
-  String get financeSnapshot;
 
   /// No description provided for @totalTransactions.
   ///
@@ -1274,12 +1292,6 @@ abstract class AppLocalizations {
   /// **'Prepare a quick access PIN for future releases'**
   String get pinSetupSubtitle;
 
-  /// No description provided for @comingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon'**
-  String get comingSoon;
-
   /// No description provided for @appVersion.
   ///
   /// In en, this message translates to:
@@ -1373,7 +1385,7 @@ abstract class AppLocalizations {
   /// No description provided for @enterPinContinue.
   ///
   /// In en, this message translates to:
-  /// **'Enter your PIN to continue to Tiet Kiem.'**
+  /// **'Enter your PIN to continue to PocketLedger.'**
   String get enterPinContinue;
 
   /// No description provided for @unlock.
@@ -1399,24 +1411,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Based on your amount and note'**
   String get smartSuggestionsSubtitle;
-
-  /// No description provided for @noSmartSuggestions.
-  ///
-  /// In en, this message translates to:
-  /// **'Add a note or amount to get suggestions.'**
-  String get noSmartSuggestions;
-
-  /// No description provided for @recurring.
-  ///
-  /// In en, this message translates to:
-  /// **'Recurring'**
-  String get recurring;
-
-  /// No description provided for @recurringHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Create repeating transactions automatically'**
-  String get recurringHint;
 
   /// No description provided for @enableRecurring.
   ///
@@ -1448,12 +1442,6 @@ abstract class AppLocalizations {
   /// **'Recurring'**
   String get recurringTitle;
 
-  /// No description provided for @recurringSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Automate repeating transactions'**
-  String get recurringSubtitle;
-
   /// No description provided for @noRecurringYet.
   ///
   /// In en, this message translates to:
@@ -1466,23 +1454,11 @@ abstract class AppLocalizations {
   /// **'Create one from a new transaction'**
   String get createRecurringHint;
 
-  /// No description provided for @nextRunLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Next run'**
-  String get nextRunLabel;
-
   /// No description provided for @budgetsTitle.
   ///
   /// In en, this message translates to:
   /// **'Budgets'**
   String get budgetsTitle;
-
-  /// No description provided for @budgetsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Stay on track with category limits'**
-  String get budgetsSubtitle;
 
   /// No description provided for @setBudget.
   ///
@@ -1573,348 +1549,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No change'**
   String get same;
-
-  /// No description provided for @aiAssistantSection.
-  ///
-  /// In en, this message translates to:
-  /// **'AI assistant'**
-  String get aiAssistantSection;
-
-  /// No description provided for @aiAssistantSectionSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'AI-powered categorization, summaries, and natural input'**
-  String get aiAssistantSectionSubtitle;
-
-  /// No description provided for @aiFeatures.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable AI features'**
-  String get aiFeatures;
-
-  /// No description provided for @aiFeaturesSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Use Gemini 2.5 Flash when a Google AI Studio API key is configured. Local fallback stays available.'**
-  String get aiFeaturesSubtitle;
-
-  /// No description provided for @openAiApiKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Google AI Studio API key'**
-  String get openAiApiKey;
-
-  /// No description provided for @openAiApiKeySubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Used for Gemini 2.5 Flash. Stored only on this device. Recommended for personal use or testing.'**
-  String get openAiApiKeySubtitle;
-
-  /// No description provided for @configureApiKey.
-  ///
-  /// In en, this message translates to:
-  /// **'Configure API key'**
-  String get configureApiKey;
-
-  /// No description provided for @apiKeyConfigured.
-  ///
-  /// In en, this message translates to:
-  /// **'API key configured'**
-  String get apiKeyConfigured;
-
-  /// No description provided for @apiKeyNotConfigured.
-  ///
-  /// In en, this message translates to:
-  /// **'API key not configured'**
-  String get apiKeyNotConfigured;
-
-  /// No description provided for @aiNaturalEntry.
-  ///
-  /// In en, this message translates to:
-  /// **'Natural input'**
-  String get aiNaturalEntry;
-
-  /// No description provided for @aiNaturalEntrySubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Describe the transaction in one sentence'**
-  String get aiNaturalEntrySubtitle;
-
-  /// No description provided for @parseTransaction.
-  ///
-  /// In en, this message translates to:
-  /// **'Parse transaction'**
-  String get parseTransaction;
-
-  /// No description provided for @describeTransactionHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Example: lunch 45k from cash wallet'**
-  String get describeTransactionHint;
-
-  /// No description provided for @aiClassifyTransaction.
-  ///
-  /// In en, this message translates to:
-  /// **'AI classify'**
-  String get aiClassifyTransaction;
-
-  /// No description provided for @aiCategoryApplied.
-  ///
-  /// In en, this message translates to:
-  /// **'AI suggestion applied'**
-  String get aiCategoryApplied;
-
-  /// No description provided for @aiSuggestionFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not extract a useful suggestion.'**
-  String get aiSuggestionFailed;
-
-  /// No description provided for @aiSummaryTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Monthly summary'**
-  String get aiSummaryTitle;
-
-  /// No description provided for @aiSummarySubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Get a concise spending recap for the selected month'**
-  String get aiSummarySubtitle;
-
-  /// No description provided for @generateSummary.
-  ///
-  /// In en, this message translates to:
-  /// **'Generate summary'**
-  String get generateSummary;
-
-  /// No description provided for @aiPowered.
-  ///
-  /// In en, this message translates to:
-  /// **'AI powered'**
-  String get aiPowered;
-
-  /// No description provided for @localFallback.
-  ///
-  /// In en, this message translates to:
-  /// **'Local fallback'**
-  String get localFallback;
-
-  /// No description provided for @authHeroTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in to sync your finance data'**
-  String get authHeroTitle;
-
-  /// No description provided for @authHeroSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Use Supabase email login first, then create a wallet or join one by invitation to start syncing across devices.'**
-  String get authHeroSubtitle;
-
-  /// No description provided for @signInTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in'**
-  String get signInTitle;
-
-  /// No description provided for @signUpTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign up'**
-  String get signUpTitle;
-
-  /// No description provided for @signInSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Continue with your existing account'**
-  String get signInSubtitle;
-
-  /// No description provided for @signUpSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Create a new account to access shared wallets'**
-  String get signUpSubtitle;
-
-  /// No description provided for @emailAddress.
-  ///
-  /// In en, this message translates to:
-  /// **'Email address'**
-  String get emailAddress;
-
-  /// No description provided for @password.
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get password;
-
-  /// No description provided for @emailRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Email is required.'**
-  String get emailRequired;
-
-  /// No description provided for @emailInvalid.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a valid email address.'**
-  String get emailInvalid;
-
-  /// No description provided for @passwordRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Password is required.'**
-  String get passwordRequired;
-
-  /// No description provided for @passwordMinLength.
-  ///
-  /// In en, this message translates to:
-  /// **'Password must be at least 6 characters.'**
-  String get passwordMinLength;
-
-  /// No description provided for @signInAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in'**
-  String get signInAction;
-
-  /// No description provided for @signUpAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Create account'**
-  String get signUpAction;
-
-  /// No description provided for @signOutAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign out'**
-  String get signOutAction;
-
-  /// No description provided for @signUpSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Account created. Sign in to continue.'**
-  String get signUpSuccess;
-
-  /// No description provided for @signedOut.
-  ///
-  /// In en, this message translates to:
-  /// **'Signed out'**
-  String get signedOut;
-
-  /// No description provided for @authInvalidCredentials.
-  ///
-  /// In en, this message translates to:
-  /// **'Incorrect email or password.'**
-  String get authInvalidCredentials;
-
-  /// No description provided for @authEmailNotConfirmed.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm your email before signing in.'**
-  String get authEmailNotConfirmed;
-
-  /// No description provided for @authUserExists.
-  ///
-  /// In en, this message translates to:
-  /// **'This email is already registered.'**
-  String get authUserExists;
-
-  /// No description provided for @authNetworkError.
-  ///
-  /// In en, this message translates to:
-  /// **'Network error. Check your connection and try again.'**
-  String get authNetworkError;
-
-  /// No description provided for @authGenericError.
-  ///
-  /// In en, this message translates to:
-  /// **'Authentication failed. Try again.'**
-  String get authGenericError;
-
-  /// No description provided for @inviteUser.
-  ///
-  /// In en, this message translates to:
-  /// **'Invite user'**
-  String get inviteUser;
-
-  /// No description provided for @inviteUserTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Invite user to {walletName}'**
-  String inviteUserTitle(String walletName);
-
-  /// No description provided for @inviteUserSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the email address of the person you want to invite to this wallet.'**
-  String get inviteUserSubtitle;
-
-  /// No description provided for @invitationSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Invitation sent to {email}'**
-  String invitationSent(String email);
-
-  /// No description provided for @authSignUpLead.
-  ///
-  /// In en, this message translates to:
-  /// **'Create an account to sync your wallets across devices.'**
-  String get authSignUpLead;
-
-  /// No description provided for @authSignInLead.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in to continue with your wallets and transactions.'**
-  String get authSignInLead;
-
-  /// No description provided for @authToggleToSignIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Already have an account? Sign in'**
-  String get authToggleToSignIn;
-
-  /// No description provided for @authToggleToSignUp.
-  ///
-  /// In en, this message translates to:
-  /// **'Don\'t have an account? Sign up'**
-  String get authToggleToSignUp;
-
-  /// No description provided for @authFooterSignUp.
-  ///
-  /// In en, this message translates to:
-  /// **'After signing up, you can create your own wallet or join a shared wallet by invitation.'**
-  String get authFooterSignUp;
-
-  /// No description provided for @authFooterSignIn.
-  ///
-  /// In en, this message translates to:
-  /// **'Local data appears instantly. Background sync keeps your wallets updated across devices.'**
-  String get authFooterSignIn;
-
-  /// No description provided for @authFeatureLocalFirst.
-  ///
-  /// In en, this message translates to:
-  /// **'Saves locally first, so your data remains available offline.'**
-  String get authFeatureLocalFirst;
-
-  /// No description provided for @authFeatureSharedWallets.
-  ///
-  /// In en, this message translates to:
-  /// **'Shared wallets can be joined later by invitation.'**
-  String get authFeatureSharedWallets;
-
-  /// No description provided for @authFeatureSync.
-  ///
-  /// In en, this message translates to:
-  /// **'Syncs wallets and transactions across devices in the background.'**
-  String get authFeatureSync;
-
-  /// No description provided for @authFeatureAccessControl.
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet access is protected by wallet member permissions.'**
-  String get authFeatureAccessControl;
 }
 
 class _AppLocalizationsDelegate

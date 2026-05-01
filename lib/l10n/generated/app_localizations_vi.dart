@@ -24,6 +24,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get walletsTab => 'Ví';
 
   @override
+  String get moreTab => 'Khác';
+
+  @override
   String get quickAdd => 'Thêm nhanh';
 
   @override
@@ -140,6 +143,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get walletType => 'Loại ví';
 
   @override
+  String get transactionTypeLabel => 'Loại giao dịch';
+
+  @override
+  String get amountLabel => 'Số tiền';
+
+  @override
   String get color => 'Màu sắc';
 
   @override
@@ -216,6 +225,31 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticsTitle => 'Thống kê';
 
   @override
+  String get moreTitle => 'Khác';
+
+  @override
+  String get moreSubtitle => 'Công cụ và tự động hóa ở một nơi';
+
+  @override
+  String get toolsSection => 'Công cụ';
+
+  @override
+  String get toolsSectionSubtitle => 'Máy tính, lịch định kỳ và ngân sách';
+
+  @override
+  String get openCalculator => 'Mở máy tính';
+
+  @override
+  String get calculatorHint => 'Tính nhanh số tiền trước khi lưu giao dịch';
+
+  @override
+  String get automationSectionSubtitle => 'Quản lý các giao dịch lặp lại';
+
+  @override
+  String get planningSectionSubtitle =>
+      'Đặt giới hạn chi theo danh mục và tháng';
+
+  @override
   String get noDataToChart => 'Chưa có dữ liệu để vẽ biểu đồ';
 
   @override
@@ -252,12 +286,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get createWalletContinue => 'Tạo ví để tiếp tục';
-
-  @override
-  String get quickAddTitle => 'Thêm nhanh';
-
-  @override
-  String get quickEditTitle => 'Chỉnh sửa nhanh';
 
   @override
   String get coreFieldsFirst =>
@@ -340,7 +368,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get headlineTransfer => 'Bạn muốn chuyển bao nhiêu?';
 
   @override
-  String get calculator => 'Calculator';
+  String get calculator => 'Máy tính';
 
   @override
   String get saveIncome => 'Lưu thu nhập';
@@ -445,13 +473,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get cancel => 'Hủy';
 
   @override
-  String get deleteTransaction => 'Xóa giao dịch';
-
-  @override
-  String get deleteTransactionPrompt =>
-      'Giao dịch này sẽ bị xóa vĩnh viễn. Bạn có muốn tiếp tục không?';
-
-  @override
   String get statusConfirmed => 'Đã xác nhận';
 
   @override
@@ -461,10 +482,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get errorTitle => 'Đã xảy ra lỗi';
 
   @override
-  String get tryAgain => 'Thử lại';
-
-  @override
-  String get helloUser => 'Xin chào';
+  String get helloUser => 'Xin chào, Bạn';
 
   @override
   String get profileTitle => 'Hồ sơ';
@@ -473,21 +491,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsTitle => 'Cài đặt';
 
   @override
-  String get profilePlaceholder =>
-      'Khu vực hồ sơ đã sẵn sàng cho thông tin tài khoản, định danh và tùy chọn cá nhân.';
-
-  @override
-  String get settingsPlaceholder =>
-      'Khu vực cài đặt đã sẵn sàng cho ngôn ngữ, thông báo và tùy chọn ứng dụng.';
-
-  @override
   String get editProfile => 'Chỉnh sửa hồ sơ';
 
   @override
   String get quickOverview => 'Tổng quan nhanh';
-
-  @override
-  String get financeSnapshot => 'Tóm tắt nhanh hoạt động tài chính của bạn';
 
   @override
   String get totalTransactions => 'Tổng giao dịch';
@@ -625,9 +632,6 @@ class AppLocalizationsVi extends AppLocalizations {
       'Chuẩn bị mã PIN truy cập nhanh cho các bản phát hành sau';
 
   @override
-  String get comingSoon => 'Sắp có';
-
-  @override
   String get appVersion => 'Phiên bản ứng dụng';
 
   @override
@@ -638,65 +642,56 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get editTransactionSubtitle =>
-      'Review details, adjust values, and save instantly.';
+      'Xem lại thông tin, chỉnh sửa nhanh và lưu ngay.';
 
   @override
-  String get confirmTransaction => 'Confirm transaction';
+  String get confirmTransaction => 'Xác nhận giao dịch';
 
   @override
-  String get transactionConfirmed => 'Transaction confirmed';
+  String get transactionConfirmed => 'Đã xác nhận giao dịch';
 
   @override
-  String get pinConfigured => 'PIN is configured and ready to use';
+  String get pinConfigured => 'PIN đã được thiết lập và sẵn sàng sử dụng';
 
   @override
-  String get setPin => 'Set PIN';
+  String get setPin => 'Đặt PIN';
 
   @override
   String get createPinSubtitle =>
-      'Create a 4-digit PIN to protect your finance app.';
+      'Tạo mã PIN 4 số để bảo vệ ứng dụng tài chính.';
 
   @override
-  String get changePinSubtitle => 'Update your 4-digit PIN for app lock.';
+  String get changePinSubtitle => 'Cập nhật mã PIN 4 số cho khóa ứng dụng.';
 
   @override
-  String get enterPin => 'Enter PIN';
+  String get enterPin => 'Nhập PIN';
 
   @override
-  String get confirmPin => 'Confirm PIN';
+  String get confirmPin => 'Xác nhận PIN';
 
   @override
-  String get pinMustBe4Digits => 'PIN must contain exactly 4 digits.';
+  String get pinMustBe4Digits => 'PIN phải gồm đúng 4 chữ số.';
 
   @override
-  String get pinDoesNotMatch => 'PIN confirmation does not match.';
+  String get pinDoesNotMatch => 'PIN xác nhận không khớp.';
 
   @override
-  String get unlockApp => 'Unlock app';
+  String get unlockApp => 'Mở khóa ứng dụng';
 
   @override
-  String get enterPinContinue => 'Nhập PIN để tiếp tục vào Tiết Kiệm.';
+  String get enterPinContinue => 'Nhập PIN để tiếp tục vào PocketLedger.';
 
   @override
-  String get unlock => 'Unlock';
+  String get unlock => 'Mở khóa';
 
   @override
-  String get invalidPin => 'Incorrect PIN. Try again.';
+  String get invalidPin => 'PIN không đúng. Vui lòng thử lại.';
 
   @override
   String get smartSuggestions => 'Gợi ý thông minh';
 
   @override
   String get smartSuggestionsSubtitle => 'Dựa trên số tiền và ghi chú';
-
-  @override
-  String get noSmartSuggestions => 'Thêm ghi chú hoặc số tiền để xem gợi ý.';
-
-  @override
-  String get recurring => 'Lặp lại';
-
-  @override
-  String get recurringHint => 'Tự động tạo giao dịch định kỳ';
 
   @override
   String get enableRecurring => 'Bật lặp lại';
@@ -714,22 +709,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get recurringTitle => 'Định kỳ';
 
   @override
-  String get recurringSubtitle => 'Tự động hóa giao dịch lặp lại';
-
-  @override
   String get noRecurringYet => 'Chưa có giao dịch định kỳ';
 
   @override
   String get createRecurringHint => 'Tạo từ giao dịch mới';
 
   @override
-  String get nextRunLabel => 'Lần kế tiếp';
-
-  @override
   String get budgetsTitle => 'Ngân sách';
-
-  @override
-  String get budgetsSubtitle => 'Theo dõi giới hạn chi theo danh mục';
 
   @override
   String get setBudget => 'Đặt ngân sách';
@@ -753,7 +739,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get createBudgetHint => 'Đặt ngân sách để theo dõi tiến độ';
 
   @override
-  String get noBudgetsYet => 'Ưua có ngân sách nào';
+  String get noBudgetsYet => 'Chưa có ngân sách nào';
 
   @override
   String get spendingInsightsTitle => 'Phân tích chi tiêu';
@@ -775,195 +761,4 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get same => 'Không đổi';
-
-  @override
-  String get aiAssistantSection => 'Trợ lý AI';
-
-  @override
-  String get aiAssistantSectionSubtitle =>
-      'Phân loại giao dịch, tóm tắt tháng và nhập tự nhiên';
-
-  @override
-  String get aiFeatures => 'Bật tính năng AI';
-
-  @override
-  String get aiFeaturesSubtitle =>
-      'Dùng Gemini 2.5 Flash khi có API key từ Google AI Studio. Vẫn có fallback local khi chưa cấu hình.';
-
-  @override
-  String get openAiApiKey => 'Google AI Studio API key';
-
-  @override
-  String get openAiApiKeySubtitle =>
-      'Dùng cho Gemini 2.5 Flash. Chỉ lưu trên thiết bị này. Phù hợp cho cá nhân hoặc mục đích test.';
-
-  @override
-  String get configureApiKey => 'Cấu hình API key';
-
-  @override
-  String get apiKeyConfigured => 'Đã cấu hình API key';
-
-  @override
-  String get apiKeyNotConfigured => 'Chưa cấu hình API key';
-
-  @override
-  String get aiNaturalEntry => 'Nhập tự nhiên';
-
-  @override
-  String get aiNaturalEntrySubtitle => 'Mô tả giao dịch bằng một câu';
-
-  @override
-  String get parseTransaction => 'Phân tích giao dịch';
-
-  @override
-  String get describeTransactionHint => 'Ví dụ: ăn trưa 45k từ ví tiền mặt';
-
-  @override
-  String get aiClassifyTransaction => 'AI phân loại';
-
-  @override
-  String get aiCategoryApplied => 'Đã áp dụng gợi ý AI';
-
-  @override
-  String get aiSuggestionFailed => 'AI chưa trích xuất được gợi ý hợp lệ.';
-
-  @override
-  String get aiSummaryTitle => 'Tóm tắt tháng';
-
-  @override
-  String get aiSummarySubtitle =>
-      'Nhận tóm tắt chi tiêu ngắn gọn cho tháng đang chọn';
-
-  @override
-  String get generateSummary => 'Tạo tóm tắt';
-
-  @override
-  String get aiPowered => 'AI hỗ trợ';
-
-  @override
-  String get localFallback => 'Fallback local';
-
-  @override
-  String get authHeroTitle => 'Đăng nhập để đồng bộ dữ liệu tài chính';
-
-  @override
-  String get authHeroSubtitle =>
-      'Đăng nhập bằng email Supabase trước, sau đó tạo ví mới hoặc tham gia ví được mời để bắt đầu đồng bộ.';
-
-  @override
-  String get signInTitle => 'Đăng nhập';
-
-  @override
-  String get signUpTitle => 'Đăng ký';
-
-  @override
-  String get signInSubtitle => 'Tiếp tục với tài khoản hiện có';
-
-  @override
-  String get signUpSubtitle =>
-      'Tạo tài khoản mới để truy cập các ví dùng chung';
-
-  @override
-  String get emailAddress => 'Địa chỉ email';
-
-  @override
-  String get password => 'Mật khẩu';
-
-  @override
-  String get emailRequired => 'Vui lòng nhập email.';
-
-  @override
-  String get emailInvalid => 'Email không hợp lệ.';
-
-  @override
-  String get passwordRequired => 'Vui lòng nhập mật khẩu.';
-
-  @override
-  String get passwordMinLength => 'Mật khẩu phải có ít nhất 6 ký tự.';
-
-  @override
-  String get signInAction => 'Đăng nhập';
-
-  @override
-  String get signUpAction => 'Tạo tài khoản';
-
-  @override
-  String get signOutAction => 'Đăng xuất';
-
-  @override
-  String get signUpSuccess =>
-      'Tạo tài khoản thành công. Hãy đăng nhập để tiếp tục.';
-
-  @override
-  String get signedOut => 'Đã đăng xuất';
-
-  @override
-  String get authInvalidCredentials => 'Sai email hoặc mật khẩu.';
-
-  @override
-  String get authEmailNotConfirmed => 'Hãy xác nhận email trước khi đăng nhập.';
-
-  @override
-  String get authUserExists => 'Email này đã được đăng ký.';
-
-  @override
-  String get authNetworkError => 'Lỗi mạng. Hãy kiểm tra kết nối rồi thử lại.';
-
-  @override
-  String get authGenericError => 'Đăng nhập thất bại. Hãy thử lại.';
-
-  @override
-  String get inviteUser => 'Mời người dùng';
-
-  @override
-  String inviteUserTitle(String walletName) {
-    return 'Mời người dùng vào $walletName';
-  }
-
-  @override
-  String get inviteUserSubtitle =>
-      'Nhập email của người bạn muốn mời vào ví này.';
-
-  @override
-  String invitationSent(String email) {
-    return 'Đã gửi lời mời tới $email';
-  }
-
-  @override
-  String get authSignUpLead =>
-      'Tạo tài khoản để đồng bộ ví trên nhiều thiết bị.';
-
-  @override
-  String get authSignInLead =>
-      'Đăng nhập để tiếp tục với các ví và giao dịch của bạn.';
-
-  @override
-  String get authToggleToSignIn => 'Đã có tài khoản? Đăng nhập';
-
-  @override
-  String get authToggleToSignUp => 'Chưa có tài khoản? Đăng ký';
-
-  @override
-  String get authFooterSignUp =>
-      'Sau khi đăng ký, bạn có thể tạo ví riêng hoặc tham gia ví chia sẻ qua lời mời.';
-
-  @override
-  String get authFooterSignIn =>
-      'Dữ liệu local hiển thị ngay lập tức. Đồng bộ nền giữ các ví luôn cập nhật trên nhiều thiết bị.';
-
-  @override
-  String get authFeatureLocalFirst =>
-      'Luôn lưu cục bộ trước, nên dữ liệu vẫn dùng được khi offline.';
-
-  @override
-  String get authFeatureSharedWallets =>
-      'Có thể tham gia ví chia sẻ sau qua lời mời.';
-
-  @override
-  String get authFeatureSync =>
-      'Đồng bộ ví và giao dịch giữa các thiết bị ở chế độ nền.';
-
-  @override
-  String get authFeatureAccessControl =>
-      'Quyền truy cập ví được bảo vệ theo thành viên của từng ví.';
 }

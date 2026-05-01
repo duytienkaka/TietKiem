@@ -57,12 +57,10 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                       .where((item) => item.id == transaction.categoryId)
                       .firstOrNull;
                   final matchesType =
-                      _selectedType == null ||
-                      transaction.type == _selectedType;
+                      _selectedType == null || transaction.type == _selectedType;
                   final target =
                       '${transaction.note ?? ''} '
-                              '${category?.displayName(context) ?? ''}'
-                          .toLowerCase();
+                      '${category?.displayName(context) ?? ''}'.toLowerCase();
                   final matchesQuery = query.isEmpty || target.contains(query);
                   return matchesType && matchesQuery;
                 }).toList();
@@ -119,8 +117,7 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                                 child: _FilterPill(
                                   label: type.label(context),
                                   selected: _selectedType == type,
-                                  onTap: () =>
-                                      setState(() => _selectedType = type),
+                                  onTap: () => setState(() => _selectedType = type),
                                 ),
                               ),
                             ),
@@ -148,16 +145,15 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                             AnimatedSwitcher(
                               duration: const Duration(milliseconds: 180),
                               transitionBuilder: (child, animation) =>
-                                  FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  ),
+                                  FadeTransition(opacity: animation, child: child),
                               child: Text(
                                 key: ValueKey(
                                   'results-${filtered.length}-${_selectedType?.name ?? 'all'}-$query',
                                 ),
                                 context.l10n.resultsCount(filtered.length),
-                                style: Theme.of(context).textTheme.bodyMedium
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
                                     ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                             ),
@@ -179,32 +175,19 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                               'transactions-list-${filtered.length}-${_selectedType?.name ?? 'all'}-$query',
                             ),
                             children: [
-                              for (
-                                var index = 0;
-                                index < filtered.length;
-                                index++
-                              ) ...[
+                              for (var index = 0; index < filtered.length; index++) ...[
                                 Builder(
                                   builder: (context) {
                                     final transaction = filtered[index];
                                     final wallet = wallets
-                                        .where(
-                                          (item) =>
-                                              item.id == transaction.walletId,
-                                        )
+                                        .where((item) => item.id == transaction.walletId)
                                         .firstOrNull;
                                     final targetWallet = wallets
-                                        .where(
-                                          (item) =>
-                                              item.id ==
-                                              transaction.targetWalletId,
-                                        )
+                                        .where((item) =>
+                                            item.id == transaction.targetWalletId)
                                         .firstOrNull;
                                     final category = categories
-                                        .where(
-                                          (item) =>
-                                              item.id == transaction.categoryId,
-                                        )
+                                        .where((item) => item.id == transaction.categoryId)
                                         .firstOrNull;
 
                                     return AnimatedTransactionItem(
@@ -218,9 +201,7 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                                           category: category,
                                           onTap: () => context.pushNamed(
                                             'transactionDetail',
-                                            pathParameters: {
-                                              'id': transaction.id,
-                                            },
+                                            pathParameters: {'id': transaction.id},
                                           ),
                                         ),
                                       ),
@@ -352,17 +333,16 @@ class _FilterPill extends StatelessWidget {
           color: selected ? scheme.primary : Colors.white,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: selected
-                ? scheme.primary
-                : scheme.outlineVariant.withValues(alpha: 0.5),
+            color:
+                selected ? scheme.primary : scheme.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
         child: Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: selected ? Colors.white : const Color(0xFF344054),
-            fontWeight: FontWeight.w700,
-          ),
+                color: selected ? Colors.white : const Color(0xFF344054),
+                fontWeight: FontWeight.w700,
+              ),
         ),
       ),
     );

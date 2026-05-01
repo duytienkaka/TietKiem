@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Tiet Kiem';
+  String get appTitle => 'Tiết Kiệm';
 
   @override
   String get homeTab => 'Home';
@@ -22,6 +22,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get walletsTab => 'Wallets';
+
+  @override
+  String get moreTab => 'More';
 
   @override
   String get quickAdd => 'Quick add';
@@ -141,6 +144,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get walletType => 'Wallet type';
 
   @override
+  String get transactionTypeLabel => 'Transaction type';
+
+  @override
+  String get amountLabel => 'Amount';
+
+  @override
   String get color => 'Color';
 
   @override
@@ -217,6 +226,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticsTitle => 'Statistics';
 
   @override
+  String get moreTitle => 'More';
+
+  @override
+  String get moreSubtitle => 'Tools and automation in one place';
+
+  @override
+  String get toolsSection => 'Tools';
+
+  @override
+  String get toolsSectionSubtitle => 'Calculator, recurring rules, and budgets';
+
+  @override
+  String get openCalculator => 'Open calculator';
+
+  @override
+  String get calculatorHint => 'Quick calculations for amounts before saving';
+
+  @override
+  String get automationSectionSubtitle => 'Manage repeating transactions';
+
+  @override
+  String get planningSectionSubtitle => 'Set limits by category and month';
+
+  @override
   String get noDataToChart => 'No data to chart';
 
   @override
@@ -253,12 +286,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createWalletContinue => 'Create wallet and continue';
-
-  @override
-  String get quickAddTitle => 'Quick add';
-
-  @override
-  String get quickEditTitle => 'Quick edit';
 
   @override
   String get coreFieldsFirst => 'Core fields first. Extra details when needed.';
@@ -443,13 +470,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
-  String get deleteTransaction => 'Delete transaction';
-
-  @override
-  String get deleteTransactionPrompt =>
-      'This transaction will be removed permanently. Do you want to continue?';
-
-  @override
   String get statusConfirmed => 'Confirmed';
 
   @override
@@ -459,10 +479,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorTitle => 'Something went wrong';
 
   @override
-  String get tryAgain => 'Try again';
-
-  @override
-  String get helloUser => 'Hello';
+  String get helloUser => 'Hello, Alex';
 
   @override
   String get profileTitle => 'Profile';
@@ -471,21 +488,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
-  String get profilePlaceholder =>
-      'Your profile area is ready for account details, identity, and preferences.';
-
-  @override
-  String get settingsPlaceholder =>
-      'This settings area is ready for language, notifications, and app preferences.';
-
-  @override
   String get editProfile => 'Edit profile';
 
   @override
   String get quickOverview => 'Quick overview';
-
-  @override
-  String get financeSnapshot => 'A fast snapshot of your account activity';
 
   @override
   String get totalTransactions => 'Total transactions';
@@ -623,9 +629,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Prepare a quick access PIN for future releases';
 
   @override
-  String get comingSoon => 'Coming soon';
-
-  @override
   String get appVersion => 'App version';
 
   @override
@@ -673,7 +676,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockApp => 'Unlock app';
 
   @override
-  String get enterPinContinue => 'Enter your PIN to continue to Tiet Kiem.';
+  String get enterPinContinue => 'Enter your PIN to continue to PocketLedger.';
 
   @override
   String get unlock => 'Unlock';
@@ -686,15 +689,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get smartSuggestionsSubtitle => 'Based on your amount and note';
-
-  @override
-  String get noSmartSuggestions => 'Add a note or amount to get suggestions.';
-
-  @override
-  String get recurring => 'Recurring';
-
-  @override
-  String get recurringHint => 'Create repeating transactions automatically';
 
   @override
   String get enableRecurring => 'Enable recurring';
@@ -712,22 +706,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recurringTitle => 'Recurring';
 
   @override
-  String get recurringSubtitle => 'Automate repeating transactions';
-
-  @override
   String get noRecurringYet => 'No recurring rules yet';
 
   @override
   String get createRecurringHint => 'Create one from a new transaction';
 
   @override
-  String get nextRunLabel => 'Next run';
-
-  @override
   String get budgetsTitle => 'Budgets';
-
-  @override
-  String get budgetsSubtitle => 'Stay on track with category limits';
 
   @override
   String get setBudget => 'Set budget';
@@ -773,195 +758,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get same => 'No change';
-
-  @override
-  String get aiAssistantSection => 'AI assistant';
-
-  @override
-  String get aiAssistantSectionSubtitle =>
-      'AI-powered categorization, summaries, and natural input';
-
-  @override
-  String get aiFeatures => 'Enable AI features';
-
-  @override
-  String get aiFeaturesSubtitle =>
-      'Use Gemini 2.5 Flash when a Google AI Studio API key is configured. Local fallback stays available.';
-
-  @override
-  String get openAiApiKey => 'Google AI Studio API key';
-
-  @override
-  String get openAiApiKeySubtitle =>
-      'Used for Gemini 2.5 Flash. Stored only on this device. Recommended for personal use or testing.';
-
-  @override
-  String get configureApiKey => 'Configure API key';
-
-  @override
-  String get apiKeyConfigured => 'API key configured';
-
-  @override
-  String get apiKeyNotConfigured => 'API key not configured';
-
-  @override
-  String get aiNaturalEntry => 'Natural input';
-
-  @override
-  String get aiNaturalEntrySubtitle =>
-      'Describe the transaction in one sentence';
-
-  @override
-  String get parseTransaction => 'Parse transaction';
-
-  @override
-  String get describeTransactionHint => 'Example: lunch 45k from cash wallet';
-
-  @override
-  String get aiClassifyTransaction => 'AI classify';
-
-  @override
-  String get aiCategoryApplied => 'AI suggestion applied';
-
-  @override
-  String get aiSuggestionFailed => 'Could not extract a useful suggestion.';
-
-  @override
-  String get aiSummaryTitle => 'Monthly summary';
-
-  @override
-  String get aiSummarySubtitle =>
-      'Get a concise spending recap for the selected month';
-
-  @override
-  String get generateSummary => 'Generate summary';
-
-  @override
-  String get aiPowered => 'AI powered';
-
-  @override
-  String get localFallback => 'Local fallback';
-
-  @override
-  String get authHeroTitle => 'Sign in to sync your finance data';
-
-  @override
-  String get authHeroSubtitle =>
-      'Use Supabase email login first, then create a wallet or join one by invitation to start syncing across devices.';
-
-  @override
-  String get signInTitle => 'Sign in';
-
-  @override
-  String get signUpTitle => 'Sign up';
-
-  @override
-  String get signInSubtitle => 'Continue with your existing account';
-
-  @override
-  String get signUpSubtitle => 'Create a new account to access shared wallets';
-
-  @override
-  String get emailAddress => 'Email address';
-
-  @override
-  String get password => 'Password';
-
-  @override
-  String get emailRequired => 'Email is required.';
-
-  @override
-  String get emailInvalid => 'Enter a valid email address.';
-
-  @override
-  String get passwordRequired => 'Password is required.';
-
-  @override
-  String get passwordMinLength => 'Password must be at least 6 characters.';
-
-  @override
-  String get signInAction => 'Sign in';
-
-  @override
-  String get signUpAction => 'Create account';
-
-  @override
-  String get signOutAction => 'Sign out';
-
-  @override
-  String get signUpSuccess => 'Account created. Sign in to continue.';
-
-  @override
-  String get signedOut => 'Signed out';
-
-  @override
-  String get authInvalidCredentials => 'Incorrect email or password.';
-
-  @override
-  String get authEmailNotConfirmed => 'Confirm your email before signing in.';
-
-  @override
-  String get authUserExists => 'This email is already registered.';
-
-  @override
-  String get authNetworkError =>
-      'Network error. Check your connection and try again.';
-
-  @override
-  String get authGenericError => 'Authentication failed. Try again.';
-
-  @override
-  String get inviteUser => 'Invite user';
-
-  @override
-  String inviteUserTitle(String walletName) {
-    return 'Invite user to $walletName';
-  }
-
-  @override
-  String get inviteUserSubtitle =>
-      'Enter the email address of the person you want to invite to this wallet.';
-
-  @override
-  String invitationSent(String email) {
-    return 'Invitation sent to $email';
-  }
-
-  @override
-  String get authSignUpLead =>
-      'Create an account to sync your wallets across devices.';
-
-  @override
-  String get authSignInLead =>
-      'Sign in to continue with your wallets and transactions.';
-
-  @override
-  String get authToggleToSignIn => 'Already have an account? Sign in';
-
-  @override
-  String get authToggleToSignUp => 'Don\'t have an account? Sign up';
-
-  @override
-  String get authFooterSignUp =>
-      'After signing up, you can create your own wallet or join a shared wallet by invitation.';
-
-  @override
-  String get authFooterSignIn =>
-      'Local data appears instantly. Background sync keeps your wallets updated across devices.';
-
-  @override
-  String get authFeatureLocalFirst =>
-      'Saves locally first, so your data remains available offline.';
-
-  @override
-  String get authFeatureSharedWallets =>
-      'Shared wallets can be joined later by invitation.';
-
-  @override
-  String get authFeatureSync =>
-      'Syncs wallets and transactions across devices in the background.';
-
-  @override
-  String get authFeatureAccessControl =>
-      'Wallet access is protected by wallet member permissions.';
 }

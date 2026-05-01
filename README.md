@@ -1,67 +1,95 @@
 # Tiet Kiem
 
-Offline-first Flutter finance app with Drift as on-device source of truth and Supabase for auth, sync, realtime, and wallet-based sharing.
+Ứng dụng quản lý tài chính cá nhân viết bằng Flutter, tối ưu cho trải nghiệm mobile kiểu fintech và chạy offline-first.
 
-## Stack
+## Tính năng chính
 
-- Flutter
-- Drift + SQLite
-- Riverpod
-- Supabase Auth
-- Supabase Realtime
+- Quản lý nhiều ví: tiền mặt, ngân hàng, tiết kiệm.
+- Ghi nhận giao dịch: thu nhập, chi tiêu, chuyển tiền.
+- Đính kèm ảnh hóa đơn bằng camera hoặc thư viện.
+- Xem thống kê theo tháng với biểu đồ chi tiêu và thu/chi.
+- Quản lý ngân sách theo danh mục.
+- Quản lý giao dịch định kỳ.
+- Máy tính nhanh trong màn `Khác`.
+- Hồ sơ, cài đặt, đổi ngôn ngữ, dark mode, export/reset dữ liệu.
+- Khóa ứng dụng bằng PIN.
 
-## Offline-first architecture
+## Kiến trúc và lưu trữ
 
-- Reads always come from local Drift tables.
-- Writes go to Drift first, then into a local sync queue.
-- Sync runs in the background and pushes queued changes to Supabase.
-- Realtime updates from Supabase are merged back into Drift.
-- Conflict strategy is `updated_at` last-write-wins.
+- Flutter + Material 3
+- Riverpod cho state management
+- go_router cho điều hướng
+- Drift (SQLite) cho wallets, categories, transactions
+- SharedPreferences cho app settings, PIN, budgets, recurring rules
+- image_picker cho ảnh hóa đơn
+- fl_chart cho biểu đồ
 
-## Supabase setup
+App hiện không dùng backend và không có tính năng AI.
 
-1. Create a Supabase project.
-2. Run the SQL migration in [supabase/migrations/002_wallet_sharing_refactor.sql](supabase/migrations/002_wallet_sharing_refactor.sql).
-3. Copy [.env.example](.env.example) to `.env` in the project root and fill in your own values:
+## Cấu trúc thư mục
 
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
+```text
+lib/
+├── core/
+│   ├── database/
+│   ├── error/
+│   ├── router/
+│   └── theme/
+├── features/
+│   ├── budget/
+│   ├── category/
+│   ├── recurring/
+│   ├── transaction/
+│   └── wallet/
+├── l10n/
+└── shared/
 ```
 
-4. Keep `.env` local only. It is gitignored and must not be committed.
-5. Make sure Email + Password auth is enabled in Supabase Auth.
+## Các màn hình
 
-## Flutter setup
+- `Trang chủ`: tổng số dư, ví, giao dịch gần đây, thêm nhanh.
+- `Giao dịch`: tìm kiếm, lọc, xem lịch sử giao dịch.
+- `Thống kê`: biểu đồ theo tháng và drill-down giao dịch.
+- `Ví`: tạo/sửa/xóa ví.
+- `Khác`: máy tính, định kỳ, ngân sách.
+- `Hồ sơ`: avatar, tên, email, thống kê cơ bản.
+- `Cài đặt`: ngôn ngữ, dark mode, thông báo, export/reset, app lock.
+
+## Chạy dự án
 
 ```bash
 flutter pub get
-flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-## What was added
-
-- Multi-user backend schema with `wallets` and `wallet_members`
-- RLS policies on all shared tables
-- Realtime for `wallets`, `categories`, `transactions`, and `budgets`
-- Wallet-scoped sync and sharing
-- Local sync queue
-- Background sync bootstrap wired from `main.dart`
-
-## Current sync model
-
-- `wallets`, `categories`, `transactions`, and `budgets` are sync-ready
-- deletes are soft-deletes using `deleted_at`
-- transfer transactions sync with `category_id = null` remotely while local app keeps its existing transfer handling
-
-## Build
+Chạy web:
 
 ```bash
-flutter build apk --release
+flutter run -d chrome
 ```
 
-## Public repo notes
+Build web:
 
-- Do not commit `.env`, API keys, access tokens, or local CLI state.
-- The client uses the Supabase anon key only. Never use a service role key in the app.
+```bash
+flutter build web
+```
+
+## Kiểm tra chất lượng
+
+```bash
+flutter analyze
+flutter test
+```
+
+## Ghi chú phát triển
+
+- Toàn bộ text UI đi qua `l10n`.
+- Hạn chế hardcode màu và spacing ngoài theme/widget dùng chung.
+- Không thay đổi business logic khi chỉ chỉnh UI/UX.
+- Các tính năng `Budget` và `Recurring` hiện được gom về tab `Khác`.
+
+## Trạng thái hiện tại
+
+- `flutter analyze`: pass
+- `flutter test`: pass
+- `flutter build web`: pass

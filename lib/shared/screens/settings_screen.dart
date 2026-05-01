@@ -130,43 +130,6 @@ class SettingsScreen extends ConsumerWidget {
               AnimatedReveal(
                 delay: const Duration(milliseconds: 120),
                 child: _SettingsSection(
-                  title: context.l10n.aiAssistantSection,
-                  subtitle: context.l10n.aiAssistantSectionSubtitle,
-                  children: [
-                    SettingItem(
-                      icon: Icons.auto_awesome_rounded,
-                      title: context.l10n.aiFeatures,
-                      subtitle: context.l10n.aiFeaturesSubtitle,
-                      trailing: Switch(
-                        value: preferences.aiAssistantEnabled,
-                        onChanged: (value) => ref
-                            .read(appPreferencesProvider.notifier)
-                            .updateAiAssistant(value),
-                      ),
-                    ),
-                    SettingItem(
-                      icon: Icons.key_rounded,
-                      title: context.l10n.openAiApiKey,
-                      subtitle: context.l10n.openAiApiKeySubtitle,
-                      trailing: Text(
-                        preferences.openAiApiKey?.isNotEmpty == true
-                            ? context.l10n.apiKeyConfigured
-                            : context.l10n.apiKeyNotConfigured,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      onTap: () => _showOpenAiApiKeySheet(
-                        context,
-                        ref,
-                        existingApiKey: preferences.openAiApiKey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-              AnimatedReveal(
-                delay: const Duration(milliseconds: 150),
-                child: _SettingsSection(
                   title: context.l10n.securitySection,
                   subtitle: context.l10n.securitySectionSubtitle,
                   children: [
@@ -203,7 +166,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 18),
               AnimatedReveal(
-                delay: const Duration(milliseconds: 180),
+                delay: const Duration(milliseconds: 150),
                 child: _SettingsSection(
                   title: context.l10n.aboutSection,
                   subtitle: context.l10n.aboutSectionSubtitle,
@@ -702,116 +665,6 @@ class SettingsScreen extends ConsumerWidget {
     });
   }
 
-  Future<void> _showOpenAiApiKeySheet(
-    BuildContext context,
-    WidgetRef ref, {
-    String? existingApiKey,
-  }) {
-    final controller = TextEditingController(text: existingApiKey ?? '');
-    final formKey = GlobalKey<FormState>();
-    var obscure = true;
-
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 8,
-                bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
-              ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 520),
-                  child: AppCard(
-                    padding: const EdgeInsets.all(20),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.openAiApiKey,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            context.l10n.openAiApiKeySubtitle,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: controller,
-                            obscureText: obscure,
-                            decoration: InputDecoration(
-                              labelText: context.l10n.openAiApiKey,
-                              hintText: 'sk-...',
-                              prefixIcon: const Icon(Icons.key_rounded),
-                              suffixIcon: IconButton(
-                                onPressed: () =>
-                                    setSheetState(() => obscure = !obscure),
-                                icon: Icon(
-                                  obscure
-                                      ? Icons.visibility_rounded
-                                      : Icons.visibility_off_rounded,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          Row(
-                            children: [
-                              TextButton(
-                                onPressed: () async {
-                                  await ref
-                                      .read(appPreferencesProvider.notifier)
-                                      .updateOpenAiApiKey(null);
-                                  if (sheetContext.mounted) {
-                                    Navigator.of(sheetContext).pop();
-                                  }
-                                },
-                                child: Text(context.l10n.remove),
-                              ),
-                              const Spacer(),
-                              FilledButton.icon(
-                                onPressed: () async {
-                                  if (formKey.currentState?.validate() != true) {
-                                    return;
-                                  }
-                                  await ref
-                                      .read(appPreferencesProvider.notifier)
-                                      .updateOpenAiApiKey(controller.text.trim());
-                                  if (sheetContext.mounted) {
-                                    Navigator.of(sheetContext).pop();
-                                  }
-                                },
-                                icon: const Icon(Icons.check_rounded),
-                                label: Text(context.l10n.save),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    ).whenComplete(controller.dispose);
-  }
 }
 
 class _SettingsLoadingState extends StatelessWidget {

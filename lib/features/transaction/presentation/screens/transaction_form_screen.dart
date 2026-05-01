@@ -15,12 +15,8 @@ import '../../../../shared/widgets/shake_widget.dart';
 import '../../../../shared/widgets/skeleton_box.dart';
 import '../../../../shared/widgets/smooth_bottom_sheet.dart';
 import '../../../../shared/utils/currency_input_formatter.dart';
-import '../../../../shared/services/wallet_bootstrap_service.dart';
-import '../../../ai/domain/entities/ai_transaction_draft.dart';
-import '../../../ai/presentation/providers/finance_ai_provider.dart';
 import '../../../category/domain/entities/category.dart';
 import '../../../category/presentation/providers/category_provider.dart';
-import '../../../recurring/presentation/providers/recurring_provider.dart';
 import '../../../wallet/domain/entities/wallet.dart';
 import '../../../wallet/presentation/providers/wallet_provider.dart';
 import '../../../wallet/presentation/screens/wallet_screen.dart';
@@ -98,8 +94,7 @@ class TransactionEntryView extends ConsumerStatefulWidget {
   final bool embedded;
 
   @override
-  ConsumerState<TransactionEntryView> createState() =>
-      _TransactionEntryViewState();
+  ConsumerState<TransactionEntryView> createState() => _TransactionEntryViewState();
 }
 
 class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
@@ -121,10 +116,6 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
   bool _detailsExpanded = false;
   int _shakeTrigger = 0;
   int _rawAmount = 0;
-  bool _recurringEnabled = false;
-  RecurringInterval _recurringInterval = RecurringInterval.monthly;
-  bool _aiBusy = false;
-  String? _bootstrappingCategoryWalletId;
 
   @override
   void initState() {
@@ -172,14 +163,10 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
             );
           }
 
-          final availableCategories = _categoriesForWalletAndType(
-            categories,
-            walletId: _walletId,
-            type: _type,
-          );
-          final availableTargets = wallets
-              .where((item) => item.id != _walletId)
+          final availableCategories = categories
+              .where((category) => category.type == _type && category.id != 'transfer')
               .toList();
+          final availableTargets = wallets.where((item) => item.id != _walletId).toList();
           final mediaQuery = MediaQuery.of(context);
           final safeBottomInset = mediaQuery.viewPadding.bottom;
           final keyboardInset = mediaQuery.viewInsets.bottom;
@@ -195,26 +182,15 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                   type: _type,
                 );
 
-          if (_type != TransactionType.transfer &&
-              _walletId != null &&
-              availableCategories.isEmpty &&
-              _bootstrappingCategoryWalletId != _walletId) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted && _walletId != null) {
-                _ensureCategoriesForWallet(_walletId!);
-              }
-            });
-          }
-
           _categoryId = _type == TransactionType.transfer
               ? null
               : (availableCategories.any((item) => item.id == _categoryId)
-                    ? _categoryId
-                    : availableCategories.firstOrNull?.id);
+                  ? _categoryId
+                  : availableCategories.firstOrNull?.id);
           _targetWalletId = _type == TransactionType.transfer
               ? (availableTargets.any((item) => item.id == _targetWalletId)
-                    ? _targetWalletId
-                    : availableTargets.firstOrNull?.id)
+                  ? _targetWalletId
+                  : availableTargets.firstOrNull?.id)
               : null;
 
           final sheetBody = SafeArea(
@@ -260,29 +236,20 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                             child: ShakeWidget(
                               trigger: _shakeTrigger,
                               child: AppCard(
-                                padding: const EdgeInsets.fromLTRB(
-                                  18,
-                                  18,
-                                  18,
-                                  16,
-                                ),
+                                padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
                                 child: Column(
                                   children: [
                                     _TypeStrip(
                                       type: _type,
-                                      onChanged: (type) =>
-                                          _applyType(type, categories),
+                                      onChanged: (type) => _applyType(type, categories),
                                     ),
                                     const SizedBox(height: 18),
                                     Text(
                                       _headlineForType(context, _type),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge
-                                          ?.copyWith(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
                                           ),
                                     ),
                                     const SizedBox(height: 10),
@@ -291,6 +258,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                       rawValue: _rawAmount,
                                       focusNode: _amountFocusNode,
                                       onChanged: (value) => _rawAmount = value,
+                                      onCalculated: _applyCalculatedAmount,
                                       onFieldSubmitted: (_) => _save(),
                                     ),
                                   ],
@@ -313,18 +281,13 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                           Icons.account_balance_wallet_rounded,
                                           size: 18,
                                           color: selected
-                                              ? Theme.of(
-                                                  context,
-                                                ).colorScheme.primary
+                                              ? Theme.of(context).colorScheme.primary
                                               : null,
                                         ),
                                         label: Text(wallet.name),
                                         selected: selected,
                                         onSelected: (_) =>
-                                            _applyWalletSelection(
-                                              wallet.id,
-                                              categories,
-                                            ),
+                                            setState(() => _walletId = wallet.id),
                                       );
                                     }).toList(),
                                   )
@@ -335,7 +298,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                           ),
                           if (_type == TransactionType.transfer) ...[
                             const SizedBox(height: 14),
-                            _CompactSection(
+                          _CompactSection(
                               title: context.l10n.targetWallet,
                               subtitle: context.l10n.tapOnceSwitchDestination,
                               child: availableTargets.length > 1
@@ -345,8 +308,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                       children: availableTargets.map((wallet) {
                                         return ChoiceChip(
                                           label: Text(wallet.name),
-                                          selected:
-                                              wallet.id == _targetWalletId,
+                                          selected: wallet.id == _targetWalletId,
                                           onSelected: (_) => setState(
                                             () => _targetWalletId = wallet.id,
                                           ),
@@ -355,8 +317,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                     )
                                   : _StaticSelectionChip(
                                       icon: Icons.swap_horiz_rounded,
-                                      label:
-                                          availableTargets.firstOrNull?.name ??
+                                      label: availableTargets.firstOrNull?.name ??
                                           context.l10n.noTargetWallet,
                                     ),
                             ),
@@ -365,169 +326,37 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                             _CompactSection(
                               title: context.l10n.category,
                               subtitle: context.l10n.tapIconChangeInstantly,
-                              child: availableCategories.isEmpty
-                                  ? _EmptyCategoryState(
-                                      loading:
-                                          _bootstrappingCategoryWalletId ==
-                                          _walletId,
-                                      onRetry: _walletId == null
-                                          ? null
-                                          : () => _ensureCategoriesForWallet(
-                                              _walletId!,
-                                            ),
-                                    )
-                                  : CategorySelector(
-                                      categories: availableCategories,
-                                      selectedId: _categoryId,
-                                      onSelected: (value) =>
-                                          setState(() => _categoryId = value),
-                                    ),
+                              child: CategorySelector(
+                                categories: availableCategories,
+                                selectedId: _categoryId,
+                                onSelected: (value) => setState(() => _categoryId = value),
+                              ),
                             ),
                           ],
-                          if (_type != TransactionType.transfer) ...[
+                          if (_type != TransactionType.transfer &&
+                              suggestedCategories.isNotEmpty) ...[
                             const SizedBox(height: 14),
                             _CompactSection(
                               title: context.l10n.smartSuggestions,
                               subtitle: context.l10n.smartSuggestionsSubtitle,
-                              child: suggestedCategories.isEmpty
-                                  ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          context.l10n.noSmartSuggestions,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                color: Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurfaceVariant,
-                                              ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        OutlinedButton.icon(
-                                          onPressed: _aiBusy
-                                              ? null
-                                              : () => _runAiClassification(
-                                                  context,
-                                                  wallets: wallets,
-                                                  categories: categories,
-                                                ),
-                                          icon: _aiBusy
-                                              ? const SizedBox(
-                                                  width: 18,
-                                                  height: 18,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                      ),
-                                                )
-                                              : const Icon(
-                                                  Icons.auto_awesome_rounded,
-                                                ),
-                                          label: Text(
-                                            context.l10n.aiClassifyTransaction,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Wrap(
-                                          spacing: 8,
-                                          runSpacing: 8,
-                                          children: suggestedCategories.map((
-                                            category,
-                                          ) {
-                                            return ActionChip(
-                                              label: Text(
-                                                category.displayName(context),
-                                              ),
-                                              avatar: const Icon(
-                                                Icons.auto_awesome,
-                                                size: 16,
-                                              ),
-                                              onPressed: () => setState(
-                                                () => _categoryId = category.id,
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        OutlinedButton.icon(
-                                          onPressed: _aiBusy
-                                              ? null
-                                              : () => _runAiClassification(
-                                                  context,
-                                                  wallets: wallets,
-                                                  categories: categories,
-                                                ),
-                                          icon: _aiBusy
-                                              ? const SizedBox(
-                                                  width: 18,
-                                                  height: 18,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                      ),
-                                                )
-                                              : const Icon(
-                                                  Icons.auto_awesome_rounded,
-                                                ),
-                                          label: Text(
-                                            context.l10n.aiClassifyTransaction,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                            ),
-                            const SizedBox(height: 14),
-                            _CompactSection(
-                              title: context.l10n.recurring,
-                              subtitle: context.l10n.recurringHint,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SwitchListTile.adaptive(
-                                    contentPadding: EdgeInsets.zero,
-                                    title: Text(context.l10n.enableRecurring),
-                                    value: _recurringEnabled,
-                                    onChanged: (value) {
-                                      setState(() => _recurringEnabled = value);
-                                    },
-                                  ),
-                                  if (_recurringEnabled) ...[
-                                    const SizedBox(height: 6),
-                                    DropdownButtonFormField<RecurringInterval>(
-                                      initialValue: _recurringInterval,
-                                      decoration: InputDecoration(
-                                        labelText: context.l10n.repeatEvery,
-                                        prefixIcon: const Icon(
-                                          Icons.repeat_rounded,
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: suggestedCategories.map((category) {
+                                      return ActionChip(
+                                        label: Text(category.displayName(context)),
+                                        avatar: const Icon(
+                                          Icons.auto_awesome,
+                                          size: 16,
                                         ),
-                                      ),
-                                      items: RecurringInterval.values
-                                          .map(
-                                            (interval) => DropdownMenuItem(
-                                              value: interval,
-                                              child: Text(
-                                                interval.label(context),
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          setState(
-                                            () => _recurringInterval = value,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ],
+                                        onPressed: () =>
+                                            setState(() => _categoryId = category.id),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ],
                               ),
                             ),
@@ -538,9 +367,8 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                             noteText: _noteController.text,
                             hasImage: _imagePath?.isNotEmpty == true,
                             status: _status,
-                            onToggle: () => setState(
-                              () => _detailsExpanded = !_detailsExpanded,
-                            ),
+                            onToggle: () =>
+                                setState(() => _detailsExpanded = !_detailsExpanded),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -548,9 +376,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                   initialValue: _status,
                                   decoration: InputDecoration(
                                     labelText: context.l10n.status,
-                                    prefixIcon: const Icon(
-                                      Icons.verified_user_rounded,
-                                    ),
+                                    prefixIcon: const Icon(Icons.verified_user_rounded),
                                   ),
                                   items: TransactionStatus.values
                                       .map(
@@ -580,14 +406,10 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                 const SizedBox(height: 12),
                                 AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 220),
-                                  child:
-                                      _imagePath != null &&
-                                          _imagePath!.isNotEmpty
+                                  child: _imagePath != null && _imagePath!.isNotEmpty
                                       ? ClipRRect(
                                           key: ValueKey(_imagePath),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
+                                          borderRadius: BorderRadius.circular(20),
                                           child: ReceiptImage(
                                             source: _imagePath!,
                                             height: 150,
@@ -599,17 +421,13 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                           key: const ValueKey('no-image'),
                                           height: 110,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
+                                            borderRadius: BorderRadius.circular(20),
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .surfaceContainerHighest,
                                           ),
                                           child: Center(
-                                            child: Text(
-                                              context.l10n.noReceiptAttached,
-                                            ),
+                                            child: Text(context.l10n.noReceiptAttached),
                                           ),
                                         ),
                                 ),
@@ -619,28 +437,19 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                   runSpacing: 8,
                                   children: [
                                     OutlinedButton.icon(
-                                      onPressed: () =>
-                                          _pickImage(ImageSource.camera),
-                                      icon: const Icon(
-                                        Icons.photo_camera_rounded,
-                                      ),
+                                      onPressed: () => _pickImage(ImageSource.camera),
+                                      icon: const Icon(Icons.photo_camera_rounded),
                                       label: Text(context.l10n.camera),
                                     ),
                                     OutlinedButton.icon(
-                                      onPressed: () =>
-                                          _pickImage(ImageSource.gallery),
-                                      icon: const Icon(
-                                        Icons.photo_library_rounded,
-                                      ),
+                                      onPressed: () => _pickImage(ImageSource.gallery),
+                                      icon: const Icon(Icons.photo_library_rounded),
                                       label: Text(context.l10n.gallery),
                                     ),
                                     if (_imagePath != null)
                                       TextButton.icon(
-                                        onPressed: () =>
-                                            setState(() => _imagePath = null),
-                                        icon: const Icon(
-                                          Icons.delete_outline_rounded,
-                                        ),
+                                        onPressed: () => setState(() => _imagePath = null),
+                                        icon: const Icon(Icons.delete_outline_rounded),
                                         label: Text(context.l10n.remove),
                                       ),
                                   ],
@@ -658,15 +467,11 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                         16,
                         12,
                         16,
-                        16 +
-                            safeBottomInset +
-                            (widget.embedded ? keyboardInset : 0),
+                        16 + safeBottomInset + (widget.embedded ? keyboardInset : 0),
                       ),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(24),
-                        ),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.05),
@@ -676,9 +481,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                         ],
                       ),
                       child: AppButton(
-                        label: _saving
-                            ? context.l10n.saving
-                            : _saveLabel(context),
+                        label: _saving ? context.l10n.saving : _saveLabel(context),
                         icon: Icons.check_circle_rounded,
                         isLoading: _saving,
                         onPressed: _save,
@@ -720,18 +523,14 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
 
     final editing = widget.transactionId == null
         ? null
-        : transactions
-              .where((item) => item.id == widget.transactionId)
-              .firstOrNull;
+        : transactions.where((item) => item.id == widget.transactionId).firstOrNull;
     _editingTransaction = editing;
 
     if (editing != null) {
       _type = editing.type;
       _walletId = editing.walletId;
       _targetWalletId = editing.targetWalletId;
-      _categoryId = editing.categoryId == 'transfer'
-          ? null
-          : editing.categoryId;
+      _categoryId = editing.categoryId == 'transfer' ? null : editing.categoryId;
       _status = editing.status;
       _imagePath = editing.imagePath;
       _noteController.text = editing.note ?? '';
@@ -742,18 +541,14 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
         _type = widget.initialType ?? latest.type;
         _walletId = latest.walletId;
         _targetWalletId = latest.targetWalletId;
-        _categoryId = latest.categoryId == 'transfer'
-            ? null
-            : latest.categoryId;
+        _categoryId = latest.categoryId == 'transfer' ? null : latest.categoryId;
         _status = latest.status;
       } else {
         _type = widget.initialType ?? TransactionType.expense;
         _walletId = wallets.firstOrNull?.id;
-        final initialCategories = _categoriesForWalletAndType(
-          categories,
-          walletId: _walletId,
-          type: _type,
-        );
+        final initialCategories = categories
+            .where((item) => item.type == _type && item.id != 'transfer')
+            .toList();
         _categoryId = initialCategories.firstOrNull?.id;
       }
     }
@@ -766,52 +561,16 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
       _type = type;
       if (_type == TransactionType.transfer) {
         _categoryId = null;
-        _recurringEnabled = false;
       } else {
-        final matches = _categoriesForWalletAndType(
-          categories,
-          walletId: _walletId,
-          type: _type,
-        );
+        final matches = categories
+            .where((item) => item.type == _type && item.id != 'transfer')
+            .toList();
         _categoryId = matches.any((item) => item.id == _categoryId)
             ? _categoryId
             : matches.firstOrNull?.id;
         _targetWalletId = null;
       }
     });
-  }
-
-  void _applyWalletSelection(String walletId, List<Category> categories) {
-    setState(() {
-      _walletId = walletId;
-      if (_type == TransactionType.transfer) {
-        if (_targetWalletId == walletId) {
-          _targetWalletId = null;
-        }
-      } else {
-        final matches = _categoriesForWalletAndType(
-          categories,
-          walletId: walletId,
-          type: _type,
-        );
-        _categoryId = matches.any((item) => item.id == _categoryId)
-            ? _categoryId
-            : matches.firstOrNull?.id;
-      }
-    });
-  }
-
-  Future<void> _ensureCategoriesForWallet(String walletId) async {
-    setState(() => _bootstrappingCategoryWalletId = walletId);
-    try {
-      await ref
-          .read(walletBootstrapServiceProvider)
-          .ensureDefaultCategories(walletId);
-    } finally {
-      if (mounted && _bootstrappingCategoryWalletId == walletId) {
-        setState(() => _bootstrappingCategoryWalletId = null);
-      }
-    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -828,9 +587,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() ||
-        _rawAmount <= 0 ||
-        _walletId == null) {
+    if (!_formKey.currentState!.validate() || _rawAmount <= 0 || _walletId == null) {
       setState(() => _shakeTrigger++);
       _amountFocusNode.requestFocus();
       return;
@@ -839,9 +596,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
     setState(() => _saving = true);
     try {
       FocusScope.of(context).unfocus();
-      await ref
-          .read(transactionProvider.notifier)
-          .saveTransaction(
+      await ref.read(transactionProvider.notifier).saveTransaction(
             id: _editingTransaction?.id,
             type: _type,
             amount: _rawAmount.toDouble(),
@@ -853,27 +608,14 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
             status: _status,
             createdAt: _editingTransaction?.createdAt,
           );
-      if (_recurringEnabled && _type != TransactionType.transfer) {
-        await ref
-            .read(recurringProvider.notifier)
-            .saveRule(
-              type: _type,
-              amount: _rawAmount.toDouble(),
-              walletId: _walletId!,
-              categoryId: _categoryId ?? 'transfer',
-              note: _noteController.text,
-              status: _status,
-              interval: _recurringInterval,
-            );
-      }
       if (mounted) {
         context.pop();
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(localizeError(context, error))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(localizeError(context, error))),
+        );
       }
     } finally {
       if (mounted) {
@@ -889,94 +631,6 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
       applyCurrencyEditingValue(_amountController, normalized);
     });
     _amountFocusNode.requestFocus();
-  }
-
-  Future<void> _runAiClassification(
-    BuildContext context, {
-    required List<Wallet> wallets,
-    required List<Category> categories,
-  }) async {
-    if (_aiBusy) {
-      return;
-    }
-    setState(() => _aiBusy = true);
-    final languageCode = Localizations.localeOf(context).languageCode;
-    try {
-      final draft = await ref
-          .read(financeAiServiceProvider)
-          .classifyTransaction(
-            note: _noteController.text,
-            amount: _rawAmount,
-            fallbackType: _type,
-            categories: categories,
-            wallets: wallets,
-            languageCode: languageCode,
-          );
-      if (!mounted) {
-        return;
-      }
-      if (!draft.hasMeaningfulSuggestion) {
-        ScaffoldMessenger.of(this.context).showSnackBar(
-          SnackBar(content: Text(this.context.l10n.aiSuggestionFailed)),
-        );
-        return;
-      }
-      _applyAiDraft(draft, categories: categories, wallets: wallets);
-      ScaffoldMessenger.of(this.context).showSnackBar(
-        SnackBar(content: Text(this.context.l10n.aiCategoryApplied)),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _aiBusy = false);
-      }
-    }
-  }
-
-  void _applyAiDraft(
-    AiTransactionDraft draft, {
-    required List<Category> categories,
-    required List<Wallet> wallets,
-  }) {
-    setState(() {
-      if (draft.walletId != null &&
-          wallets.any((wallet) => wallet.id == draft.walletId)) {
-        _walletId = draft.walletId;
-      }
-      if (draft.type != null) {
-        _type = draft.type!;
-      }
-      if (draft.amount != null && draft.amount! > 0) {
-        _rawAmount = draft.amount!;
-        applyCurrencyEditingValue(_amountController, draft.amount!);
-      }
-      if (draft.note?.trim().isNotEmpty ?? false) {
-        _noteController.text = draft.note!.trim();
-      }
-
-      final categoriesForType = _categoriesForWalletAndType(
-        categories,
-        walletId: draft.walletId ?? _walletId,
-        type: _type,
-      );
-      final nextCategoryId = draft.categoryId;
-      if (_type == TransactionType.transfer) {
-        _categoryId = null;
-        _recurringEnabled = false;
-      } else if (nextCategoryId != null &&
-          categoriesForType.any((item) => item.id == nextCategoryId)) {
-        _categoryId = nextCategoryId;
-      }
-
-      if (_type == TransactionType.transfer &&
-          draft.targetWalletId != null &&
-          wallets.any((wallet) => wallet.id == draft.targetWalletId) &&
-          draft.targetWalletId != _walletId) {
-        _targetWalletId = draft.targetWalletId;
-      }
-      _detailsExpanded =
-          _noteController.text.trim().isNotEmpty ||
-          _imagePath?.isNotEmpty == true;
-    });
   }
 
   List<Category> _suggestCategories(
@@ -1004,9 +658,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
     for (final category in categories) {
       final label = category.displayName(context).toLowerCase();
       final fallback = category.name.toLowerCase();
-      if (tokens.any(
-        (token) => label.contains(token) || fallback.contains(token),
-      )) {
+      if (tokens.any((token) => label.contains(token) || fallback.contains(token))) {
         scores[category.id] = (scores[category.id] ?? 0) + 3;
       }
     }
@@ -1039,42 +691,28 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
       scores[transaction.categoryId] = score;
     }
 
-    final ranked =
-        categories.where((category) => (scores[category.id] ?? 0) > 0).toList()
-          ..sort((a, b) => (scores[b.id] ?? 0).compareTo(scores[a.id] ?? 0));
+    final ranked = categories
+        .where((category) => (scores[category.id] ?? 0) > 0)
+        .toList()
+      ..sort(
+        (a, b) =>
+            (scores[b.id] ?? 0).compareTo(scores[a.id] ?? 0),
+      );
 
     return ranked.take(3).toList();
   }
 
-  List<Category> _categoriesForWalletAndType(
-    List<Category> categories, {
-    required String? walletId,
-    required TransactionType type,
-  }) {
-    return categories
-        .where(
-          (item) =>
-              item.type == type &&
-              item.id != 'transfer' &&
-              (walletId == null || item.workspaceId == walletId),
-        )
-        .toList();
-  }
-
   String _saveLabel(BuildContext context) => switch (_type) {
-    TransactionType.income =>
-      _editingTransaction == null
-          ? context.l10n.saveIncome
-          : context.l10n.updateIncome,
-    TransactionType.expense =>
-      _editingTransaction == null
-          ? context.l10n.saveExpense
-          : context.l10n.updateExpense,
-    TransactionType.transfer =>
-      _editingTransaction == null
-          ? context.l10n.saveTransfer
-          : context.l10n.updateTransfer,
-  };
+        TransactionType.income => _editingTransaction == null
+            ? context.l10n.saveIncome
+            : context.l10n.updateIncome,
+        TransactionType.expense => _editingTransaction == null
+            ? context.l10n.saveExpense
+            : context.l10n.updateExpense,
+        TransactionType.transfer => _editingTransaction == null
+            ? context.l10n.saveTransfer
+            : context.l10n.updateTransfer,
+      };
 
   String _formTitle(BuildContext context) {
     if (_editingTransaction != null) {
@@ -1089,7 +727,10 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
 }
 
 class _HeaderText extends StatelessWidget {
-  const _HeaderText({required this.title, required this.subtitle});
+  const _HeaderText({
+    required this.title,
+    required this.subtitle,
+  });
 
   final String title;
   final String subtitle;
@@ -1104,8 +745,8 @@ class _HeaderText extends StatelessWidget {
         Text(
           subtitle,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
         ),
       ],
     );
@@ -1140,7 +781,10 @@ class _CompactSection extends StatelessWidget {
 }
 
 class _TypeStrip extends StatelessWidget {
-  const _TypeStrip({required this.type, required this.onChanged});
+  const _TypeStrip({
+    required this.type,
+    required this.onChanged,
+  });
 
   final TransactionType type;
   final ValueChanged<TransactionType> onChanged;
@@ -1173,7 +817,10 @@ class _TypeStrip extends StatelessWidget {
 }
 
 class _StaticSelectionChip extends StatelessWidget {
-  const _StaticSelectionChip({required this.icon, required this.label});
+  const _StaticSelectionChip({
+    required this.icon,
+    required this.label,
+  });
 
   final IconData icon;
   final String label;
@@ -1192,53 +839,6 @@ class _StaticSelectionChip extends StatelessWidget {
           Icon(icon, size: 18),
           const SizedBox(width: 8),
           Text(label, style: Theme.of(context).textTheme.titleSmall),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyCategoryState extends StatelessWidget {
-  const _EmptyCategoryState({required this.loading, this.onRetry});
-
-  final bool loading;
-  final VoidCallback? onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest.withValues(alpha: 0.42),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            loading
-                ? 'Đang tạo danh mục mặc định...'
-                : 'Chưa có danh mục cho ví này',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-          ),
-          if (onRetry != null) ...[
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: loading ? null : onRetry,
-              icon: loading
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.refresh_rounded),
-              label: Text(loading ? 'Đang tải...' : 'Tạo lại danh mục'),
-            ),
-          ],
         ],
       ),
     );
@@ -1295,9 +895,8 @@ class _DetailsCard extends StatelessWidget {
           ),
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 200),
-            crossFadeState: expanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+            crossFadeState:
+                expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             firstChild: const SizedBox(height: 0),
             secondChild: Padding(
               padding: const EdgeInsets.only(top: 10),
@@ -1310,8 +909,7 @@ class _DetailsCard extends StatelessWidget {
   }
 }
 
-String _headlineForType(BuildContext context, TransactionType type) =>
-    switch (type) {
+String _headlineForType(BuildContext context, TransactionType type) => switch (type) {
       TransactionType.income => context.l10n.headlineIncome,
       TransactionType.expense => context.l10n.headlineExpense,
       TransactionType.transfer => context.l10n.headlineTransfer,
@@ -1351,17 +949,11 @@ class _TransactionFormLoadingState extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Expanded(
-                            child: SkeletonBox(height: 46, borderRadius: 18),
-                          ),
+                          Expanded(child: SkeletonBox(height: 46, borderRadius: 18)),
                           SizedBox(width: 8),
-                          Expanded(
-                            child: SkeletonBox(height: 46, borderRadius: 18),
-                          ),
+                          Expanded(child: SkeletonBox(height: 46, borderRadius: 18)),
                           SizedBox(width: 8),
-                          Expanded(
-                            child: SkeletonBox(height: 46, borderRadius: 18),
-                          ),
+                          Expanded(child: SkeletonBox(height: 46, borderRadius: 18)),
                         ],
                       ),
                       SizedBox(height: 18),
@@ -1372,9 +964,15 @@ class _TransactionFormLoadingState extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const _FormSectionSkeleton(chipCount: 3, chipWidth: 92),
+                const _FormSectionSkeleton(
+                  chipCount: 3,
+                  chipWidth: 92,
+                ),
                 const SizedBox(height: 14),
-                const _FormSectionSkeleton(chipCount: 6, chipWidth: 74),
+                const _FormSectionSkeleton(
+                  chipCount: 6,
+                  chipWidth: 74,
+                ),
                 const SizedBox(height: 14),
                 AppCard(
                   padding: const EdgeInsets.all(14),
@@ -1397,9 +995,7 @@ class _TransactionFormLoadingState extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + safeBottomInset),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
-                ),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),

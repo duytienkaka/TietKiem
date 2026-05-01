@@ -7,19 +7,15 @@ final sharedPreferencesProvider = FutureProvider<SharedPreferences>(
   (ref) => SharedPreferences.getInstance(),
 );
 
-final appPreferencesProvider =
-    AsyncNotifierProvider<AppPreferencesNotifier, AppPreferencesState>(
-      AppPreferencesNotifier.new,
-    );
+final appPreferencesProvider = AsyncNotifierProvider<AppPreferencesNotifier,
+    AppPreferencesState>(AppPreferencesNotifier.new);
 
 class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
   static const _languageCodeKey = 'prefs.languageCode';
   static const _darkModeKey = 'prefs.darkModeEnabled';
   static const _notificationsKey = 'prefs.notificationsEnabled';
   static const _appLockKey = 'prefs.appLockEnabled';
-  static const _aiAssistantKey = 'prefs.aiAssistantEnabled';
   static const _pinCodeKey = 'prefs.pinCode';
-  static const _openAiApiKeyKey = 'prefs.openAiApiKey';
   static const _profileNameKey = 'prefs.profileName';
   static const _profileEmailKey = 'prefs.profileEmail';
   static const _avatarPathKey = 'prefs.avatarPath';
@@ -35,11 +31,9 @@ class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
       darkModeEnabled: prefs.getBool(_darkModeKey) ?? false,
       notificationsEnabled: prefs.getBool(_notificationsKey) ?? true,
       appLockEnabled: prefs.getBool(_appLockKey) ?? false,
-      aiAssistantEnabled: prefs.getBool(_aiAssistantKey) ?? false,
       pinCode: prefs.getString(_pinCodeKey),
-      openAiApiKey: prefs.getString(_openAiApiKeyKey),
-      profileName: prefs.getString(_profileNameKey) ?? '',
-      profileEmail: prefs.getString(_profileEmailKey) ?? '',
+      profileName: prefs.getString(_profileNameKey) ?? 'Alex Tran',
+      profileEmail: prefs.getString(_profileEmailKey) ?? 'alex@pocketledger.app',
       avatarPath: prefs.getString(_avatarPathKey),
     );
   }
@@ -56,24 +50,17 @@ class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
   Future<void> updateAppLock(bool enabled) =>
       _save((current) => current.copyWith(appLockEnabled: enabled));
 
-  Future<void> updateAiAssistant(bool enabled) =>
-      _save((current) => current.copyWith(aiAssistantEnabled: enabled));
-
   Future<void> updatePinCode(String? pinCode) => _save(
-    (current) => current.copyWith(
-      pinCode: pinCode,
-      clearPin: pinCode == null || pinCode.isEmpty,
-    ),
-  );
+        (current) => current.copyWith(
+          pinCode: pinCode,
+          clearPin: pinCode == null || pinCode.isEmpty,
+        ),
+      );
 
-  Future<void> updateOpenAiApiKey(String? apiKey) => _save(
-    (current) => current.copyWith(
-      openAiApiKey: apiKey?.trim(),
-      clearOpenAiApiKey: apiKey == null || apiKey.trim().isEmpty,
-    ),
-  );
-
-  Future<void> updateProfile({required String name, required String email}) {
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+  }) {
     return _save(
       (current) => current.copyWith(
         profileName: name.trim(),
@@ -105,16 +92,10 @@ class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
     await prefs.setBool(_darkModeKey, next.darkModeEnabled);
     await prefs.setBool(_notificationsKey, next.notificationsEnabled);
     await prefs.setBool(_appLockKey, next.appLockEnabled);
-    await prefs.setBool(_aiAssistantKey, next.aiAssistantEnabled);
     if (next.pinCode == null || next.pinCode!.isEmpty) {
       await prefs.remove(_pinCodeKey);
     } else {
       await prefs.setString(_pinCodeKey, next.pinCode!);
-    }
-    if (next.openAiApiKey == null || next.openAiApiKey!.isEmpty) {
-      await prefs.remove(_openAiApiKeyKey);
-    } else {
-      await prefs.setString(_openAiApiKeyKey, next.openAiApiKey!);
     }
     await prefs.setString(_profileNameKey, next.profileName);
     await prefs.setString(_profileEmailKey, next.profileEmail);
