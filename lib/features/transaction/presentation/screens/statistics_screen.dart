@@ -13,6 +13,7 @@ import '../../../../shared/widgets/screen_top_header.dart';
 import '../../../../shared/widgets/skeleton_box.dart';
 import '../../../../shared/widgets/state_transition_switcher.dart';
 import '../../../category/presentation/providers/category_provider.dart';
+import '../../domain/entities/finance_transaction.dart';
 import '../../../wallet/presentation/providers/wallet_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/transaction_card_surface.dart';
@@ -99,11 +100,73 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                       .where((item) => _monthKey(item.createdAt) == previousKey)
                       .where((item) => item.type == TransactionType.expense)
                       .fold<double>(0, (sum, item) => sum + item.amount);
+                  final previousTransactions = transactions
+                      .where((item) => _monthKey(item.createdAt) == previousKey)
+                      .toList();
+                  final previousExpenseByCategory = <String, double>{};
+                  for (final transaction in previousTransactions) {
+                    if (transaction.type != TransactionType.expense) {
+                      continue;
+                    }
+                    previousExpenseByCategory.update(
+                      transaction.categoryId,
+                      (value) => value + transaction.amount,
+                      ifAbsent: () => transaction.amount,
+                    );
+                  }
                   final topCategoryEntry = expenseByCategory.entries.fold<MapEntry<String, double>?>(
                     null,
                     (current, entry) =>
                         current == null || entry.value > current.value ? entry : current,
                   );
+                  final biggestExpense = reportTransactions
+                      .where((item) => item.type == TransactionType.expense)
+                      .fold<FinanceTransaction?>(
+                        null,
+                        (current, item) => current == null || item.amount > current.amount
+                            ? item
+                            : current,
+                      );
+                  final daysWithExpense = reportTransactions
+                      .where((item) => item.type == TransactionType.expense)
+                      .map((item) => '${item.createdAt.year}-${item.createdAt.month}-${item.createdAt.day}')
+                      .toSet()
+                      .length;
+                  final averageDailyExpense = daysWithExpense == 0
+                      ? 0.0
+                      : totalExpense / daysWithExpense;
+                  final categoryShift = expenseByCategory.entries.fold<MapEntry<String, double>?>(
+                    null,
+                    (current, entry) {
+                      final previousValue = previousExpenseByCategory[entry.key] ?? 0;
+                      final delta = entry.value - previousValue;
+                      if (current == null || delta > current.value) {
+                        return MapEntry(entry.key, delta);
+                      }
+                      return current;
+                    },
+                  );
+                  final now = DateTime.now();
+                  final isCurrentMonth = selectedDate.year == now.year &&
+                      selectedDate.month == now.month;
+                  final elapsedDays = isCurrentMonth
+                      ? now.day
+                      : DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
+                  final daysInMonth =
+                      DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
+                  final remainingDays = (daysInMonth - elapsedDays).clamp(0, daysInMonth);
+                  final projectedExpense = elapsedDays <= 0
+                      ? totalExpense
+                      : (totalExpense / elapsedDays) * daysInMonth;
+                  final projectedNet = totalIncome - projectedExpense;
+                  final spendingPaceRatio = elapsedDays <= 0 || previousExpense <= 0
+                      ? 1.0
+                      : (totalExpense / elapsedDays) /
+                          (previousExpense / DateTime(
+                                selectedDate.year,
+                                selectedDate.month,
+                                0,
+                              ).day);
                   final drilldownTransactions = scopedTransactions.take(5).toList();
 
                   return ListView(
@@ -146,6 +209,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                 context.l10n.spendingInsightsTitle,
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
+                              const SizedBox(height: 4),
+                              Text(
+                                context.l10n.monthlyInsightsSubtitle,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                              ),
                               const SizedBox(height: 12),
                               Row(
                                 children: [
@@ -166,6 +236,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                               context,
                                               topCategoryEntry.value,
                                             ),
+                                      accentColor: const Color(0xFFE11976),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -180,9 +251,129 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                                               previousExpense,
                                             ),
                                       subtitle: context.l10n.expense,
+                                      accentColor: totalExpense > previousExpense
+                                          ? AppTheme.expense
+                                          : AppTheme.income,
                                     ),
                                   ),
                                 ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _InsightTile(
+                                      title: context.l10n.averageDailySpend,
+                                      value: averageDailyExpense <= 0
+                                          ? context.l10n.noDataToChart
+                                          : formatCurrency(context, averageDailyExpense),
+                                      subtitle: daysWithExpense <= 0
+                                          ? context.l10n.addIncomeExpenseToReports
+                                          : context.l10n.spendingDays(daysWithExpense),
+                                      accentColor: const Color(0xFF7A5AF8),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _InsightTile(
+                                      title: context.l10n.biggestExpense,
+                                      value: biggestExpense == null
+                                          ? context.l10n.noDataToChart
+                                          : formatCurrency(context, biggestExpense.amount),
+                                      subtitle: biggestExpense == null
+                                          ? context.l10n.addIncomeExpenseToReports
+                                          : categories
+                                                  .where((category) =>
+                                                      category.id == biggestExpense.categoryId)
+                                                  .firstOrNull
+                                                  ?.displayName(context) ??
+                                              context.l10n.unknown,
+                                      accentColor: const Color(0xFFF79009),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (categoryShift != null && categoryShift.value > 0) ...[
+                                const SizedBox(height: 12),
+                                _InsightBanner(
+                                  icon: Icons.trending_up_rounded,
+                                  color: const Color(0xFF2E90FA),
+                                  title: context.l10n.categoryShiftTitle,
+                                  message: context.l10n.categoryShiftMessage(
+                                    categories
+                                            .where((category) =>
+                                                category.id == categoryShift.key)
+                                            .firstOrNull
+                                            ?.displayName(context) ??
+                                        context.l10n.unknown,
+                                    formatCurrency(context, categoryShift.value),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      if (reportTransactions.isNotEmpty) const SizedBox(height: 16),
+                      if (reportTransactions.isNotEmpty)
+                        AppCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.l10n.monthEndForecastTitle,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                context.l10n.monthEndForecastSubtitle,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _InsightTile(
+                                      title: context.l10n.projectedExpense,
+                                      value: formatCurrency(context, projectedExpense),
+                                      subtitle: context.l10n.remainingDaysLabel(
+                                        remainingDays,
+                                      ),
+                                      accentColor: AppTheme.expense,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _InsightTile(
+                                      title: context.l10n.projectedNet,
+                                      value: formatCurrency(context, projectedNet),
+                                      subtitle: projectedNet >= 0
+                                          ? context.l10n.stayOnTrack
+                                          : context.l10n.watchBudgetPressure,
+                                      accentColor: projectedNet >= 0
+                                          ? AppTheme.income
+                                          : AppTheme.expense,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              _InsightBanner(
+                                icon: spendingPaceRatio > 1.08
+                                    ? Icons.speed_rounded
+                                    : Icons.track_changes_rounded,
+                                color: spendingPaceRatio > 1.08
+                                    ? const Color(0xFFF79009)
+                                    : const Color(0xFF16B364),
+                                title: spendingPaceRatio > 1.08
+                                    ? context.l10n.spendingPaceHighTitle
+                                    : context.l10n.spendingPaceStableTitle,
+                                message: spendingPaceRatio > 1.08
+                                    ? context.l10n.spendingPaceHighMessage(
+                                        '${((spendingPaceRatio - 1) * 100).round()}%',
+                                      )
+                                    : context.l10n.spendingPaceStableMessage,
                               ),
                             ],
                           ),
@@ -435,8 +626,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       return context.l10n.noPreviousPeriod;
     }
     final delta = ((current - previous) / previous) * 100;
-    final prefix = delta >= 0 ? '+' : '';
-    return '$prefix${delta.toStringAsFixed(0)}%';
+    final direction = delta > 0
+        ? context.l10n.increase
+        : delta < 0
+            ? context.l10n.decrease
+            : context.l10n.same;
+    final absValue = delta.abs().toStringAsFixed(0);
+    return '$direction $absValue%';
   }
 }
 
@@ -642,11 +838,13 @@ class _InsightTile extends StatelessWidget {
     required this.title,
     required this.value,
     required this.subtitle,
+    this.accentColor,
   });
 
   final String title;
   final String value;
   final String subtitle;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -655,10 +853,25 @@ class _InsightTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: (accentColor ?? Theme.of(context).colorScheme.outlineVariant)
+              .withValues(alpha: 0.18),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (accentColor != null) ...[
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: accentColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           Text(
             title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -678,6 +891,67 @@ class _InsightTile extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightBanner extends StatelessWidget {
+  const _InsightBanner({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

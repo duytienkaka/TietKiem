@@ -231,6 +231,56 @@ class AppLocalizationsVi extends AppLocalizations {
   String get moreSubtitle => 'Công cụ và tự động hóa ở một nơi';
 
   @override
+  String get savingsGoalsTitle => 'Mục tiêu tiết kiệm';
+
+  @override
+  String get savingsGoalsSubtitle => 'Theo dõi tiến độ đạt mục tiêu tài chính';
+
+  @override
+  String get addGoal => 'Thêm mục tiêu';
+
+  @override
+  String get noSavingsGoalsYet => 'Chưa có mục tiêu tiết kiệm';
+
+  @override
+  String get createSavingsGoalHint =>
+      'Tạo mục tiêu và gắn với một ví để theo dõi tiến độ tự động';
+
+  @override
+  String get createSavingsGoal => 'Tạo mục tiêu tiết kiệm';
+
+  @override
+  String get editSavingsGoal => 'Chỉnh sửa mục tiêu tiết kiệm';
+
+  @override
+  String get savingsGoalEditorHint =>
+      'Đặt số tiền mục tiêu, chọn ví và hạn hoàn thành phù hợp.';
+
+  @override
+  String get goalName => 'Tên mục tiêu';
+
+  @override
+  String get targetAmount => 'Số tiền mục tiêu';
+
+  @override
+  String get targetDate => 'Ngày mục tiêu';
+
+  @override
+  String get savedAmount => 'Đã tiết kiệm';
+
+  @override
+  String get deadlineLabel => 'Hạn';
+
+  @override
+  String get dailyNeeded => 'Cần mỗi ngày';
+
+  @override
+  String get goalOverdue => 'Đã quá hạn';
+
+  @override
+  String get createGoalAction => 'Tạo mục tiêu';
+
+  @override
   String get toolsSection => 'Công cụ';
 
   @override
@@ -587,6 +637,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notificationsSubtitle => 'Nhận nhắc nhở và cập nhật tài chính';
 
   @override
+  String get notificationPermissionDenied => 'Chưa cấp quyền thông báo.';
+
+  @override
   String get exportData => 'Xuất dữ liệu';
 
   @override
@@ -594,10 +647,38 @@ class AppLocalizationsVi extends AppLocalizations {
       'Xem trước và sao chép dữ liệu dưới dạng JSON hoặc CSV';
 
   @override
+  String get exportBackup => 'Tạo bản sao lưu';
+
+  @override
+  String get exportBackupSubtitle =>
+      'Lưu toàn bộ dữ liệu tài chính offline thành file JSON';
+
+  @override
   String get exportJson => 'Xuất JSON';
 
   @override
   String get exportCsv => 'Xuất CSV';
+
+  @override
+  String get restoreBackup => 'Khôi phục bản sao lưu';
+
+  @override
+  String get restoreBackupSubtitle =>
+      'Nhập file sao lưu và thay thế dữ liệu hiện tại trên thiết bị';
+
+  @override
+  String backupSavedMessage(String location) {
+    return 'Đã lưu bản sao lưu: $location';
+  }
+
+  @override
+  String backupRestoredMessage(int walletCount, int transactionCount) {
+    return 'Đã khôi phục $walletCount ví và $transactionCount giao dịch';
+  }
+
+  @override
+  String get invalidBackupFile =>
+      'File sao lưu không hợp lệ hoặc không thể đọc.';
 
   @override
   String get copiedToClipboard => 'Đã sao chép vào bộ nhớ tạm';
@@ -745,6 +826,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get spendingInsightsTitle => 'Phân tích chi tiêu';
 
   @override
+  String get monthlyInsightsSubtitle =>
+      'Các điểm nhấn được phân tích tự động từ giao dịch cục bộ';
+
+  @override
   String get topCategory => 'Danh mục cao nhất';
 
   @override
@@ -761,4 +846,62 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get same => 'Không đổi';
+
+  @override
+  String get averageDailySpend => 'Chi tiêu trung bình mỗi ngày';
+
+  @override
+  String get biggestExpense => 'Khoản chi lớn nhất';
+
+  @override
+  String spendingDays(int count) {
+    return '$count ngày có chi tiêu';
+  }
+
+  @override
+  String get categoryShiftTitle => 'Cần chú ý danh mục này';
+
+  @override
+  String categoryShiftMessage(String category, String amount) {
+    return '$category đã tăng $amount so với tháng trước';
+  }
+
+  @override
+  String get monthEndForecastTitle => 'Dự báo cuối tháng';
+
+  @override
+  String get monthEndForecastSubtitle =>
+      'Ước tính kết thúc tháng dựa trên tốc độ chi tiêu hiện tại';
+
+  @override
+  String get projectedExpense => 'Chi tiêu dự báo';
+
+  @override
+  String get projectedNet => 'Chênh lệch dự báo';
+
+  @override
+  String remainingDaysLabel(int count) {
+    return 'Còn $count ngày';
+  }
+
+  @override
+  String get stayOnTrack => 'Vẫn đang đúng nhịp';
+
+  @override
+  String get watchBudgetPressure => 'Có áp lực ngân sách';
+
+  @override
+  String get spendingPaceHighTitle => 'Tốc độ chi đang cao';
+
+  @override
+  String spendingPaceHighMessage(String percent) {
+    return 'Bạn đang chi nhanh hơn tháng trước khoảng $percent';
+  }
+
+  @override
+  String get spendingPaceStableTitle => 'Tốc độ chi đang ổn định';
+
+  @override
+  String get spendingPaceStableMessage =>
+      'Nhịp chi hiện tại đang khá cân bằng cho cả tháng';
 }

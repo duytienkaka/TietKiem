@@ -11,6 +11,7 @@ import 'shared/models/app_preferences_state.dart';
 import 'shared/providers/app_lock_provider.dart';
 import 'shared/providers/app_preferences_provider.dart';
 import 'shared/screens/app_lock_screen.dart';
+import 'shared/services/local_notification_bootstrap.dart';
 import 'shared/services/sync_manager.dart';
 
 Future<void> main() async {
@@ -34,6 +35,7 @@ class FinanceApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(syncBootstrapProvider);
+    ref.watch(localNotificationBootstrapProvider);
     final router = ref.watch(appRouterProvider);
     final preferences = ref.watch(appPreferencesProvider).valueOrNull ??
         const AppPreferencesState.defaults();

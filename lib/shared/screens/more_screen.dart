@@ -6,6 +6,8 @@ import '../../features/budget/domain/entities/budget.dart';
 import '../../features/budget/presentation/providers/budget_provider.dart';
 import '../../features/category/domain/entities/category.dart';
 import '../../features/category/presentation/providers/category_provider.dart';
+import '../../features/goal/domain/entities/savings_goal.dart';
+import '../../features/goal/presentation/providers/savings_goal_provider.dart';
 import '../../features/recurring/domain/entities/recurring_rule.dart';
 import '../../features/recurring/presentation/providers/recurring_provider.dart';
 import '../../features/transaction/domain/entities/finance_transaction.dart';
@@ -38,6 +40,7 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
     final transactionsAsync = ref.watch(transactionProvider);
     final categoriesAsync = ref.watch(categoryProvider);
     final walletsAsync = ref.watch(walletProvider);
+    final goalsAsync = ref.watch(savingsGoalProvider);
     final recurringAsync = ref.watch(recurringProvider);
     final budgetsAsync = ref.watch(budgetProvider);
 
@@ -55,12 +58,15 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                 value: walletsAsync,
                 loadingBuilder: (_) => const _MoreLoadingState(),
                 data: (wallets) => AsyncValueView(
-                  value: recurringAsync,
+                  value: goalsAsync,
                   loadingBuilder: (_) => const _MoreLoadingState(),
-                  data: (rules) => AsyncValueView(
-                    value: budgetsAsync,
+                  data: (goals) => AsyncValueView(
+                    value: recurringAsync,
                     loadingBuilder: (_) => const _MoreLoadingState(),
-                    data: (budgets) {
+                    data: (rules) => AsyncValueView(
+                      value: budgetsAsync,
+                      loadingBuilder: (_) => const _MoreLoadingState(),
+                      data: (budgets) {
                       final monthKeys = {
                         for (final item in transactions) _monthKey(item.createdAt),
                         for (final item in budgets) item.monthKey,
@@ -76,6 +82,10 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                       final budgetsForMonth = budgets
                           .where((budget) => budget.monthKey == activeMonthKey)
                           .toList();
+                      final goalWalletIds = goals.map((goal) => goal.walletId).toSet();
+                      final linkedWallets = wallets
+                          .where((wallet) => goalWalletIds.contains(wallet.id))
+                          .toList();
 
                       return ListView(
                         padding: const EdgeInsets.only(bottom: 120),
@@ -85,6 +95,66 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                             title: context.l10n.moreTitle,
                             subtitle: context.l10n.moreSubtitle,
                             icon: Icons.widgets_rounded,
+                          ),
+                          const SizedBox(height: 16),
+                          AppCard(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SectionHeader(
+                                  title: context.l10n.savingsGoalsTitle,
+                                  subtitle: context.l10n.savingsGoalsSubtitle,
+                                  actionLabel: context.l10n.addGoal,
+                                  onAction: wallets.isEmpty
+                                      ? null
+                                      : () => _showGoalEditor(
+                                            context,
+                                            wallets: wallets,
+                                          ),
+                                ),
+                                const SizedBox(height: 12),
+                                if (wallets.isEmpty)
+                                  EmptyState(
+                                    title: context.l10n.noWalletsYet,
+                                    message: context.l10n.createWalletStart,
+                                    icon: Icons.flag_rounded,
+                                  )
+                                else if (goals.isEmpty)
+                                  EmptyState(
+                                    title: context.l10n.noSavingsGoalsYet,
+                                    message: context.l10n.createSavingsGoalHint,
+                                    icon: Icons.flag_rounded,
+                                    actionLabel: context.l10n.addGoal,
+                                    onAction: () => _showGoalEditor(
+                                      context,
+                                      wallets: wallets,
+                                    ),
+                                  )
+                                else
+                                  Column(
+                                    children: [
+                                      for (var index = 0; index < goals.length; index++) ...[
+                                        _SavingsGoalCard(
+                                          goal: goals[index],
+                                          wallet: linkedWallets
+                                              .where((wallet) => wallet.id == goals[index].walletId)
+                                              .firstOrNull,
+                                          onEdit: () => _showGoalEditor(
+                                            context,
+                                            wallets: wallets,
+                                            initialGoal: goals[index],
+                                          ),
+                                          onDelete: () => ref
+                                              .read(savingsGoalProvider.notifier)
+                                              .deleteGoal(goals[index].id),
+                                        ),
+                                        if (index != goals.length - 1)
+                                          const SizedBox(height: 10),
+                                      ],
+                                    ],
+                                  ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 16),
                           AppCard(
@@ -245,6 +315,9 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                                               name: context.l10n.unknown,
                                               type: TransactionType.expense,
                                               icon: 'category',
+                                              workspaceId: '',
+                                              createdAt: DateTime.now(),
+                                              updatedAt: DateTime.now(),
                                             ),
                                           ),
                                           onEdit: () => _showBudgetEditor(
@@ -266,7 +339,8 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                           ),
                         ],
                       );
-                    },
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -296,6 +370,195 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
       );
     }
     return expenseByCategory;
+  }
+
+  Future<void> _showGoalEditor(
+    BuildContext context, {
+    required List<Wallet> wallets,
+    SavingsGoal? initialGoal,
+  }) async {
+    if (wallets.isEmpty) {
+      return;
+    }
+
+    final titleController = TextEditingController(text: initialGoal?.title ?? '');
+    final amountController = TextEditingController();
+    final noteController = TextEditingController(text: initialGoal?.note ?? '');
+    var walletId = initialGoal?.walletId ?? wallets.first.id;
+    var targetDate = initialGoal?.targetDate ?? DateTime.now().add(const Duration(days: 90));
+
+    if (initialGoal != null) {
+      applyCurrencyEditingValue(amountController, initialGoal.targetAmount.round());
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 8,
+                bottom: 20 + MediaQuery.of(sheetContext).viewInsets.bottom,
+              ),
+              child: AppCard(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      initialGoal == null
+                          ? context.l10n.createSavingsGoal
+                          : context.l10n.editSavingsGoal,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      context.l10n.savingsGoalEditorHint,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: titleController,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.goalName,
+                        prefixIcon: const Icon(Icons.flag_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: walletId,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.wallet,
+                        prefixIcon: const Icon(Icons.account_balance_wallet_rounded),
+                      ),
+                      items: wallets
+                          .map(
+                            (wallet) => DropdownMenuItem(
+                              value: wallet.id,
+                              child: Text(wallet.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setModalState(() => walletId = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: amountController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        VietnameseCurrencyInputFormatter(),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: context.l10n.targetAmount,
+                        prefixIcon: const Icon(Icons.savings_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: targetDate,
+                          firstDate: DateTime.now().subtract(const Duration(days: 1)),
+                          lastDate: DateTime.now().add(const Duration(days: 3650)),
+                        );
+                        if (picked != null) {
+                          setModalState(() => targetDate = picked);
+                        }
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: context.l10n.targetDate,
+                          prefixIcon: const Icon(Icons.event_rounded),
+                        ),
+                        child: Text(formatDateTime(context, targetDate).split(',').first),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: noteController,
+                      maxLines: 2,
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.note,
+                        prefixIcon: const Icon(Icons.notes_rounded),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        if (initialGoal != null)
+                          TextButton(
+                            onPressed: () async {
+                              await ref
+                                  .read(savingsGoalProvider.notifier)
+                                  .deleteGoal(initialGoal.id);
+                              if (sheetContext.mounted) {
+                                Navigator.of(sheetContext).pop();
+                              }
+                            },
+                            child: Text(context.l10n.delete),
+                          ),
+                        const Spacer(),
+                        FilledButton(
+                          onPressed: () async {
+                            final title = titleController.text.trim();
+                            final amount =
+                                parseVietnameseCurrency(amountController.text).toDouble();
+                            if (title.isEmpty || amount <= 0) {
+                              return;
+                            }
+                            await ref.read(savingsGoalProvider.notifier).saveGoal(
+                                  id: initialGoal?.id,
+                                  title: title,
+                                  walletId: walletId,
+                                  targetAmount: amount,
+                                  targetDate: targetDate,
+                                  note: noteController.text,
+                                );
+                            if (sheetContext.mounted) {
+                              Navigator.of(sheetContext).pop();
+                            }
+                          },
+                          child: Text(
+                            initialGoal == null
+                                ? context.l10n.createGoalAction
+                                : context.l10n.saveChanges,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    titleController.dispose();
+    amountController.dispose();
+    noteController.dispose();
   }
 
   Future<void> _showBudgetEditor(
@@ -816,6 +1079,239 @@ class _MonthPill extends StatelessWidget {
   }
 }
 
+class _SavingsGoalCard extends StatelessWidget {
+  const _SavingsGoalCard({
+    required this.goal,
+    required this.wallet,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final SavingsGoal goal;
+  final Wallet? wallet;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentBalance = wallet?.balance ?? 0;
+    final progress = goal.targetAmount <= 0 ? 0 : currentBalance / goal.targetAmount;
+    final clamped = progress.clamp(0, 1).toDouble();
+    final remaining = (goal.targetAmount - currentBalance).clamp(0, double.infinity);
+    final daysLeft = goal.targetDate.difference(DateTime.now()).inDays;
+    final isOverdue = daysLeft < 0 && remaining > 0;
+    final perDay = daysLeft > 0 && remaining > 0 ? remaining / daysLeft : 0.0;
+    final scheme = Theme.of(context).colorScheme;
+
+    return AppCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(Icons.flag_rounded, color: scheme.primary),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      goal.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      wallet?.name ?? context.l10n.unknownWallet,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    onEdit();
+                  } else {
+                    onDelete();
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Text(context.l10n.edit),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Text(context.l10n.delete),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _GoalMetric(
+                  label: context.l10n.savedAmount,
+                  value: formatCurrency(context, currentBalance),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _GoalMetric(
+                  label: context.l10n.targetAmount,
+                  value: formatCurrency(context, goal.targetAmount),
+                  alignEnd: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: clamped,
+              minHeight: 9,
+              backgroundColor: scheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isOverdue ? const Color(0xFFF04438) : const Color(0xFF17B26A),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _GoalInfoChip(
+                icon: Icons.event_rounded,
+                label:
+                    '${context.l10n.deadlineLabel}: ${formatDateTime(context, goal.targetDate).split(',').first}',
+              ),
+              _GoalInfoChip(
+                icon: Icons.pie_chart_rounded,
+                label: '${(clamped * 100).round()}%',
+              ),
+              if (remaining > 0)
+                _GoalInfoChip(
+                  icon: isOverdue ? Icons.warning_rounded : Icons.trending_up_rounded,
+                  label: isOverdue
+                      ? context.l10n.goalOverdue
+                      : '${context.l10n.dailyNeeded}: ${formatCurrency(context, perDay)}',
+                ),
+            ],
+          ),
+          if (goal.note?.isNotEmpty == true) ...[
+            const SizedBox(height: 10),
+            Text(
+              goal.note!,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _GoalMetric extends StatelessWidget {
+  const _GoalMetric({
+    required this.label,
+    required this.value,
+    this.alignEnd = false,
+  });
+
+  final String label;
+  final String value;
+  final bool alignEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GoalInfoChip extends StatelessWidget {
+  const _GoalInfoChip({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: scheme.onSurfaceVariant),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RecurringRuleCard extends StatelessWidget {
   const _RecurringRuleCard({
     required this.rule,
@@ -1020,6 +1516,8 @@ class _MoreLoadingState extends StatelessWidget {
         ScreenTopHeaderSkeleton(),
         SizedBox(height: 16),
         _SectionSkeleton(lines: 1),
+        SizedBox(height: 16),
+        _SectionSkeleton(lines: 2),
         SizedBox(height: 16),
         _SectionSkeleton(lines: 3),
         SizedBox(height: 16),

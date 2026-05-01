@@ -78,11 +78,7 @@ class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
     );
   }
 
-  Future<void> _save(
-    AppPreferencesState Function(AppPreferencesState current) transform,
-  ) async {
-    final current = state.valueOrNull ?? const AppPreferencesState.defaults();
-    final next = transform(current);
+  Future<void> replaceState(AppPreferencesState next) async {
     state = AsyncData(next);
 
     final SharedPreferences prefs =
@@ -105,5 +101,13 @@ class AppPreferencesNotifier extends AsyncNotifier<AppPreferencesState> {
     } else {
       await prefs.setString(_avatarPathKey, next.avatarPath!);
     }
+  }
+
+  Future<void> _save(
+    AppPreferencesState Function(AppPreferencesState current) transform,
+  ) async {
+    final current = state.valueOrNull ?? const AppPreferencesState.defaults();
+    final next = transform(current);
+    await replaceState(next);
   }
 }

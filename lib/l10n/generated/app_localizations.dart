@@ -518,6 +518,102 @@ abstract class AppLocalizations {
   /// **'Tools and automation in one place'**
   String get moreSubtitle;
 
+  /// No description provided for @savingsGoalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings goals'**
+  String get savingsGoalsTitle;
+
+  /// No description provided for @savingsGoalsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track progress toward your next money milestone'**
+  String get savingsGoalsSubtitle;
+
+  /// No description provided for @addGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add goal'**
+  String get addGoal;
+
+  /// No description provided for @noSavingsGoalsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No savings goals yet'**
+  String get noSavingsGoalsYet;
+
+  /// No description provided for @createSavingsGoalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a target and tie it to a wallet to follow progress automatically'**
+  String get createSavingsGoalHint;
+
+  /// No description provided for @createSavingsGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Create savings goal'**
+  String get createSavingsGoal;
+
+  /// No description provided for @editSavingsGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit savings goal'**
+  String get editSavingsGoal;
+
+  /// No description provided for @savingsGoalEditorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a target amount, choose a wallet, and give yourself a realistic deadline.'**
+  String get savingsGoalEditorHint;
+
+  /// No description provided for @goalName.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal name'**
+  String get goalName;
+
+  /// No description provided for @targetAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Target amount'**
+  String get targetAmount;
+
+  /// No description provided for @targetDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Target date'**
+  String get targetDate;
+
+  /// No description provided for @savedAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved so far'**
+  String get savedAmount;
+
+  /// No description provided for @deadlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get deadlineLabel;
+
+  /// No description provided for @dailyNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Need per day'**
+  String get dailyNeeded;
+
+  /// No description provided for @goalOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Past deadline'**
+  String get goalOverdue;
+
+  /// No description provided for @createGoalAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create goal'**
+  String get createGoalAction;
+
   /// No description provided for @toolsSection.
   ///
   /// In en, this message translates to:
@@ -1208,6 +1304,12 @@ abstract class AppLocalizations {
   /// **'Stay up to date with reminders and finance updates'**
   String get notificationsSubtitle;
 
+  /// No description provided for @notificationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission was not granted.'**
+  String get notificationPermissionDenied;
+
   /// No description provided for @exportData.
   ///
   /// In en, this message translates to:
@@ -1220,6 +1322,18 @@ abstract class AppLocalizations {
   /// **'Preview and copy your finance data as JSON or CSV'**
   String get exportDataSubtitle;
 
+  /// No description provided for @exportBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create backup'**
+  String get exportBackup;
+
+  /// No description provided for @exportBackupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a full offline JSON backup of your finance data'**
+  String get exportBackupSubtitle;
+
   /// No description provided for @exportJson.
   ///
   /// In en, this message translates to:
@@ -1231,6 +1345,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export CSV'**
   String get exportCsv;
+
+  /// No description provided for @restoreBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore backup'**
+  String get restoreBackup;
+
+  /// No description provided for @restoreBackupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import a backup file and replace current local data'**
+  String get restoreBackupSubtitle;
+
+  /// No description provided for @backupSavedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved: {location}'**
+  String backupSavedMessage(String location);
+
+  /// No description provided for @backupRestoredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored {walletCount} wallets and {transactionCount} transactions'**
+  String backupRestoredMessage(int walletCount, int transactionCount);
+
+  /// No description provided for @invalidBackupFile.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup file is invalid or unreadable.'**
+  String get invalidBackupFile;
 
   /// No description provided for @copiedToClipboard.
   ///
@@ -1514,6 +1658,12 @@ abstract class AppLocalizations {
   /// **'Spending insights'**
   String get spendingInsightsTitle;
 
+  /// No description provided for @monthlyInsightsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule-based highlights generated from your local transactions'**
+  String get monthlyInsightsSubtitle;
+
   /// No description provided for @topCategory.
   ///
   /// In en, this message translates to:
@@ -1549,6 +1699,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No change'**
   String get same;
+
+  /// No description provided for @averageDailySpend.
+  ///
+  /// In en, this message translates to:
+  /// **'Average daily spend'**
+  String get averageDailySpend;
+
+  /// No description provided for @biggestExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Biggest expense'**
+  String get biggestExpense;
+
+  /// No description provided for @spendingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} spending days'**
+  String spendingDays(int count);
+
+  /// No description provided for @categoryShiftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch this category'**
+  String get categoryShiftTitle;
+
+  /// No description provided for @categoryShiftMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} increased by {amount} compared to last month'**
+  String categoryShiftMessage(String category, String amount);
+
+  /// No description provided for @monthEndForecastTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Month-end forecast'**
+  String get monthEndForecastTitle;
+
+  /// No description provided for @monthEndForecastSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate how this month may close based on your current pace'**
+  String get monthEndForecastSubtitle;
+
+  /// No description provided for @projectedExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected expense'**
+  String get projectedExpense;
+
+  /// No description provided for @projectedNet.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected net'**
+  String get projectedNet;
+
+  /// No description provided for @remainingDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days left'**
+  String remainingDaysLabel(int count);
+
+  /// No description provided for @stayOnTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Still on track'**
+  String get stayOnTrack;
+
+  /// No description provided for @watchBudgetPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget pressure ahead'**
+  String get watchBudgetPressure;
+
+  /// No description provided for @spendingPaceHighTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending pace is high'**
+  String get spendingPaceHighTitle;
+
+  /// No description provided for @spendingPaceHighMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You are spending about {percent} faster than last month'**
+  String spendingPaceHighMessage(String percent);
+
+  /// No description provided for @spendingPaceStableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending pace is stable'**
+  String get spendingPaceStableTitle;
+
+  /// No description provided for @spendingPaceStableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current spending pace is close to a healthy monthly rhythm'**
+  String get spendingPaceStableMessage;
 }
 
 class _AppLocalizationsDelegate

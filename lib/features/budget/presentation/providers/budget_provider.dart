@@ -11,7 +11,7 @@ final budgetProvider = AsyncNotifierProvider<BudgetNotifier, List<Budget>>(
 );
 
 class BudgetNotifier extends AsyncNotifier<List<Budget>> {
-  static const _storageKey = 'budget.rules';
+  static const storageKey = 'budget.rules';
 
   SharedPreferences? _prefs;
 
@@ -53,7 +53,7 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
   }
 
   List<Budget> _loadBudgets(SharedPreferences prefs) {
-    final raw = prefs.getString(_storageKey);
+    final raw = prefs.getString(storageKey);
     if (raw == null || raw.isEmpty) {
       return [];
     }
@@ -73,6 +73,11 @@ class BudgetNotifier extends AsyncNotifier<List<Budget>> {
     final prefs = _prefs ?? await ref.read(sharedPreferencesProvider.future);
     _prefs = prefs;
     final raw = jsonEncode(budgets.map((budget) => budget.toJson()).toList());
-    await prefs?.setString(_storageKey, raw);
+    await prefs?.setString(storageKey, raw);
+  }
+
+  Future<void> replaceAll(List<Budget> budgets) async {
+    state = AsyncData(budgets);
+    await _saveBudgets(budgets);
   }
 }

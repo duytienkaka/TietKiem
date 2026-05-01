@@ -102,19 +102,3 @@ String localizeError(BuildContext context, Object error) {
   };
 }
 
-String localizeAuthError(BuildContext context, Object error) {
-  final message = error.toString().toLowerCase();
-  if (message.contains('invalid login credentials')) {
-    return context.l10n.authInvalidCredentials;
-  }
-  if (message.contains('email not confirmed')) {
-    return context.l10n.authEmailNotConfirmed;
-  }
-  if (message.contains('user already registered')) {
-    return context.l10n.authUserExists;
-  }
-  if (message.contains('network')) {
-    return context.l10n.authNetworkError;
-  }
-  return context.l10n.authGenericError;
-}

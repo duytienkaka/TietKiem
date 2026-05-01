@@ -94,6 +94,22 @@
   "statisticsTitle": "Statistics",
   "moreTitle": "More",
   "moreSubtitle": "Tools and automation in one place",
+  "savingsGoalsTitle": "Savings goals",
+  "savingsGoalsSubtitle": "Track progress toward your next money milestone",
+  "addGoal": "Add goal",
+  "noSavingsGoalsYet": "No savings goals yet",
+  "createSavingsGoalHint": "Create a target and tie it to a wallet to follow progress automatically",
+  "createSavingsGoal": "Create savings goal",
+  "editSavingsGoal": "Edit savings goal",
+  "savingsGoalEditorHint": "Set a target amount, choose a wallet, and give yourself a realistic deadline.",
+  "goalName": "Goal name",
+  "targetAmount": "Target amount",
+  "targetDate": "Target date",
+  "savedAmount": "Saved so far",
+  "deadlineLabel": "Deadline",
+  "dailyNeeded": "Need per day",
+  "goalOverdue": "Past deadline",
+  "createGoalAction": "Create goal",
   "toolsSection": "Tools",
   "toolsSectionSubtitle": "Calculator, recurring rules, and budgets",
   "openCalculator": "Open calculator",
@@ -209,10 +225,35 @@
   "darkModeSubtitle": "Reduce glare and keep the app comfortable at night",
   "notifications": "Notifications",
   "notificationsSubtitle": "Stay up to date with reminders and finance updates",
+  "notificationPermissionDenied": "Notification permission was not granted.",
   "exportData": "Export data",
   "exportDataSubtitle": "Preview and copy your finance data as JSON or CSV",
+  "exportBackup": "Create backup",
+  "exportBackupSubtitle": "Save a full offline JSON backup of your finance data",
   "exportJson": "Export JSON",
   "exportCsv": "Export CSV",
+  "restoreBackup": "Restore backup",
+  "restoreBackupSubtitle": "Import a backup file and replace current local data",
+  "backupSavedMessage": "Backup saved: {location}",
+  "@backupSavedMessage": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestoredMessage": "Restored {walletCount} wallets and {transactionCount} transactions",
+  "@backupRestoredMessage": {
+    "placeholders": {
+      "walletCount": {
+        "type": "int"
+      },
+      "transactionCount": {
+        "type": "int"
+      }
+    }
+  },
+  "invalidBackupFile": "The backup file is invalid or unreadable.",
   "copiedToClipboard": "Copied to clipboard",
   "copy": "Copy",
   "resetData": "Reset data",
@@ -261,10 +302,58 @@
   "createBudgetHint": "Set budgets to see progress",
   "noBudgetsYet": "No budgets yet",
   "spendingInsightsTitle": "Spending insights",
+  "monthlyInsightsSubtitle": "Rule-based highlights generated from your local transactions",
   "topCategory": "Top category",
   "comparedToLastPeriod": "Compared to last month",
   "noPreviousPeriod": "No previous period data",
   "increase": "Up",
   "decrease": "Down",
-  "same": "No change"
+  "same": "No change",
+  "averageDailySpend": "Average daily spend",
+  "biggestExpense": "Biggest expense",
+  "spendingDays": "{count} spending days",
+  "@spendingDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryShiftTitle": "Watch this category",
+  "categoryShiftMessage": "{category} increased by {amount} compared to last month",
+  "@categoryShiftMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "monthEndForecastTitle": "Month-end forecast",
+  "monthEndForecastSubtitle": "Estimate how this month may close based on your current pace",
+  "projectedExpense": "Projected expense",
+  "projectedNet": "Projected net",
+  "remainingDaysLabel": "{count} days left",
+  "@remainingDaysLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stayOnTrack": "Still on track",
+  "watchBudgetPressure": "Budget pressure ahead",
+  "spendingPaceHighTitle": "Spending pace is high",
+  "spendingPaceHighMessage": "You are spending about {percent} faster than last month",
+  "@spendingPaceHighMessage": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "spendingPaceStableTitle": "Spending pace is stable",
+  "spendingPaceStableMessage": "Your current spending pace is close to a healthy monthly rhythm"
 }

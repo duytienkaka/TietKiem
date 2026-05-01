@@ -6,6 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/category/domain/entities/category.dart';
 import '../../features/category/presentation/providers/category_provider.dart';
+import '../../features/budget/presentation/providers/budget_provider.dart';
+import '../../features/budget/domain/entities/budget.dart';
+import '../../features/goal/domain/entities/savings_goal.dart';
+import '../../features/goal/presentation/providers/savings_goal_provider.dart';
+import '../../features/recurring/presentation/providers/recurring_provider.dart';
+import '../../features/recurring/domain/entities/recurring_rule.dart';
 import '../../features/transaction/domain/entities/finance_transaction.dart';
 import '../../features/transaction/presentation/providers/transaction_provider.dart';
 import '../../features/wallet/domain/entities/wallet.dart';
@@ -14,7 +20,9 @@ import '../../l10n/l10n.dart';
 import '../models/app_preferences_state.dart';
 import '../providers/app_lock_provider.dart';
 import '../providers/app_preferences_provider.dart';
+import '../services/app_backup_service.dart';
 import '../services/app_data_maintenance_service.dart';
+import '../services/local_notification_service.dart';
 import '../widgets/animated_reveal.dart';
 import '../widgets/app_card.dart';
 import '../widgets/async_value_view.dart';
@@ -96,9 +104,29 @@ class SettingsScreen extends ConsumerWidget {
                       subtitle: context.l10n.notificationsSubtitle,
                       trailing: Switch(
                         value: preferences.notificationsEnabled,
-                        onChanged: (value) => ref
-                            .read(appPreferencesProvider.notifier)
-                            .updateNotifications(value),
+                        onChanged: (value) async {
+                          if (value) {
+                            final granted = await ref
+                                .read(localNotificationServiceProvider)
+                                .requestPermissions();
+                            if (!granted && context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(context.l10n.notificationPermissionDenied),
+                                ),
+                              );
+                              return;
+                            }
+                          }
+                          await ref
+                              .read(appPreferencesProvider.notifier)
+                              .updateNotifications(value);
+                          if (!value) {
+                            await ref
+                                .read(localNotificationServiceProvider)
+                                .cancelRecurringNotifications();
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -111,6 +139,18 @@ class SettingsScreen extends ConsumerWidget {
                   title: context.l10n.dataSection,
                   subtitle: context.l10n.dataSectionSubtitle,
                   children: [
+                    SettingItem(
+                      icon: Icons.backup_rounded,
+                      title: context.l10n.exportBackup,
+                      subtitle: context.l10n.exportBackupSubtitle,
+                      onTap: () => _exportBackup(context, ref, preferences),
+                    ),
+                    SettingItem(
+                      icon: Icons.restore_page_rounded,
+                      title: context.l10n.restoreBackup,
+                      subtitle: context.l10n.restoreBackupSubtitle,
+                      onTap: () => _restoreBackup(context, ref),
+                    ),
                     SettingItem(
                       icon: Icons.file_download_outlined,
                       title: context.l10n.exportData,
@@ -330,6 +370,82 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _exportBackup(
+    BuildContext context,
+    WidgetRef ref,
+    AppPreferencesState preferences,
+  ) async {
+    final budgets = ref.read(budgetProvider).valueOrNull ?? const <Budget>[];
+    final goals = ref.read(savingsGoalProvider).valueOrNull ?? const <SavingsGoal>[];
+    final recurring = ref.read(recurringProvider).valueOrNull ?? const <RecurringRule>[];
+
+    final savedLocation = await ref.read(appBackupServiceProvider).exportBackup(
+          preferences: preferences,
+          budgetsOverride: budgets,
+          goalsOverride: goals,
+          recurringOverride: recurring,
+        );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          context.l10n.backupSavedMessage(savedLocation),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _restoreBackup(BuildContext context, WidgetRef ref) async {
+    try {
+      final result = await ref.read(appBackupServiceProvider).restoreBackupFromPicker();
+      if (result == null) {
+        return;
+      }
+
+      if (result.preferences != null) {
+        await ref.read(appPreferencesProvider.notifier).replaceState(result.preferences!);
+        if (result.preferences!.appLockEnabled) {
+          ref.read(appLockSessionProvider.notifier).lock();
+        } else {
+          ref.read(appLockSessionProvider.notifier).unlock();
+        }
+      }
+
+      await ref.read(budgetProvider.notifier).replaceAll(result.budgets);
+      await ref.read(savingsGoalProvider.notifier).replaceAll(result.goals);
+      await ref.read(recurringProvider.notifier).replaceAll(result.recurringRules);
+      ref.invalidate(walletProvider);
+      ref.invalidate(categoryProvider);
+      ref.invalidate(transactionProvider);
+
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.l10n.backupRestoredMessage(
+              result.walletCount,
+              result.transactionCount,
+            ),
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.invalidBackupFile)),
+      );
+    }
+  }
+
   Future<void> _exportData(
     BuildContext context,
     WidgetRef ref, {
@@ -519,6 +635,12 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     await ref.read(appDataMaintenanceServiceProvider).resetFinanceData();
+    await ref.read(budgetProvider.notifier).replaceAll(const []);
+    await ref.read(savingsGoalProvider.notifier).replaceAll(const []);
+    await ref.read(recurringProvider.notifier).replaceAll(const []);
+    ref.invalidate(walletProvider);
+    ref.invalidate(categoryProvider);
+    ref.invalidate(transactionProvider);
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -19,7 +19,7 @@ final recurringProcessorProvider = FutureProvider<void>((ref) async {
 });
 
 class RecurringNotifier extends AsyncNotifier<List<RecurringRule>> {
-  static const _storageKey = 'recurring.rules';
+  static const storageKey = 'recurring.rules';
 
   SharedPreferences? _prefs;
 
@@ -143,7 +143,7 @@ class RecurringNotifier extends AsyncNotifier<List<RecurringRule>> {
   }
 
   List<RecurringRule> _loadRules(SharedPreferences prefs) {
-    final raw = prefs.getString(_storageKey);
+    final raw = prefs.getString(storageKey);
     if (raw == null || raw.isEmpty) {
       return [];
     }
@@ -163,7 +163,12 @@ class RecurringNotifier extends AsyncNotifier<List<RecurringRule>> {
     final prefs = _prefs ?? await ref.read(sharedPreferencesProvider.future);
     _prefs = prefs;
     final raw = jsonEncode(rules.map((rule) => rule.toJson()).toList());
-    await prefs?.setString(_storageKey, raw);
+    await prefs?.setString(storageKey, raw);
+  }
+
+  Future<void> replaceAll(List<RecurringRule> rules) async {
+    state = AsyncData(rules);
+    await _saveRules(rules);
   }
 
   DateTime _nextRunAt(DateTime base, RecurringInterval interval) {

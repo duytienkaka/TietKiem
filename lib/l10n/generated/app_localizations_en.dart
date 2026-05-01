@@ -232,6 +232,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get moreSubtitle => 'Tools and automation in one place';
 
   @override
+  String get savingsGoalsTitle => 'Savings goals';
+
+  @override
+  String get savingsGoalsSubtitle =>
+      'Track progress toward your next money milestone';
+
+  @override
+  String get addGoal => 'Add goal';
+
+  @override
+  String get noSavingsGoalsYet => 'No savings goals yet';
+
+  @override
+  String get createSavingsGoalHint =>
+      'Create a target and tie it to a wallet to follow progress automatically';
+
+  @override
+  String get createSavingsGoal => 'Create savings goal';
+
+  @override
+  String get editSavingsGoal => 'Edit savings goal';
+
+  @override
+  String get savingsGoalEditorHint =>
+      'Set a target amount, choose a wallet, and give yourself a realistic deadline.';
+
+  @override
+  String get goalName => 'Goal name';
+
+  @override
+  String get targetAmount => 'Target amount';
+
+  @override
+  String get targetDate => 'Target date';
+
+  @override
+  String get savedAmount => 'Saved so far';
+
+  @override
+  String get deadlineLabel => 'Deadline';
+
+  @override
+  String get dailyNeeded => 'Need per day';
+
+  @override
+  String get goalOverdue => 'Past deadline';
+
+  @override
+  String get createGoalAction => 'Create goal';
+
+  @override
   String get toolsSection => 'Tools';
 
   @override
@@ -583,6 +634,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Stay up to date with reminders and finance updates';
 
   @override
+  String get notificationPermissionDenied =>
+      'Notification permission was not granted.';
+
+  @override
   String get exportData => 'Export data';
 
   @override
@@ -590,10 +645,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'Preview and copy your finance data as JSON or CSV';
 
   @override
+  String get exportBackup => 'Create backup';
+
+  @override
+  String get exportBackupSubtitle =>
+      'Save a full offline JSON backup of your finance data';
+
+  @override
   String get exportJson => 'Export JSON';
 
   @override
   String get exportCsv => 'Export CSV';
+
+  @override
+  String get restoreBackup => 'Restore backup';
+
+  @override
+  String get restoreBackupSubtitle =>
+      'Import a backup file and replace current local data';
+
+  @override
+  String backupSavedMessage(String location) {
+    return 'Backup saved: $location';
+  }
+
+  @override
+  String backupRestoredMessage(int walletCount, int transactionCount) {
+    return 'Restored $walletCount wallets and $transactionCount transactions';
+  }
+
+  @override
+  String get invalidBackupFile => 'The backup file is invalid or unreadable.';
 
   @override
   String get copiedToClipboard => 'Copied to clipboard';
@@ -742,6 +824,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spendingInsightsTitle => 'Spending insights';
 
   @override
+  String get monthlyInsightsSubtitle =>
+      'Rule-based highlights generated from your local transactions';
+
+  @override
   String get topCategory => 'Top category';
 
   @override
@@ -758,4 +844,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get same => 'No change';
+
+  @override
+  String get averageDailySpend => 'Average daily spend';
+
+  @override
+  String get biggestExpense => 'Biggest expense';
+
+  @override
+  String spendingDays(int count) {
+    return '$count spending days';
+  }
+
+  @override
+  String get categoryShiftTitle => 'Watch this category';
+
+  @override
+  String categoryShiftMessage(String category, String amount) {
+    return '$category increased by $amount compared to last month';
+  }
+
+  @override
+  String get monthEndForecastTitle => 'Month-end forecast';
+
+  @override
+  String get monthEndForecastSubtitle =>
+      'Estimate how this month may close based on your current pace';
+
+  @override
+  String get projectedExpense => 'Projected expense';
+
+  @override
+  String get projectedNet => 'Projected net';
+
+  @override
+  String remainingDaysLabel(int count) {
+    return '$count days left';
+  }
+
+  @override
+  String get stayOnTrack => 'Still on track';
+
+  @override
+  String get watchBudgetPressure => 'Budget pressure ahead';
+
+  @override
+  String get spendingPaceHighTitle => 'Spending pace is high';
+
+  @override
+  String spendingPaceHighMessage(String percent) {
+    return 'You are spending about $percent faster than last month';
+  }
+
+  @override
+  String get spendingPaceStableTitle => 'Spending pace is stable';
+
+  @override
+  String get spendingPaceStableMessage =>
+      'Your current spending pace is close to a healthy monthly rhythm';
 }

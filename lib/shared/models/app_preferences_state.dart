@@ -57,4 +57,30 @@ class AppPreferencesState {
       avatarPath: clearAvatar ? null : avatarPath ?? this.avatarPath,
     );
   }
+
+  factory AppPreferencesState.fromJson(Map<String, dynamic> json) {
+    return AppPreferencesState(
+      languageCode: json['languageCode'] as String? ?? 'vi',
+      darkModeEnabled: json['darkModeEnabled'] as bool? ?? false,
+      notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
+      appLockEnabled: json['appLockEnabled'] as bool? ?? false,
+      pinCode: json['pinCode'] as String?,
+      profileName: json['profileName'] as String? ?? 'Alex Tran',
+      profileEmail: json['profileEmail'] as String? ?? 'alex@pocketledger.app',
+      avatarPath: json['avatarPath'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'languageCode': languageCode,
+      'darkModeEnabled': darkModeEnabled,
+      'notificationsEnabled': notificationsEnabled,
+      'appLockEnabled': appLockEnabled,
+      'pinCode': pinCode,
+      'profileName': profileName,
+      'profileEmail': profileEmail,
+      'avatarPath': avatarPath,
+    };
+  }
 }

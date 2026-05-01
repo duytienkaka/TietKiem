@@ -285,5 +285,95 @@
 "increase": "Tăng",
 "decrease": "Giảm",
 "same": "Không đổi",
-"noBudgetsYet": "Chưa có ngân sách nào"
+"noBudgetsYet": "Chưa có ngân sách nào",
+"exportBackup": "Tạo bản sao lưu",
+"exportBackupSubtitle": "Lưu toàn bộ dữ liệu tài chính offline thành file JSON",
+"restoreBackup": "Khôi phục bản sao lưu",
+"restoreBackupSubtitle": "Nhập file sao lưu và thay thế dữ liệu hiện tại trên thiết bị",
+"backupSavedMessage": "Đã lưu bản sao lưu: {location}",
+"@backupSavedMessage": {
+  "placeholders": {
+    "location": {
+      "type": "String"
+    }
+  }
+},
+"backupRestoredMessage": "Đã khôi phục {walletCount} ví và {transactionCount} giao dịch",
+"@backupRestoredMessage": {
+  "placeholders": {
+    "walletCount": {
+      "type": "int"
+    },
+    "transactionCount": {
+      "type": "int"
+    }
+  }
+},
+"invalidBackupFile": "File sao lưu không hợp lệ hoặc không thể đọc.",
+"savingsGoalsTitle": "Mục tiêu tiết kiệm",
+"savingsGoalsSubtitle": "Theo dõi tiến độ đạt mục tiêu tài chính",
+"addGoal": "Thêm mục tiêu",
+"noSavingsGoalsYet": "Chưa có mục tiêu tiết kiệm",
+"createSavingsGoalHint": "Tạo mục tiêu và gắn với một ví để theo dõi tiến độ tự động",
+"createSavingsGoal": "Tạo mục tiêu tiết kiệm",
+"editSavingsGoal": "Chỉnh sửa mục tiêu tiết kiệm",
+"savingsGoalEditorHint": "Đặt số tiền mục tiêu, chọn ví và hạn hoàn thành phù hợp.",
+"goalName": "Tên mục tiêu",
+"targetAmount": "Số tiền mục tiêu",
+"targetDate": "Ngày mục tiêu",
+"savedAmount": "Đã tiết kiệm",
+"deadlineLabel": "Hạn",
+"dailyNeeded": "Cần mỗi ngày",
+"goalOverdue": "Đã quá hạn",
+"createGoalAction": "Tạo mục tiêu",
+"notificationPermissionDenied": "Chưa cấp quyền thông báo.",
+"monthlyInsightsSubtitle": "Các điểm nhấn được phân tích tự động từ giao dịch cục bộ",
+"averageDailySpend": "Chi tiêu trung bình mỗi ngày",
+"biggestExpense": "Khoản chi lớn nhất",
+"spendingDays": "{count} ngày có chi tiêu",
+"@spendingDays": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    }
+  }
+},
+"categoryShiftTitle": "Cần chú ý danh mục này",
+"categoryShiftMessage": "{category} đã tăng {amount} so với tháng trước",
+"@categoryShiftMessage": {
+  "placeholders": {
+    "category": {
+      "type": "String"
+    },
+    "amount": {
+      "type": "String"
+    }
+  }
+}
+,
+"monthEndForecastTitle": "Dự báo cuối tháng",
+"monthEndForecastSubtitle": "Ước tính kết thúc tháng dựa trên tốc độ chi tiêu hiện tại",
+"projectedExpense": "Chi tiêu dự báo",
+"projectedNet": "Chênh lệch dự báo",
+"remainingDaysLabel": "Còn {count} ngày",
+"@remainingDaysLabel": {
+  "placeholders": {
+    "count": {
+      "type": "int"
+    }
+  }
+},
+"stayOnTrack": "Vẫn đang đúng nhịp",
+"watchBudgetPressure": "Có áp lực ngân sách",
+"spendingPaceHighTitle": "Tốc độ chi đang cao",
+"spendingPaceHighMessage": "Bạn đang chi nhanh hơn tháng trước khoảng {percent}",
+"@spendingPaceHighMessage": {
+  "placeholders": {
+    "percent": {
+      "type": "String"
+    }
+  }
+},
+"spendingPaceStableTitle": "Tốc độ chi đang ổn định",
+"spendingPaceStableMessage": "Nhịp chi hiện tại đang khá cân bằng cho cả tháng"
 }

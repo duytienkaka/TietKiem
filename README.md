@@ -11,7 +11,10 @@
 - Quản lý ngân sách theo danh mục.
 - Quản lý giao dịch định kỳ.
 - Máy tính nhanh trong màn `Khác`.
-- Hồ sơ, cài đặt, đổi ngôn ngữ, dark mode, export/reset dữ liệu.
+- Mục tiêu tiết kiệm gắn với ví và theo dõi tiến độ tự động.
+- Sao lưu/khôi phục dữ liệu cục bộ bằng file JSON.
+- Nhắc giao dịch định kỳ bằng thông báo cục bộ trên thiết bị hỗ trợ.
+- Hồ sơ, cài đặt, đổi ngôn ngữ, dark mode, reset dữ liệu.
 - Khóa ứng dụng bằng PIN.
 
 ## Kiến trúc và lưu trữ
@@ -20,7 +23,7 @@
 - Riverpod cho state management
 - go_router cho điều hướng
 - Drift (SQLite) cho wallets, categories, transactions
-- SharedPreferences cho app settings, PIN, budgets, recurring rules
+- SharedPreferences cho app settings, PIN, budgets, recurring rules, savings goals
 - image_picker cho ảnh hóa đơn
 - fl_chart cho biểu đồ
 
@@ -38,6 +41,7 @@ lib/
 ├── features/
 │   ├── budget/
 │   ├── category/
+│   ├── goal/
 │   ├── recurring/
 │   ├── transaction/
 │   └── wallet/
@@ -49,11 +53,11 @@ lib/
 
 - `Trang chủ`: tổng số dư, ví, giao dịch gần đây, thêm nhanh.
 - `Giao dịch`: tìm kiếm, lọc, xem lịch sử giao dịch.
-- `Thống kê`: biểu đồ theo tháng và drill-down giao dịch.
-- `Ví`: tạo/sửa/xóa ví.
-- `Khác`: máy tính, định kỳ, ngân sách.
+- `Thống kê`: biểu đồ theo tháng, insight nội bộ và dự báo cuối tháng.
+- `Ví`: tạo, sửa, xóa ví.
+- `Khác`: máy tính, định kỳ, ngân sách, mục tiêu tiết kiệm.
 - `Hồ sơ`: avatar, tên, email, thống kê cơ bản.
-- `Cài đặt`: ngôn ngữ, dark mode, thông báo, export/reset, app lock.
+- `Cài đặt`: ngôn ngữ, dark mode, thông báo, sao lưu/khôi phục, reset, app lock.
 
 ## Chạy dự án
 
@@ -86,7 +90,7 @@ flutter test
 - Toàn bộ text UI đi qua `l10n`.
 - Hạn chế hardcode màu và spacing ngoài theme/widget dùng chung.
 - Không thay đổi business logic khi chỉ chỉnh UI/UX.
-- Các tính năng `Budget` và `Recurring` hiện được gom về tab `Khác`.
+- Các tính năng `Budget`, `Recurring`, `Savings goals` được gom về tab `Khác`.
 
 ## Trạng thái hiện tại
 

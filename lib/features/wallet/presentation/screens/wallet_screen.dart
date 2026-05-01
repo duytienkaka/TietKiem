@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/finance_enums.dart';
-import '../../../../shared/services/supabase_remote_data_source.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -96,18 +95,6 @@ class WalletScreen extends ConsumerWidget {
                                 onTap: () =>
                                     showWalletSheet(context, wallet: wallet),
                               ),
-                              const SizedBox(height: 8),
-                              FilledButton.tonalIcon(
-                                onPressed: () => _showInviteWalletSheet(
-                                  context,
-                                  ref,
-                                  wallet,
-                                ),
-                                icon: const Icon(
-                                  Icons.person_add_alt_1_rounded,
-                                ),
-                                label: Text(context.l10n.inviteUser),
-                              ),
                             ],
                           ),
                         ),
@@ -141,130 +128,6 @@ class WalletScreen extends ConsumerWidget {
         ).showSnackBar(SnackBar(content: Text(localizeError(context, error))));
       }
     }
-  }
-
-  Future<void> _showInviteWalletSheet(
-    BuildContext context,
-    WidgetRef ref,
-    Wallet wallet,
-  ) async {
-    final controller = TextEditingController();
-    var inviting = false;
-
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      barrierColor: Colors.black.withValues(alpha: 0.36),
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          return SafeArea(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                8,
-                20,
-                20 + MediaQuery.of(sheetContext).viewInsets.bottom,
-              ),
-              child: Material(
-                color: Theme.of(context).colorScheme.surface,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.l10n.inviteUserTitle(wallet.name),
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      context.l10n.inviteUserSubtitle,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: controller,
-                      keyboardType: TextInputType.emailAddress,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        labelText: context.l10n.emailAddress,
-                        prefixIcon: const Icon(Icons.email_outlined),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: FilledButton.icon(
-                        onPressed: inviting
-                            ? null
-                            : () async {
-                                final email = controller.text
-                                    .trim()
-                                    .toLowerCase();
-                                if (email.isEmpty) {
-                                  return;
-                                }
-                                setSheetState(() => inviting = true);
-                                try {
-                                  await ref
-                                      .read(supabaseRemoteDataSourceProvider)
-                                      .inviteUserToWallet(
-                                        walletId: wallet.id,
-                                        email: email,
-                                      );
-                                  if (sheetContext.mounted) {
-                                    Navigator.of(sheetContext).pop();
-                                  }
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          context.l10n.invitationSent(email),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                } catch (error) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          localizeError(context, error),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                } finally {
-                                  if (sheetContext.mounted) {
-                                    setSheetState(() => inviting = false);
-                                  }
-                                }
-                              },
-                        icon: inviting
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.send_rounded),
-                        label: Text(context.l10n.inviteUser),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-
-    controller.dispose();
   }
 }
 
