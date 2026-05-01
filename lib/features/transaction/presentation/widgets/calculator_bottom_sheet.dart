@@ -12,6 +12,7 @@ Future<int?> showAmountCalculatorSheet(
   return showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
+    useRootNavigator: true,
     useSafeArea: true,
     showDragHandle: false,
     backgroundColor: Colors.transparent,
@@ -60,6 +61,7 @@ class _CalculatorBottomSheetState extends State<_CalculatorBottomSheet> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
+    final maxHeight = MediaQuery.of(context).size.height * 0.92;
 
     return SafeArea(
       child: Padding(
@@ -82,108 +84,112 @@ class _CalculatorBottomSheetState extends State<_CalculatorBottomSheet> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 14, 16, 16 + bottomPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 44,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: scheme.outlineVariant.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '\u004d\u00e1y t\u00ednh',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: scheme.onSurface,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: maxHeight),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 14, 16, 16 + bottomPadding),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: scheme.outlineVariant.withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(999),
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                    decoration: BoxDecoration(
-                      color: scheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    const SizedBox(height: 16),
+                    Row(
                       children: [
-                        Text(
-                          _expression.isEmpty ? '0' : _displayExpression(_expression),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.right,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Text(
+                            '\u004d\u00e1y t\u00ednh',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: scheme.onSurface,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _hasError ? 'L\u1ed7i' : _resultText,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            color: _hasError ? scheme.error : scheme.onSurface,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close_rounded),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _buttons.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 14,
-                      crossAxisSpacing: 14,
-                      childAspectRatio: 0.98,
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            _expression.isEmpty ? '0' : _displayExpression(_expression),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _hasError ? 'L\u1ed7i' : _resultText,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: _hasError ? scheme.error : scheme.onSurface,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    itemBuilder: (context, index) {
-                      final label = _buttons[index];
-                      if (label.isEmpty) {
-                        return const SizedBox.shrink();
-                      }
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _buttons.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 4,
+                              mainAxisSpacing: 14,
+                              crossAxisSpacing: 14,
+                              childAspectRatio: 0.98,
+                            ),
+                        itemBuilder: (context, index) {
+                          final label = _buttons[index];
+                          if (label.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
 
-                      return _CalculatorButton(
-                        label: label,
-                        variant: _buttonVariant(label),
-                        operatorStyle: _isOperator(label),
-                        onTap: () => _handleTap(label),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: _resultValue == null || _hasError
-                          ? null
-                          : () => Navigator.of(context).pop(_resultValue),
-                      icon: const Icon(Icons.check_circle_rounded),
-                      label: const Text('D\u00f9ng k\u1ebft qu\u1ea3'),
+                          return _CalculatorButton(
+                            label: label,
+                            variant: _buttonVariant(label),
+                            operatorStyle: _isOperator(label),
+                            onTap: () => _handleTap(label),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: _resultValue == null || _hasError
+                            ? null
+                            : () => Navigator.of(context).pop(_resultValue),
+                        icon: const Icon(Icons.check_circle_rounded),
+                        label: const Text('D\u00f9ng k\u1ebft qu\u1ea3'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

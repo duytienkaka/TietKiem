@@ -39,7 +39,12 @@ class ScreenTopHeader extends StatelessWidget {
             );
 
         return Container(
-          padding: EdgeInsets.all(narrow ? 16 : 18),
+          padding: EdgeInsets.fromLTRB(
+            narrow ? 14 : 16,
+            narrow ? 14 : 16,
+            narrow ? 14 : 16,
+            narrow ? 14 : 16,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             gradient: const LinearGradient(
@@ -72,7 +77,7 @@ class ScreenTopHeader extends StatelessWidget {
                         Expanded(child: _HeaderTextBlock(title: title, subtitle: subtitle, eyebrow: eyebrow)),
                       ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     Align(alignment: Alignment.centerRight, child: accent),
                   ],
                 )
@@ -128,25 +133,25 @@ class _HeaderTextBlock extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
         ],
         Text(
           title,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.headlineSmall?.copyWith(
+          style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w800,
             color: const Color(0xFF101828),
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Text(
           subtitle,
-          maxLines: 3,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.bodyMedium?.copyWith(
+          style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
-            height: 1.35,
+            height: 1.3,
           ),
         ),
       ],
@@ -172,8 +177,8 @@ class _HeaderButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: SizedBox(
-          width: 44,
-          height: 44,
+          width: 42,
+          height: 42,
           child: Icon(icon, color: const Color(0xFF344054)),
         ),
       ),
@@ -203,11 +208,11 @@ class _HeaderAccent extends StatelessWidget {
     }
 
     return Container(
-      width: 52,
-      height: 52,
+      width: 46,
+      height: 46,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -237,7 +242,12 @@ class ScreenTopHeaderSkeleton extends StatelessWidget {
       builder: (context, constraints) {
         final narrow = constraints.maxWidth < 420;
         return Container(
-          padding: EdgeInsets.all(narrow ? 16 : 18),
+          padding: EdgeInsets.fromLTRB(
+            narrow ? 14 : 16,
+            narrow ? 14 : 16,
+            narrow ? 14 : 16,
+            narrow ? 14 : 16,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             gradient: const LinearGradient(
@@ -260,33 +270,33 @@ class ScreenTopHeaderSkeleton extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SkeletonBox(width: 96, height: 12, borderRadius: 999),
-                        SizedBox(height: 8),
-                        SkeletonBox(width: 180, height: 26),
-                        SizedBox(height: 8),
-                        SkeletonBox(width: double.infinity, height: 14),
                         SizedBox(height: 6),
-                        SkeletonBox(width: 220, height: 14),
+                        SkeletonBox(width: 156, height: 22),
+                        SizedBox(height: 6),
+                        SkeletonBox(width: double.infinity, height: 12),
+                        SizedBox(height: 4),
+                        SkeletonBox(width: 190, height: 12),
                       ],
                     ),
                   ),
                   if (!narrow) ...[
                     const SizedBox(width: 12),
                     SkeletonBox(
-                      width: 52,
-                      height: 52,
-                      borderRadius: 18,
+                      width: 46,
+                      height: 46,
+                      borderRadius: 16,
                     ),
                   ],
                 ],
               ),
               if (narrow) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerRight,
                   child: SkeletonBox(
-                    width: showAction ? 110 : 52,
-                    height: 44,
-                    borderRadius: 18,
+                    width: showAction ? 104 : 46,
+                    height: 42,
+                    borderRadius: 16,
                   ),
                 ),
               ] else if (showAction) ...[

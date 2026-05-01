@@ -1517,8 +1517,6 @@ class _MoreLoadingState extends StatelessWidget {
         SizedBox(height: 16),
         _SectionSkeleton(lines: 1),
         SizedBox(height: 16),
-        _SectionSkeleton(lines: 2),
-        SizedBox(height: 16),
         _SectionSkeleton(lines: 3),
         SizedBox(height: 16),
         _SectionSkeleton(lines: 3),

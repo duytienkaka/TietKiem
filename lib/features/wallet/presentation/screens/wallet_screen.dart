@@ -58,7 +58,7 @@ class WalletScreen extends ConsumerWidget {
                   if (wallets.isEmpty)
                     EmptyState(
                       title: context.l10n.noWalletsCreated,
-                      message: context.l10n.addCashBankSavingWallet,
+                      message: context.l10n.createWalletStart,
                       icon: Icons.account_balance_wallet_rounded,
                       actionLabel: context.l10n.createWallet,
                       onAction: () => showWalletSheet(context),
@@ -219,11 +219,9 @@ class WalletSheet extends ConsumerStatefulWidget {
 }
 
 class _WalletSheetState extends ConsumerState<WalletSheet> {
-  static const _colors = [0xFFE11976, 0xFF2E90FA, 0xFF7A5AF8, 0xFF16B364];
   static const _icons = [
     'account_balance_wallet',
     'account_balance',
-    'savings',
   ];
 
   late final TextEditingController _nameController;
@@ -244,8 +242,10 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
         : TextEditingController.fromValue(
             currencyEditingValueFromInt(wallet.balance.round()),
           );
-    _type = wallet?.type ?? WalletType.cash;
-    _color = wallet?.color ?? _colors.first;
+    _type = wallet?.type == WalletType.saving
+        ? WalletType.bank
+        : wallet?.type ?? WalletType.cash;
+    _color = wallet?.color ?? 0xFFE11976;
     _icon = wallet?.icon ?? _icons.first;
   }
 
@@ -315,7 +315,7 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
                         decoration: InputDecoration(
                           labelText: context.l10n.walletType,
                         ),
-                        items: WalletType.values
+                        items: const [WalletType.cash, WalletType.bank]
                             .map(
                               (type) => DropdownMenuItem(
                                 value: type,
@@ -332,36 +332,54 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
                       const SizedBox(height: 14),
                       _ChoiceLabel(title: context.l10n.color),
                       const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: _colors.map((color) {
-                          final selected = _color == color;
-                          return GestureDetector(
-                            onTap: () => setState(() => _color = color),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: Color(color),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: selected
-                                      ? Theme.of(context).colorScheme.onSurface
-                                      : Theme.of(context).colorScheme.surface,
-                                  width: selected ? 2.5 : 0,
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: Color(_color),
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
-                              ),
-                              child: selected
-                                  ? const Icon(
-                                      Icons.check_rounded,
-                                      color: Colors.white,
-                                    )
-                                  : null,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    '#${_color.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                ),
+                              ],
                             ),
-                          );
-                        }).toList(),
+                            const SizedBox(height: 12),
+                            _ColorSlider(
+                              label: 'R',
+                              value: _channelValue(Color(_color).r),
+                              activeColor: Colors.red,
+                              onChanged: (value) => _updateColor(red: value.round()),
+                            ),
+                            _ColorSlider(
+                              label: 'G',
+                              value: _channelValue(Color(_color).g),
+                              activeColor: Colors.green,
+                              onChanged: (value) => _updateColor(green: value.round()),
+                            ),
+                            _ColorSlider(
+                              label: 'B',
+                              value: _channelValue(Color(_color).b),
+                              activeColor: Colors.blue,
+                              onChanged: (value) => _updateColor(blue: value.round()),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 14),
                       _ChoiceLabel(title: context.l10n.icon),
@@ -454,10 +472,25 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
     }
   }
 
+  void _updateColor({int? red, int? green, int? blue}) {
+    final current = Color(_color);
+    setState(() {
+      _color = Color.fromARGB(
+        255,
+        red ?? _channelInt(current.r),
+        green ?? _channelInt(current.g),
+        blue ?? _channelInt(current.b),
+      ).toARGB32();
+    });
+  }
+
+  double _channelValue(double value) => _channelInt(value).toDouble();
+
+  int _channelInt(double value) => (value * 255).round().clamp(0, 255);
+
   IconData _resolveWalletIcon(String icon) => switch (icon) {
     'account_balance_wallet' => Icons.account_balance_wallet_rounded,
     'account_balance' => Icons.account_balance_rounded,
-    'savings' => Icons.savings_rounded,
     _ => Icons.wallet_rounded,
   };
 }
@@ -472,6 +505,60 @@ class _ChoiceLabel extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+    );
+  }
+}
+
+class _ColorSlider extends StatelessWidget {
+  const _ColorSlider({
+    required this.label,
+    required this.value,
+    required this.activeColor,
+    required this.onChanged,
+  });
+
+  final String label;
+  final double value;
+  final Color activeColor;
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 18,
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+        ),
+        Expanded(
+          child: SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: activeColor,
+              thumbColor: activeColor,
+              overlayColor: activeColor.withValues(alpha: 0.16),
+            ),
+            child: Slider(
+              value: value,
+              min: 0,
+              max: 255,
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 34,
+          child: Text(
+            value.round().toString(),
+            textAlign: TextAlign.right,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
+      ],
     );
   }
 }

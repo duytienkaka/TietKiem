@@ -20,6 +20,7 @@ import '../../../category/presentation/providers/category_provider.dart';
 import '../../../wallet/domain/entities/wallet.dart';
 import '../../../wallet/presentation/providers/wallet_provider.dart';
 import '../../../wallet/presentation/screens/wallet_screen.dart';
+import 'bill_qr_scanner_screen.dart';
 import '../../domain/entities/finance_transaction.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/amount_input.dart';
@@ -260,6 +261,19 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                       onChanged: (value) => _rawAmount = value,
                                       onCalculated: _applyCalculatedAmount,
                                       onFieldSubmitted: (_) => _save(),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: OutlinedButton.icon(
+                                        onPressed: _scanBillQr,
+                                        icon: const Icon(Icons.qr_code_scanner_rounded),
+                                        label: Text(
+                                          Localizations.localeOf(context).languageCode == 'vi'
+                                              ? 'Quét mã bill'
+                                              : 'Scan bill QR',
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -582,6 +596,27 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
     final savedPath = await savePickedImage(file);
     setState(() {
       _imagePath = savedPath;
+      _detailsExpanded = true;
+    });
+  }
+
+  Future<void> _scanBillQr() async {
+    FocusScope.of(context).unfocus();
+    final scanned = await showBillQrScanner(context);
+    if (!mounted || scanned == null) {
+      return;
+    }
+
+    setState(() {
+      if (scanned.amount != null && scanned.amount! > 0) {
+        _rawAmount = scanned.amount!;
+        applyCurrencyEditingValue(_amountController, scanned.amount!);
+      }
+
+      final note = scanned.composedNote ?? scanned.rawValue;
+      if (note.trim().isNotEmpty) {
+        _noteController.text = note.trim();
+      }
       _detailsExpanded = true;
     });
   }

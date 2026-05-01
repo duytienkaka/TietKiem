@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/l10n.dart';
+import '../../../../shared/models/app_preferences_state.dart';
 import '../../../../shared/finance_enums.dart';
+import '../../../../shared/providers/app_preferences_provider.dart';
 import '../../../../shared/widgets/animated_reveal.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/empty_state.dart';
+import '../../../../shared/widgets/receipt_image.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/skeleton_box.dart';
 import '../../../../shared/widgets/transaction_type_badge.dart';
@@ -59,6 +62,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final walletsAsync = ref.watch(walletProvider);
     final transactionsAsync = ref.watch(transactionProvider);
     final categoriesAsync = ref.watch(categoryProvider);
+    final preferences =
+        ref.watch(appPreferencesProvider).valueOrNull ??
+        const AppPreferencesState.defaults();
 
     return Scaffold(
       body: SafeArea(
@@ -95,6 +101,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: _HomeHeader(
                           greeting: _greetingForHour(context, now.hour),
                           compact: _collapsedHeader,
+                          profileName: preferences.profileName,
+                          avatarPath: preferences.avatarPath,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -396,15 +404,22 @@ class _HomeHeader extends StatelessWidget {
   const _HomeHeader({
     required this.greeting,
     required this.compact,
+    required this.profileName,
+    required this.avatarPath,
   });
 
   final String greeting;
   final bool compact;
+  final String profileName;
+  final String? avatarPath;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final initials = _extractInitials(context.l10n.helloUser);
+    final resolvedName = profileName.trim().isEmpty
+        ? context.l10n.helloUser.replaceFirst(RegExp(r'^.*?,\s*'), '')
+        : profileName.trim();
+    final initials = _extractInitials(resolvedName);
     return Container(
       padding: EdgeInsets.fromLTRB(16, compact ? 12 : 16, 16, compact ? 12 : 16),
       decoration: BoxDecoration(
@@ -448,7 +463,7 @@ class _HomeHeader extends StatelessWidget {
                     children: [
                       SizedBox(height: compact ? 2 : 6),
                       Text(
-                        context.l10n.helloUser,
+                        resolvedName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: (compact
@@ -474,7 +489,6 @@ class _HomeHeader extends StatelessWidget {
               height: compact ? 42 : 46,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white,
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -489,12 +503,25 @@ class _HomeHeader extends StatelessWidget {
                 ],
               ),
               child: Center(
-                child: Text(
-                  initials,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: const Color(0xFFE11976),
-                    fontWeight: FontWeight.w800,
-                  ),
+                child: ClipOval(
+                  child: avatarPath?.isNotEmpty == true
+                      ? ReceiptImage(
+                          source: avatarPath!,
+                          height: compact ? 42 : 46,
+                          width: compact ? 42 : 46,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          color: Colors.white.withValues(alpha: 0.78),
+                          alignment: Alignment.center,
+                          child: Text(
+                            initials,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: const Color(0xFFE11976),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
                 ),
               ),
             ),

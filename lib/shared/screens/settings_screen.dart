@@ -183,24 +183,6 @@ class SettingsScreen extends ConsumerWidget {
                             _handleAppLockToggle(context, ref, preferences, value),
                       ),
                     ),
-                    SettingItem(
-                      icon: Icons.pin_outlined,
-                      title: context.l10n.pinSetup,
-                      subtitle: preferences.pinCode?.isNotEmpty == true
-                          ? context.l10n.pinConfigured
-                          : context.l10n.pinSetupSubtitle,
-                      onTap: () => _showPinSetupSheet(
-                        context,
-                        ref,
-                        existingPin: preferences.pinCode,
-                      ),
-                      trailing: Text(
-                        preferences.pinCode?.isNotEmpty == true
-                            ? '****'
-                            : context.l10n.setPin,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -214,13 +196,13 @@ class SettingsScreen extends ConsumerWidget {
                     SettingItem(
                       icon: Icons.info_outline_rounded,
                       title: context.l10n.appVersion,
-                      trailing: Text('1.0.0', style: Theme.of(context).textTheme.bodyMedium),
+                      trailing: Text('1.0.3', style: Theme.of(context).textTheme.bodyMedium),
                     ),
                     SettingItem(
                       icon: Icons.code_rounded,
                       title: context.l10n.developer,
                       trailing: Text(
-                        'Tiet Kiem',
+                        'Duy Tien',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),

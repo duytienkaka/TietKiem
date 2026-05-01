@@ -29,10 +29,19 @@ class _AnimatedFabState extends State<AnimatedFab> {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeInOut,
         scale: _pressed ? 0.96 : 1,
-        child: FloatingActionButton.extended(
-          onPressed: widget.onPressed,
-          icon: Icon(widget.icon),
-          label: Text(widget.label),
+        child: SizedBox(
+          height: 51,
+          child: FloatingActionButton.extended(
+            onPressed: widget.onPressed,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            extendedPadding: const EdgeInsetsDirectional.only(
+              start: 16,
+              end: 16,
+            ),
+            extendedIconLabelSpacing: 8,
+            icon: Icon(widget.icon, size: 20),
+            label: Text(widget.label),
+          ),
         ),
       ),
     );

@@ -34,7 +34,9 @@ String formatMonthYear(BuildContext context, DateTime value) {
 extension WalletTypeL10n on WalletType {
   String label(BuildContext context) => switch (this) {
     WalletType.cash => context.l10n.walletTypeCash,
-    WalletType.bank => context.l10n.walletTypeBank,
+    WalletType.bank => Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Tài khoản'
+        : 'Account',
     WalletType.saving => context.l10n.walletTypeSaving,
   };
 }
@@ -79,7 +81,9 @@ extension CategoryL10n on Category {
 
 String localizeIconLabel(BuildContext context, String icon) => switch (icon) {
   'account_balance_wallet' => context.l10n.iconWallet,
-  'account_balance' => context.l10n.iconBank,
+  'account_balance' => Localizations.localeOf(context).languageCode == 'vi'
+      ? 'Tài khoản'
+      : 'Account',
   'savings' => context.l10n.iconSavings,
   _ => icon,
 };
