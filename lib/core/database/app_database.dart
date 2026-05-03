@@ -26,6 +26,10 @@ class Wallets extends Table {
   RealColumn get balance => real()();
   IntColumn get color => integer()();
   TextColumn get icon => text()();
+  TextColumn get bankName => text().nullable()();
+  TextColumn get accountNumber => text().nullable()();
+  TextColumn get accountHolder => text().nullable()();
+  TextColumn get paymentNote => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -123,43 +127,37 @@ class SyncQueueItems extends Table {
     RecurringTransactions,
     SyncQueueItems,
   ],
-  daos: [
-    WalletDao,
-    CategoryDao,
-    TransactionDao,
-    SyncQueueDao,
-  ],
+  daos: [WalletDao, CategoryDao, TransactionDao, SyncQueueDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
- 
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-        onUpgrade: (m, from, to) async {
-          await transaction(() async {
-            await customStatement('PRAGMA foreign_keys = OFF');
-            for (final table in allTables.toList().reversed) {
-              await delete(table).go();
-            }
-            for (final table in allTables) {
-              await m.deleteTable(table.actualTableName);
-            }
-            await m.createAll();
-            await customStatement('PRAGMA foreign_keys = ON');
-          });
-        },
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+    onUpgrade: (m, from, to) async {
+      await transaction(() async {
+        await customStatement('PRAGMA foreign_keys = OFF');
+        for (final table in allTables.toList().reversed) {
+          await delete(table).go();
+        }
+        for (final table in allTables) {
+          await m.deleteTable(table.actualTableName);
+        }
+        await m.createAll();
+        await customStatement('PRAGMA foreign_keys = ON');
+      });
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 
   Future<void> resetFinanceData() async {
     await transaction(() async {

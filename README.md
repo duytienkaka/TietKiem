@@ -1,43 +1,69 @@
-# Tiet Kiem
+# Tiết Kiệm
 
-Ứng dụng quản lý tài chính cá nhân viết bằng Flutter, tối ưu cho trải nghiệm mobile kiểu fintech và chạy offline-first.
+Ứng dụng quản lý tài chính cá nhân viết bằng Flutter, tối ưu cho trải nghiệm mobile, offline-first, và phù hợp để theo dõi thu chi hằng ngày.
+
+## Tải xuống
+
+- APK mới nhất: [Tải `TietKiem-latest.apk`](https://github.com/duytienkaka/TietKiem/raw/main/downloads/TietKiem-latest.apk)
+
+Nếu GitHub chặn tải trực tiếp trên mobile, bạn có thể vào thư mục [`downloads/`](downloads/) trong repo và bấm vào file APK.
 
 ## Tính năng chính
 
-- Quản lý nhiều ví: tiền mặt, ngân hàng, tiết kiệm.
+- Quản lý nhiều ví: tiền mặt, tài khoản ngân hàng.
 - Ghi nhận giao dịch: thu nhập, chi tiêu, chuyển tiền.
 - Đính kèm ảnh hóa đơn bằng camera hoặc thư viện.
-- Xem thống kê theo tháng với biểu đồ chi tiêu và thu/chi.
-- Quản lý ngân sách theo danh mục.
+- Xem thống kê theo tháng với biểu đồ thu chi.
+- Quản lý ngân sách.
 - Quản lý giao dịch định kỳ.
-- Máy tính nhanh trong màn `Khác`.
-- Mục tiêu tiết kiệm gắn với ví và theo dõi tiến độ tự động.
-- Sao lưu/khôi phục dữ liệu cục bộ bằng file JSON.
-- Nhắc giao dịch định kỳ bằng thông báo cục bộ trên thiết bị hỗ trợ.
-- Hồ sơ, cài đặt, đổi ngôn ngữ, dark mode, reset dữ liệu.
+- Máy tính nhanh trong tab `Khác`.
+- Mục tiêu tiết kiệm theo ví.
+- Quản lý danh mục riêng theo từng ví.
+- Sao lưu và khôi phục dữ liệu cục bộ bằng file JSON.
 - Khóa ứng dụng bằng PIN.
 
-## Kiến trúc và lưu trữ
+## Cài đặt nhanh
 
-- Flutter + Material 3
-- Riverpod cho state management
-- go_router cho điều hướng
-- Drift (SQLite) cho wallets, categories, transactions
-- SharedPreferences cho app settings, PIN, budgets, recurring rules, savings goals
-- image_picker cho ảnh hóa đơn
-- fl_chart cho biểu đồ
+1. Tải file APK ở mục `Tải xuống`.
+2. Chép file sang điện thoại Android.
+3. Cài đặt ứng dụng.
+4. Nếu Android cảnh báo nguồn không xác định, cho phép cài đặt từ nguồn này rồi thử lại.
 
-App hiện không dùng backend và không có tính năng AI.
+## Chạy local cho developer
+
+```bash
+flutter pub get
+flutter run
+```
+
+Chạy trên Chrome:
+
+```bash
+flutter run -d chrome
+```
+
+Build APK release:
+
+```bash
+flutter build apk --release
+```
+
+## Stack
+
+- Flutter
+- Material 3
+- Riverpod
+- go_router
+- Drift (SQLite)
+- SharedPreferences
+- image_picker
+- fl_chart
 
 ## Cấu trúc thư mục
 
 ```text
 lib/
 ├── core/
-│   ├── database/
-│   ├── error/
-│   ├── router/
-│   └── theme/
 ├── features/
 │   ├── budget/
 │   ├── category/
@@ -49,35 +75,6 @@ lib/
 └── shared/
 ```
 
-## Các màn hình
-
-- `Trang chủ`: tổng số dư, ví, giao dịch gần đây, thêm nhanh.
-- `Giao dịch`: tìm kiếm, lọc, xem lịch sử giao dịch.
-- `Thống kê`: biểu đồ theo tháng, insight nội bộ và dự báo cuối tháng.
-- `Ví`: tạo, sửa, xóa ví.
-- `Khác`: máy tính, định kỳ, ngân sách, mục tiêu tiết kiệm.
-- `Hồ sơ`: avatar, tên, email, thống kê cơ bản.
-- `Cài đặt`: ngôn ngữ, dark mode, thông báo, sao lưu/khôi phục, reset, app lock.
-
-## Chạy dự án
-
-```bash
-flutter pub get
-flutter run
-```
-
-Chạy web:
-
-```bash
-flutter run -d chrome
-```
-
-Build web:
-
-```bash
-flutter build web
-```
-
 ## Kiểm tra chất lượng
 
 ```bash
@@ -85,15 +82,8 @@ flutter analyze
 flutter test
 ```
 
-## Ghi chú phát triển
-
-- Toàn bộ text UI đi qua `l10n`.
-- Hạn chế hardcode màu và spacing ngoài theme/widget dùng chung.
-- Không thay đổi business logic khi chỉ chỉnh UI/UX.
-- Các tính năng `Budget`, `Recurring`, `Savings goals` được gom về tab `Khác`.
-
 ## Trạng thái hiện tại
 
 - `flutter analyze`: pass
 - `flutter test`: pass
-- `flutter build web`: pass
+- `flutter build apk --release`: pass

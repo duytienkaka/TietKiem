@@ -75,6 +75,50 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _bankNameMeta = const VerificationMeta(
+    'bankName',
+  );
+  @override
+  late final GeneratedColumn<String> bankName = GeneratedColumn<String>(
+    'bank_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accountNumberMeta = const VerificationMeta(
+    'accountNumber',
+  );
+  @override
+  late final GeneratedColumn<String> accountNumber = GeneratedColumn<String>(
+    'account_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accountHolderMeta = const VerificationMeta(
+    'accountHolder',
+  );
+  @override
+  late final GeneratedColumn<String> accountHolder = GeneratedColumn<String>(
+    'account_holder',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paymentNoteMeta = const VerificationMeta(
+    'paymentNote',
+  );
+  @override
+  late final GeneratedColumn<String> paymentNote = GeneratedColumn<String>(
+    'payment_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -117,6 +161,10 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     balance,
     color,
     icon,
+    bankName,
+    accountNumber,
+    accountHolder,
+    paymentNote,
     createdAt,
     updatedAt,
     deletedAt,
@@ -189,6 +237,39 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     } else if (isInserting) {
       context.missing(_iconMeta);
     }
+    if (data.containsKey('bank_name')) {
+      context.handle(
+        _bankNameMeta,
+        bankName.isAcceptableOrUnknown(data['bank_name']!, _bankNameMeta),
+      );
+    }
+    if (data.containsKey('account_number')) {
+      context.handle(
+        _accountNumberMeta,
+        accountNumber.isAcceptableOrUnknown(
+          data['account_number']!,
+          _accountNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('account_holder')) {
+      context.handle(
+        _accountHolderMeta,
+        accountHolder.isAcceptableOrUnknown(
+          data['account_holder']!,
+          _accountHolderMeta,
+        ),
+      );
+    }
+    if (data.containsKey('payment_note')) {
+      context.handle(
+        _paymentNoteMeta,
+        paymentNote.isAcceptableOrUnknown(
+          data['payment_note']!,
+          _paymentNoteMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -248,6 +329,22 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
         DriftSqlType.string,
         data['${effectivePrefix}icon'],
       )!,
+      bankName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_name'],
+      ),
+      accountNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_number'],
+      ),
+      accountHolder: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_holder'],
+      ),
+      paymentNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_note'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -277,6 +374,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   final double balance;
   final int color;
   final String icon;
+  final String? bankName;
+  final String? accountNumber;
+  final String? accountHolder;
+  final String? paymentNote;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
@@ -288,6 +389,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     required this.balance,
     required this.color,
     required this.icon,
+    this.bankName,
+    this.accountNumber,
+    this.accountHolder,
+    this.paymentNote,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -302,6 +407,18 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     map['balance'] = Variable<double>(balance);
     map['color'] = Variable<int>(color);
     map['icon'] = Variable<String>(icon);
+    if (!nullToAbsent || bankName != null) {
+      map['bank_name'] = Variable<String>(bankName);
+    }
+    if (!nullToAbsent || accountNumber != null) {
+      map['account_number'] = Variable<String>(accountNumber);
+    }
+    if (!nullToAbsent || accountHolder != null) {
+      map['account_holder'] = Variable<String>(accountHolder);
+    }
+    if (!nullToAbsent || paymentNote != null) {
+      map['payment_note'] = Variable<String>(paymentNote);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || deletedAt != null) {
@@ -319,6 +436,18 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       balance: Value(balance),
       color: Value(color),
       icon: Value(icon),
+      bankName: bankName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankName),
+      accountNumber: accountNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountNumber),
+      accountHolder: accountHolder == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountHolder),
+      paymentNote: paymentNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentNote),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -340,6 +469,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       balance: serializer.fromJson<double>(json['balance']),
       color: serializer.fromJson<int>(json['color']),
       icon: serializer.fromJson<String>(json['icon']),
+      bankName: serializer.fromJson<String?>(json['bankName']),
+      accountNumber: serializer.fromJson<String?>(json['accountNumber']),
+      accountHolder: serializer.fromJson<String?>(json['accountHolder']),
+      paymentNote: serializer.fromJson<String?>(json['paymentNote']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -356,6 +489,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       'balance': serializer.toJson<double>(balance),
       'color': serializer.toJson<int>(color),
       'icon': serializer.toJson<String>(icon),
+      'bankName': serializer.toJson<String?>(bankName),
+      'accountNumber': serializer.toJson<String?>(accountNumber),
+      'accountHolder': serializer.toJson<String?>(accountHolder),
+      'paymentNote': serializer.toJson<String?>(paymentNote),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
@@ -370,6 +507,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     double? balance,
     int? color,
     String? icon,
+    Value<String?> bankName = const Value.absent(),
+    Value<String?> accountNumber = const Value.absent(),
+    Value<String?> accountHolder = const Value.absent(),
+    Value<String?> paymentNote = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
@@ -381,6 +522,14 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     balance: balance ?? this.balance,
     color: color ?? this.color,
     icon: icon ?? this.icon,
+    bankName: bankName.present ? bankName.value : this.bankName,
+    accountNumber: accountNumber.present
+        ? accountNumber.value
+        : this.accountNumber,
+    accountHolder: accountHolder.present
+        ? accountHolder.value
+        : this.accountHolder,
+    paymentNote: paymentNote.present ? paymentNote.value : this.paymentNote,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -396,6 +545,16 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       balance: data.balance.present ? data.balance.value : this.balance,
       color: data.color.present ? data.color.value : this.color,
       icon: data.icon.present ? data.icon.value : this.icon,
+      bankName: data.bankName.present ? data.bankName.value : this.bankName,
+      accountNumber: data.accountNumber.present
+          ? data.accountNumber.value
+          : this.accountNumber,
+      accountHolder: data.accountHolder.present
+          ? data.accountHolder.value
+          : this.accountHolder,
+      paymentNote: data.paymentNote.present
+          ? data.paymentNote.value
+          : this.paymentNote,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -412,6 +571,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
           ..write('balance: $balance, ')
           ..write('color: $color, ')
           ..write('icon: $icon, ')
+          ..write('bankName: $bankName, ')
+          ..write('accountNumber: $accountNumber, ')
+          ..write('accountHolder: $accountHolder, ')
+          ..write('paymentNote: $paymentNote, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -428,6 +591,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     balance,
     color,
     icon,
+    bankName,
+    accountNumber,
+    accountHolder,
+    paymentNote,
     createdAt,
     updatedAt,
     deletedAt,
@@ -443,6 +610,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
           other.balance == this.balance &&
           other.color == this.color &&
           other.icon == this.icon &&
+          other.bankName == this.bankName &&
+          other.accountNumber == this.accountNumber &&
+          other.accountHolder == this.accountHolder &&
+          other.paymentNote == this.paymentNote &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
@@ -456,6 +627,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   final Value<double> balance;
   final Value<int> color;
   final Value<String> icon;
+  final Value<String?> bankName;
+  final Value<String?> accountNumber;
+  final Value<String?> accountHolder;
+  final Value<String?> paymentNote;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
@@ -468,6 +643,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     this.balance = const Value.absent(),
     this.color = const Value.absent(),
     this.icon = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.accountNumber = const Value.absent(),
+    this.accountHolder = const Value.absent(),
+    this.paymentNote = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -481,6 +660,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     required double balance,
     required int color,
     required String icon,
+    this.bankName = const Value.absent(),
+    this.accountNumber = const Value.absent(),
+    this.accountHolder = const Value.absent(),
+    this.paymentNote = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
@@ -502,6 +685,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     Expression<double>? balance,
     Expression<int>? color,
     Expression<String>? icon,
+    Expression<String>? bankName,
+    Expression<String>? accountNumber,
+    Expression<String>? accountHolder,
+    Expression<String>? paymentNote,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -515,6 +702,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
       if (balance != null) 'balance': balance,
       if (color != null) 'color': color,
       if (icon != null) 'icon': icon,
+      if (bankName != null) 'bank_name': bankName,
+      if (accountNumber != null) 'account_number': accountNumber,
+      if (accountHolder != null) 'account_holder': accountHolder,
+      if (paymentNote != null) 'payment_note': paymentNote,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -530,6 +721,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     Value<double>? balance,
     Value<int>? color,
     Value<String>? icon,
+    Value<String?>? bankName,
+    Value<String?>? accountNumber,
+    Value<String?>? accountHolder,
+    Value<String?>? paymentNote,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
@@ -543,6 +738,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
       balance: balance ?? this.balance,
       color: color ?? this.color,
       icon: icon ?? this.icon,
+      bankName: bankName ?? this.bankName,
+      accountNumber: accountNumber ?? this.accountNumber,
+      accountHolder: accountHolder ?? this.accountHolder,
+      paymentNote: paymentNote ?? this.paymentNote,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -574,6 +773,18 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     if (icon.present) {
       map['icon'] = Variable<String>(icon.value);
     }
+    if (bankName.present) {
+      map['bank_name'] = Variable<String>(bankName.value);
+    }
+    if (accountNumber.present) {
+      map['account_number'] = Variable<String>(accountNumber.value);
+    }
+    if (accountHolder.present) {
+      map['account_holder'] = Variable<String>(accountHolder.value);
+    }
+    if (paymentNote.present) {
+      map['payment_note'] = Variable<String>(paymentNote.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -599,6 +810,10 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
           ..write('balance: $balance, ')
           ..write('color: $color, ')
           ..write('icon: $icon, ')
+          ..write('bankName: $bankName, ')
+          ..write('accountNumber: $accountNumber, ')
+          ..write('accountHolder: $accountHolder, ')
+          ..write('paymentNote: $paymentNote, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -4044,6 +4259,10 @@ typedef $$WalletsTableCreateCompanionBuilder =
       required double balance,
       required int color,
       required String icon,
+      Value<String?> bankName,
+      Value<String?> accountNumber,
+      Value<String?> accountHolder,
+      Value<String?> paymentNote,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
@@ -4058,6 +4277,10 @@ typedef $$WalletsTableUpdateCompanionBuilder =
       Value<double> balance,
       Value<int> color,
       Value<String> icon,
+      Value<String?> bankName,
+      Value<String?> accountNumber,
+      Value<String?> accountHolder,
+      Value<String?> paymentNote,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
@@ -4128,6 +4351,26 @@ class $$WalletsTableFilterComposer
 
   ColumnFilters<String> get icon => $composableBuilder(
     column: $table.icon,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountHolder => $composableBuilder(
+    column: $table.accountHolder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentNote => $composableBuilder(
+    column: $table.paymentNote,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4216,6 +4459,26 @@ class $$WalletsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountHolder => $composableBuilder(
+    column: $table.accountHolder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paymentNote => $composableBuilder(
+    column: $table.paymentNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -4263,6 +4526,24 @@ class $$WalletsTableAnnotationComposer
 
   GeneratedColumn<String> get icon =>
       $composableBuilder(column: $table.icon, builder: (column) => column);
+
+  GeneratedColumn<String> get bankName =>
+      $composableBuilder(column: $table.bankName, builder: (column) => column);
+
+  GeneratedColumn<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get accountHolder => $composableBuilder(
+    column: $table.accountHolder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get paymentNote => $composableBuilder(
+    column: $table.paymentNote,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -4334,6 +4615,10 @@ class $$WalletsTableTableManager
                 Value<double> balance = const Value.absent(),
                 Value<int> color = const Value.absent(),
                 Value<String> icon = const Value.absent(),
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> accountNumber = const Value.absent(),
+                Value<String?> accountHolder = const Value.absent(),
+                Value<String?> paymentNote = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -4346,6 +4631,10 @@ class $$WalletsTableTableManager
                 balance: balance,
                 color: color,
                 icon: icon,
+                bankName: bankName,
+                accountNumber: accountNumber,
+                accountHolder: accountHolder,
+                paymentNote: paymentNote,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -4360,6 +4649,10 @@ class $$WalletsTableTableManager
                 required double balance,
                 required int color,
                 required String icon,
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> accountNumber = const Value.absent(),
+                Value<String?> accountHolder = const Value.absent(),
+                Value<String?> paymentNote = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -4372,6 +4665,10 @@ class $$WalletsTableTableManager
                 balance: balance,
                 color: color,
                 icon: icon,
+                bankName: bankName,
+                accountNumber: accountNumber,
+                accountHolder: accountHolder,
+                paymentNote: paymentNote,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -7150,6 +7447,8 @@ class WalletDaoManager {
 
 mixin _$CategoryDaoMixin on DatabaseAccessor<AppDatabase> {
   $CategoriesTable get categories => attachedDatabase.categories;
+  $WalletsTable get wallets => attachedDatabase.wallets;
+  $TransactionsTable get transactions => attachedDatabase.transactions;
   CategoryDaoManager get managers => CategoryDaoManager(this);
 }
 
@@ -7158,6 +7457,10 @@ class CategoryDaoManager {
   CategoryDaoManager(this._db);
   $$CategoriesTableTableManager get categories =>
       $$CategoriesTableTableManager(_db.attachedDatabase, _db.categories);
+  $$WalletsTableTableManager get wallets =>
+      $$WalletsTableTableManager(_db.attachedDatabase, _db.wallets);
+  $$TransactionsTableTableManager get transactions =>
+      $$TransactionsTableTableManager(_db.attachedDatabase, _db.transactions);
 }
 
 mixin _$TransactionDaoMixin on DatabaseAccessor<AppDatabase> {

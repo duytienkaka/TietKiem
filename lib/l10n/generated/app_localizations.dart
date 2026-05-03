@@ -1795,6 +1795,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your current spending pace is close to a healthy monthly rhythm'**
   String get spendingPaceStableMessage;
+
+  /// No description provided for @categoryNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name is required.'**
+  String get categoryNameRequired;
+
+  /// No description provided for @categoryIconRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Category icon is required.'**
+  String get categoryIconRequired;
+
+  /// No description provided for @categoryAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This category already exists in the wallet.'**
+  String get categoryAlreadyExists;
+
+  /// No description provided for @categoryInUseCannotDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'This category is in use and cannot be deleted.'**
+  String get categoryInUseCannotDelete;
+
+  /// No description provided for @categoryManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Category management'**
+  String get categoryManagement;
+
+  /// No description provided for @categoryManagementSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or remove categories for each wallet.'**
+  String get categoryManagementSubtitle;
+
+  /// No description provided for @addCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add category'**
+  String get addCategory;
+
+  /// No description provided for @addCategorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a name and an emoji icon from your keyboard.'**
+  String get addCategorySubtitle;
+
+  /// No description provided for @categoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get categoryName;
+
+  /// No description provided for @categoryEmojiIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Emoji icon'**
+  String get categoryEmojiIcon;
+
+  /// No description provided for @categoryEmojiHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: 🍜'**
+  String get categoryEmojiHint;
+
+  /// No description provided for @deleteCategoryPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete category \"{name}\"?'**
+  String deleteCategoryPrompt(String name);
+
+  /// No description provided for @categoryScopeWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories for wallet: {walletName}'**
+  String categoryScopeWallet(String walletName);
+
+  /// No description provided for @noCategoriesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet'**
+  String get noCategoriesYet;
+
+  /// No description provided for @addCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first category for this wallet.'**
+  String get addCategoryHint;
+
+  /// No description provided for @noCategoriesForWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet does not have categories for the selected type yet.'**
+  String get noCategoriesForWallet;
+
+  /// No description provided for @selectCategoryToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a category to continue.'**
+  String get selectCategoryToContinue;
+
+  /// No description provided for @accountWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Account wallets'**
+  String get accountWallets;
+
+  /// No description provided for @cashWallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash wallets'**
+  String get cashWallets;
+
+  /// No description provided for @walletPortfolio.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet portfolio'**
+  String get walletPortfolio;
+
+  /// No description provided for @walletPortfolioSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a wallet to review details and manage it.'**
+  String get walletPortfolioSubtitle;
+
+  /// No description provided for @walletDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet details'**
+  String get walletDetails;
+
+  /// No description provided for @editWalletSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change wallet name, balance, color, or type.'**
+  String get editWalletSubtitle;
+
+  /// No description provided for @deleteWalletAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallet'**
+  String get deleteWalletAction;
+
+  /// No description provided for @deleteWalletActionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this wallet when it has no linked transactions.'**
+  String get deleteWalletActionSubtitle;
+
+  /// No description provided for @deleteWalletPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet will be removed if it has no linked transactions. Continue?'**
+  String get deleteWalletPrompt;
+
+  /// No description provided for @addTransactionFromWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a new transaction for {walletName}'**
+  String addTransactionFromWallet(String walletName);
+
+  /// No description provided for @walletRecentTransactionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest activity related to this wallet.'**
+  String get walletRecentTransactionsSubtitle;
+
+  /// No description provided for @accountInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Account information'**
+  String get accountInfo;
+
+  /// No description provided for @accountInfoReady.
+  ///
+  /// In en, this message translates to:
+  /// **'This wallet is ready to receive transfers by QR.'**
+  String get accountInfoReady;
+
+  /// No description provided for @accountInfoIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Add account details to generate a transaction QR.'**
+  String get accountInfoIncomplete;
+
+  /// No description provided for @updateAccountInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Update account info'**
+  String get updateAccountInfo;
+
+  /// No description provided for @bankName.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank name'**
+  String get bankName;
+
+  /// No description provided for @accountNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Account number'**
+  String get accountNumber;
+
+  /// No description provided for @accountHolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Account holder'**
+  String get accountHolder;
+
+  /// No description provided for @paymentNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment note'**
+  String get paymentNote;
+
+  /// No description provided for @transactionQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction QR'**
+  String get transactionQr;
+
+  /// No description provided for @notConfiguredYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not configured yet'**
+  String get notConfiguredYet;
 }
 
 class _AppLocalizationsDelegate

@@ -19,3 +19,29 @@ final Map<String, IconData> appIconMap = {
 };
 
 IconData resolveIcon(String name) => appIconMap[name] ?? Icons.category_rounded;
+
+bool hasMappedIcon(String name) => appIconMap.containsKey(name);
+
+Widget buildAdaptiveIcon(
+  String name, {
+  Color? color,
+  double size = 24,
+  FontWeight fontWeight = FontWeight.w700,
+}) {
+  final trimmed = name.trim();
+  if (hasMappedIcon(trimmed)) {
+    return Icon(resolveIcon(trimmed), color: color, size: size);
+  }
+
+  final fallback = trimmed.isEmpty ? '🏷️' : trimmed;
+  return Text(
+    fallback,
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      fontSize: size * 0.9,
+      height: 1,
+      color: color,
+      fontWeight: fontWeight,
+    ),
+  );
+}

@@ -10,7 +10,8 @@ import '../../core/database/database_provider.dart';
 import '../../features/budget/domain/entities/budget.dart' as budget_entity;
 import '../../features/budget/presentation/providers/budget_provider.dart';
 import '../../features/category/data/models/category_model.dart';
-import '../../features/category/domain/entities/category.dart' as category_entity;
+import '../../features/category/domain/entities/category.dart'
+    as category_entity;
 import '../../features/goal/domain/entities/savings_goal.dart';
 import '../../features/goal/presentation/providers/savings_goal_provider.dart';
 import '../../features/recurring/domain/entities/recurring_rule.dart';
@@ -35,8 +36,8 @@ class AppBackupService {
   const AppBackupService({
     required db.AppDatabase database,
     required Future<SharedPreferences> sharedPreferences,
-  })  : _database = database,
-        _sharedPreferences = sharedPreferences;
+  }) : _database = database,
+       _sharedPreferences = sharedPreferences;
 
   final db.AppDatabase _database;
   final Future<SharedPreferences> _sharedPreferences;
@@ -60,27 +61,22 @@ class AppBackupService {
       'schemaVersion': 1,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'preferences': preferences.toJson(),
-      'wallets': [
-        for (final wallet in wallets) _walletToJson(wallet),
-      ],
+      'wallets': [for (final wallet in wallets) _walletToJson(wallet)],
       'categories': [
         for (final category in categories) _categoryToJson(category),
       ],
       'transactions': [
         for (final transaction in transactions) _transactionToJson(transaction),
       ],
-      'budgets': [
-        for (final budget in budgets) budget.toJson(),
-      ],
-      'goals': [
-        for (final goal in goals) goal.toJson(),
-      ],
-      'recurringRules': [
-        for (final rule in recurring) rule.toJson(),
-      ],
+      'budgets': [for (final budget in budgets) budget.toJson()],
+      'goals': [for (final goal in goals) goal.toJson()],
+      'recurringRules': [for (final rule in recurring) rule.toJson()],
     });
 
-    final timestamp = DateTime.now().toUtc().toIso8601String().replaceAll(':', '-');
+    final timestamp = DateTime.now().toUtc().toIso8601String().replaceAll(
+      ':',
+      '-',
+    );
     return saveBackupFile(
       fileName: 'tietkiem-backup-$timestamp.json',
       contents: payload,
@@ -188,27 +184,32 @@ class AppBackupService {
   }
 
   Future<List<wallet_entity.Wallet>> _loadWallets() async {
-    final rows = await (_database.select(_database.wallets)
-          ..where((tbl) => tbl.deletedAt.isNull())
-          ..orderBy([(tbl) => drift.OrderingTerm.asc(tbl.createdAt)]))
-        .get();
+    final rows =
+        await (_database.select(_database.wallets)
+              ..where((tbl) => tbl.deletedAt.isNull())
+              ..orderBy([(tbl) => drift.OrderingTerm.asc(tbl.createdAt)]))
+            .get();
     return rows.map((item) => WalletModel.fromData(item).toEntity()).toList();
   }
 
   Future<List<category_entity.Category>> _loadCategories() async {
-    final rows = await (_database.select(_database.categories)
-          ..where((tbl) => tbl.deletedAt.isNull())
-          ..orderBy([(tbl) => drift.OrderingTerm.asc(tbl.name)]))
-        .get();
+    final rows =
+        await (_database.select(_database.categories)
+              ..where((tbl) => tbl.deletedAt.isNull())
+              ..orderBy([(tbl) => drift.OrderingTerm.asc(tbl.name)]))
+            .get();
     return rows.map((item) => CategoryModel.fromData(item).toEntity()).toList();
   }
 
   Future<List<FinanceTransaction>> _loadTransactions() async {
-    final rows = await (_database.select(_database.transactions)
-          ..where((tbl) => tbl.deletedAt.isNull())
-          ..orderBy([(tbl) => drift.OrderingTerm.desc(tbl.createdAt)]))
-        .get();
-    return rows.map((item) => TransactionModel.fromData(item).toEntity()).toList();
+    final rows =
+        await (_database.select(_database.transactions)
+              ..where((tbl) => tbl.deletedAt.isNull())
+              ..orderBy([(tbl) => drift.OrderingTerm.desc(tbl.createdAt)]))
+            .get();
+    return rows
+        .map((item) => TransactionModel.fromData(item).toEntity())
+        .toList();
   }
 
   List<budget_entity.Budget> _loadBudgets(SharedPreferences prefs) {
@@ -241,8 +242,12 @@ class AppBackupService {
       return const [];
     }
     final decoded = jsonDecode(raw) as List<dynamic>;
-    return decoded.whereType<Map<String, dynamic>>().map(SavingsGoal.fromJson).toList();
+    return decoded
+        .whereType<Map<String, dynamic>>()
+        .map(SavingsGoal.fromJson)
+        .toList();
   }
+
   Map<String, dynamic> _walletToJson(wallet_entity.Wallet wallet) {
     return {
       'id': wallet.id,
@@ -252,6 +257,10 @@ class AppBackupService {
       'balance': wallet.balance,
       'color': wallet.color,
       'icon': wallet.icon,
+      'bankName': wallet.bankName,
+      'accountNumber': wallet.accountNumber,
+      'accountHolder': wallet.accountHolder,
+      'paymentNote': wallet.paymentNote,
       'createdAt': wallet.createdAt.toIso8601String(),
       'updatedAt': wallet.updatedAt.toIso8601String(),
       'deletedAt': wallet.deletedAt?.toIso8601String(),
@@ -267,8 +276,14 @@ class AppBackupService {
       balance: (json['balance'] as num).toDouble(),
       color: json['color'] as int,
       icon: json['icon'] as String,
+      bankName: json['bankName'] as String?,
+      accountNumber: json['accountNumber'] as String?,
+      accountHolder: json['accountHolder'] as String?,
+      paymentNote: json['paymentNote'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String? ?? json['createdAt'] as String),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] as String? ?? json['createdAt'] as String,
+      ),
       deletedAt: json['deletedAt'] == null
           ? null
           : DateTime.parse(json['deletedAt'] as String),
@@ -296,7 +311,9 @@ class AppBackupService {
       type: TransactionType.values.byName(json['type'] as String),
       icon: json['icon'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String? ?? json['createdAt'] as String),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] as String? ?? json['createdAt'] as String,
+      ),
       deletedAt: json['deletedAt'] == null
           ? null
           : DateTime.parse(json['deletedAt'] as String),
@@ -335,7 +352,9 @@ class AppBackupService {
       imagePath: json['imagePath'] as String?,
       status: TransactionStatus.values.byName(json['status'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String? ?? json['createdAt'] as String),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] as String? ?? json['createdAt'] as String,
+      ),
       deletedAt: json['deletedAt'] == null
           ? null
           : DateTime.parse(json['deletedAt'] as String),

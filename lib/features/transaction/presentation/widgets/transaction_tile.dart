@@ -30,13 +30,21 @@ class TransactionTile extends StatelessWidget {
     final theme = Theme.of(context);
     final (amountPrefix, amountColor, iconBg) = switch (transaction.type) {
       TransactionType.income => ('+', AppTheme.income, const Color(0xFFE8FFF3)),
-      TransactionType.expense => ('-', AppTheme.expense, const Color(0xFFFFEBEA)),
-      TransactionType.transfer => ('', AppTheme.transfer, const Color(0xFFEAF4FF)),
+      TransactionType.expense => (
+        '-',
+        AppTheme.expense,
+        const Color(0xFFFFEBEA),
+      ),
+      TransactionType.transfer => (
+        '',
+        AppTheme.transfer,
+        const Color(0xFFEAF4FF),
+      ),
     };
 
     final title = transaction.type == TransactionType.transfer
         ? '${wallet?.name ?? context.l10n.unknown} '
-            '-> ${targetWallet?.name ?? context.l10n.unknown}'
+              '-> ${targetWallet?.name ?? context.l10n.unknown}'
         : category?.displayName(context) ?? transaction.type.label(context);
     final statusLabel = transaction.status == TransactionStatus.verified
         ? context.l10n.statusConfirmed
@@ -60,13 +68,12 @@ class TransactionTile extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 24,
                   backgroundColor: iconBg,
-                  child: Icon(
-                    resolveIcon(
-                      transaction.type == TransactionType.transfer
-                          ? 'swap_horiz'
-                          : category?.icon ?? 'receipt_long',
-                    ),
+                  child: buildAdaptiveIcon(
+                    transaction.type == TransactionType.transfer
+                        ? 'swap_horiz'
+                        : category?.icon ?? 'receipt_long',
                     color: amountColor,
+                    size: 22,
                   ),
                 ),
               ),
@@ -115,7 +122,8 @@ class TransactionTile extends StatelessWidget {
                         color: Colors.transparent,
                         child: _StatusBadge(
                           label: statusLabel,
-                          verified: transaction.status == TransactionStatus.verified,
+                          verified:
+                              transaction.status == TransactionStatus.verified,
                         ),
                       ),
                     ),
@@ -167,10 +175,7 @@ class TransactionTile extends StatelessWidget {
 }
 
 class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({
-    required this.label,
-    required this.verified,
-  });
+  const _StatusBadge({required this.label, required this.verified});
 
   final String label;
   final bool verified;
@@ -204,9 +209,9 @@ class _StatusBadge extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               softWrap: false,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: foreground,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: foreground,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],

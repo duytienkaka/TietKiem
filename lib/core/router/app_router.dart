@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/category/presentation/screens/category_management_screen.dart';
 import '../../features/transaction/presentation/screens/home_screen.dart';
 import '../../features/transaction/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transaction/presentation/screens/statistics_screen.dart';
 import '../../features/transaction/presentation/screens/transaction_form_screen.dart';
 import '../../features/transaction/presentation/screens/transaction_screen.dart';
+import '../../features/wallet/presentation/screens/wallet_detail_screen.dart';
 import '../../features/wallet/presentation/screens/wallet_screen.dart';
 import '../../l10n/l10n.dart';
 import '../../shared/screens/more_screen.dart';
@@ -24,44 +26,42 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/',
             name: 'home',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const HomeScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _fadePage(state: state, child: const HomeScreen()),
           ),
           GoRoute(
             path: '/transactions',
             name: 'transactions',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const TransactionScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _fadePage(state: state, child: const TransactionScreen()),
           ),
           GoRoute(
             path: '/statistics',
             name: 'statistics',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const StatisticsScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _fadePage(state: state, child: const StatisticsScreen()),
           ),
           GoRoute(
             path: '/wallets',
             name: 'wallets',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const WalletScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _fadePage(state: state, child: const WalletScreen()),
           ),
           GoRoute(
             path: '/more',
             name: 'more',
-            pageBuilder: (context, state) => _fadePage(
-              state: state,
-              child: const MoreScreen(),
-            ),
+            pageBuilder: (context, state) =>
+                _fadePage(state: state, child: const MoreScreen()),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/wallets/:id',
+        name: 'walletDetail',
+        pageBuilder: (context, state) => _slideFadePage(
+          state: state,
+          child: WalletDetailScreen(walletId: state.pathParameters['id']!),
+        ),
       ),
       GoRoute(
         path: '/transactions/add',
@@ -75,7 +75,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ).chain(CurveTween(curve: Curves.easeOutCubic));
             return FadeTransition(
               opacity: animation,
-              child: SlideTransition(position: animation.drive(tween), child: child),
+              child: SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              ),
             );
           },
           child: TransactionFormScreen(
@@ -95,7 +98,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ).chain(CurveTween(curve: Curves.easeOutCubic));
             return FadeTransition(
               opacity: animation,
-              child: SlideTransition(position: animation.drive(tween), child: child),
+              child: SlideTransition(
+                position: animation.drive(tween),
+                child: child,
+              ),
             );
           },
           child: TransactionFormScreen(
@@ -138,17 +144,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         name: 'profile',
-        pageBuilder: (context, state) => _slideFadePage(
-          state: state,
-          child: const ProfileScreen(),
-        ),
+        pageBuilder: (context, state) =>
+            _slideFadePage(state: state, child: const ProfileScreen()),
       ),
       GoRoute(
         path: '/settings',
         name: 'settings',
+        pageBuilder: (context, state) =>
+            _slideFadePage(state: state, child: const SettingsScreen()),
+      ),
+      GoRoute(
+        path: '/settings/categories',
+        name: 'categoryManagement',
         pageBuilder: (context, state) => _slideFadePage(
           state: state,
-          child: const SettingsScreen(),
+          child: const CategoryManagementScreen(),
         ),
       ),
     ],
@@ -206,9 +216,17 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final destinations = [
       ('/', context.l10n.homeTab, Icons.home_rounded),
-      ('/transactions', context.l10n.transactionsTab, Icons.receipt_long_rounded),
+      (
+        '/transactions',
+        context.l10n.transactionsTab,
+        Icons.receipt_long_rounded,
+      ),
       ('/statistics', context.l10n.statisticsTab, Icons.pie_chart_rounded),
-      ('/wallets', context.l10n.walletsTab, Icons.account_balance_wallet_rounded),
+      (
+        '/wallets',
+        context.l10n.walletsTab,
+        Icons.account_balance_wallet_rounded,
+      ),
       ('/more', context.l10n.moreTab, Icons.widgets_rounded),
     ];
     final location = GoRouterState.of(context).uri.toString();
@@ -238,7 +256,7 @@ class AppShell extends StatelessWidget {
                     icon: Icon(item.$3),
                     label: item.$2,
                   ),
-            )
+                )
                 .toList(),
             onDestinationSelected: (selected) {
               context.go(destinations[selected].$1);

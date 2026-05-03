@@ -902,4 +902,136 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get spendingPaceStableMessage =>
       'Your current spending pace is close to a healthy monthly rhythm';
+
+  @override
+  String get categoryNameRequired => 'Category name is required.';
+
+  @override
+  String get categoryIconRequired => 'Category icon is required.';
+
+  @override
+  String get categoryAlreadyExists =>
+      'This category already exists in the wallet.';
+
+  @override
+  String get categoryInUseCannotDelete =>
+      'This category is in use and cannot be deleted.';
+
+  @override
+  String get categoryManagement => 'Category management';
+
+  @override
+  String get categoryManagementSubtitle =>
+      'Add or remove categories for each wallet.';
+
+  @override
+  String get addCategory => 'Add category';
+
+  @override
+  String get addCategorySubtitle =>
+      'Use a name and an emoji icon from your keyboard.';
+
+  @override
+  String get categoryName => 'Category name';
+
+  @override
+  String get categoryEmojiIcon => 'Emoji icon';
+
+  @override
+  String get categoryEmojiHint => 'Example: 🍜';
+
+  @override
+  String deleteCategoryPrompt(String name) {
+    return 'Delete category \"$name\"?';
+  }
+
+  @override
+  String categoryScopeWallet(String walletName) {
+    return 'Categories for wallet: $walletName';
+  }
+
+  @override
+  String get noCategoriesYet => 'No categories yet';
+
+  @override
+  String get addCategoryHint => 'Create your first category for this wallet.';
+
+  @override
+  String get noCategoriesForWallet =>
+      'This wallet does not have categories for the selected type yet.';
+
+  @override
+  String get selectCategoryToContinue => 'Select a category to continue.';
+
+  @override
+  String get accountWallets => 'Account wallets';
+
+  @override
+  String get cashWallets => 'Cash wallets';
+
+  @override
+  String get walletPortfolio => 'Wallet portfolio';
+
+  @override
+  String get walletPortfolioSubtitle =>
+      'Open a wallet to review details and manage it.';
+
+  @override
+  String get walletDetails => 'Wallet details';
+
+  @override
+  String get editWalletSubtitle =>
+      'Change wallet name, balance, color, or type.';
+
+  @override
+  String get deleteWalletAction => 'Delete wallet';
+
+  @override
+  String get deleteWalletActionSubtitle =>
+      'Remove this wallet when it has no linked transactions.';
+
+  @override
+  String get deleteWalletPrompt =>
+      'This wallet will be removed if it has no linked transactions. Continue?';
+
+  @override
+  String addTransactionFromWallet(String walletName) {
+    return 'Add a new transaction for $walletName';
+  }
+
+  @override
+  String get walletRecentTransactionsSubtitle =>
+      'Latest activity related to this wallet.';
+
+  @override
+  String get accountInfo => 'Account information';
+
+  @override
+  String get accountInfoReady =>
+      'This wallet is ready to receive transfers by QR.';
+
+  @override
+  String get accountInfoIncomplete =>
+      'Add account details to generate a transaction QR.';
+
+  @override
+  String get updateAccountInfo => 'Update account info';
+
+  @override
+  String get bankName => 'Bank name';
+
+  @override
+  String get accountNumber => 'Account number';
+
+  @override
+  String get accountHolder => 'Account holder';
+
+  @override
+  String get paymentNote => 'Payment note';
+
+  @override
+  String get transactionQr => 'Transaction QR';
+
+  @override
+  String get notConfiguredYet => 'Not configured yet';
 }

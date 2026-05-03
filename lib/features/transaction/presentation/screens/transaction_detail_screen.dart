@@ -18,10 +18,7 @@ import '../providers/transaction_provider.dart';
 import '../widgets/transaction_hero_tags.dart';
 
 class TransactionDetailScreen extends ConsumerWidget {
-  const TransactionDetailScreen({
-    super.key,
-    required this.transactionId,
-  });
+  const TransactionDetailScreen({super.key, required this.transactionId});
 
   final String transactionId;
 
@@ -72,14 +69,15 @@ class TransactionDetailScreen extends ConsumerWidget {
               final amountPrefix = transaction.type == TransactionType.expense
                   ? '-'
                   : transaction.type == TransactionType.income
-                      ? '+'
-                      : '';
+                  ? '+'
+                  : '';
               final iconName = transaction.type == TransactionType.transfer
                   ? 'swap_horiz'
                   : category?.icon ?? 'receipt_long';
               final categoryName = transaction.type == TransactionType.transfer
                   ? context.l10n.transfer
-                  : category?.displayName(context) ?? transaction.type.label(context);
+                  : category?.displayName(context) ??
+                        transaction.type.label(context);
 
               return SafeArea(
                 child: Column(
@@ -90,112 +88,123 @@ class TransactionDetailScreen extends ConsumerWidget {
                           SliverPadding(
                             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                             sliver: SliverList(
-                              delegate: SliverChildListDelegate(
-                                [
-                                  _DetailHeader(
-                                    transaction: transaction,
-                                    accent: accent,
-                                    amountText:
-                                        '$amountPrefix${formatCurrency(context, transaction.amount)}',
-                                    categoryName: categoryName,
-                                    iconName: iconName,
-                                    onBack: () => Navigator.of(context).maybePop(),
+                              delegate: SliverChildListDelegate([
+                                _DetailHeader(
+                                  transaction: transaction,
+                                  accent: accent,
+                                  amountText:
+                                      '$amountPrefix${formatCurrency(context, transaction.amount)}',
+                                  categoryName: categoryName,
+                                  iconName: iconName,
+                                  onBack: () =>
+                                      Navigator.of(context).maybePop(),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: _SectionCard(
+                                    title: context.l10n.transactionInformation,
+                                    child: Column(
+                                      children: [
+                                        _InfoRow(
+                                          icon: Icons
+                                              .account_balance_wallet_rounded,
+                                          title: context.l10n.wallet,
+                                          value:
+                                              wallet?.name ??
+                                              context.l10n.unknownWallet,
+                                        ),
+                                        const SizedBox(height: 14),
+                                        _InfoRow(
+                                          icon:
+                                              transaction.type ==
+                                                  TransactionType.transfer
+                                              ? Icons.swap_horiz_rounded
+                                              : Icons.grid_view_rounded,
+                                          title:
+                                              transaction.type ==
+                                                  TransactionType.transfer
+                                              ? context.l10n.targetWallet
+                                              : context.l10n.category,
+                                          value:
+                                              transaction.type ==
+                                                  TransactionType.transfer
+                                              ? targetWallet?.name ??
+                                                    context.l10n.noTargetWallet
+                                              : categoryName,
+                                        ),
+                                        const SizedBox(height: 14),
+                                        _InfoRow(
+                                          icon: Icons.schedule_rounded,
+                                          title: context.l10n.dateTime,
+                                          value: formatDateTime(
+                                            context,
+                                            transaction.createdAt,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: _StatusControlCard(
+                                    transaction: transaction,
+                                    onConfirm:
+                                        transaction.status ==
+                                            TransactionStatus.verified
+                                        ? null
+                                        : () => _confirmTransaction(
+                                            context,
+                                            ref,
+                                            transaction,
+                                          ),
+                                  ),
+                                ),
+                                if ((transaction.note ?? '').trim().isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 16),
                                     child: _SectionCard(
-                                      title: context.l10n.transactionInformation,
-                                      child: Column(
-                                        children: [
-                                          _InfoRow(
-                                            icon: Icons.account_balance_wallet_rounded,
-                                            title: context.l10n.wallet,
-                                            value:
-                                                wallet?.name ?? context.l10n.unknownWallet,
-                                          ),
-                                          const SizedBox(height: 14),
-                                          _InfoRow(
-                                            icon: transaction.type == TransactionType.transfer
-                                                ? Icons.swap_horiz_rounded
-                                                : Icons.grid_view_rounded,
-                                            title:
-                                                transaction.type == TransactionType.transfer
-                                                    ? context.l10n.targetWallet
-                                                    : context.l10n.category,
-                                            value:
-                                                transaction.type == TransactionType.transfer
-                                                    ? targetWallet?.name ??
-                                                        context.l10n.noTargetWallet
-                                                    : categoryName,
-                                          ),
-                                          const SizedBox(height: 14),
-                                          _InfoRow(
-                                            icon: Icons.schedule_rounded,
-                                            title: context.l10n.dateTime,
-                                            value: formatDateTime(
-                                              context,
-                                              transaction.createdAt,
-                                            ),
-                                          ),
-                                        ],
+                                      title: context.l10n.note,
+                                      child: Text(
+                                        transaction.note!.trim(),
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyLarge,
                                       ),
                                     ),
                                   ),
+                                if (transaction.imagePath?.isNotEmpty == true)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 16),
-                                    child: _StatusControlCard(
-                                      transaction: transaction,
-                                      onConfirm: transaction.status == TransactionStatus.verified
-                                          ? null
-                                          : () => _confirmTransaction(
-                                                context,
-                                                ref,
-                                                transaction,
-                                              ),
-                                    ),
-                                  ),
-                                  if ((transaction.note ?? '').trim().isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: _SectionCard(
-                                        title: context.l10n.note,
-                                        child: Text(
-                                          transaction.note!.trim(),
-                                          style: Theme.of(context).textTheme.bodyLarge,
+                                    child: _SectionCard(
+                                      title: context.l10n.receiptImage,
+                                      child: GestureDetector(
+                                        onTap: () => _openImagePreview(
+                                          context,
+                                          transaction.id,
+                                          transaction.imagePath!,
                                         ),
-                                      ),
-                                    ),
-                                  if (transaction.imagePath?.isNotEmpty == true)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: _SectionCard(
-                                        title: context.l10n.receiptImage,
-                                        child: GestureDetector(
-                                          onTap: () => _openImagePreview(
-                                            context,
-                                            transaction.id,
-                                            transaction.imagePath!,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
                                           ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(18),
-                                            child: Hero(
-                                              tag: transactionImageHeroTag(
-                                                transaction.id,
-                                              ),
-                                              transitionOnUserGestures: true,
-                                              child: ReceiptImage(
-                                                source: transaction.imagePath!,
-                                                height: 220,
-                                                width: double.infinity,
-                                                fit: BoxFit.cover,
-                                              ),
+                                          child: Hero(
+                                            tag: transactionImageHeroTag(
+                                              transaction.id,
+                                            ),
+                                            transitionOnUserGestures: true,
+                                            child: ReceiptImage(
+                                              source: transaction.imagePath!,
+                                              height: 220,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                ],
-                              ),
+                                  ),
+                              ]),
                             ),
                           ),
                         ],
@@ -217,10 +226,9 @@ class TransactionDetailScreen extends ConsumerWidget {
     FinanceTransaction transaction,
   ) async {
     try {
-      await ref.read(transactionProvider.notifier).updateTransactionStatus(
-            transaction.id,
-            TransactionStatus.verified,
-          );
+      await ref
+          .read(transactionProvider.notifier)
+          .updateTransactionStatus(transaction.id, TransactionStatus.verified);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.transactionConfirmed)),
@@ -228,9 +236,9 @@ class TransactionDetailScreen extends ConsumerWidget {
       }
     } catch (error) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(localizeError(context, error))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(localizeError(context, error))));
       }
     }
   }
@@ -246,10 +254,11 @@ class TransactionDetailScreen extends ConsumerWidget {
         barrierColor: Colors.black.withValues(alpha: 0.92),
         transitionDuration: const Duration(milliseconds: 280),
         reverseTransitionDuration: const Duration(milliseconds: 220),
-        pageBuilder: (context, animation, secondaryAnimation) => _ImagePreviewPage(
-          heroTag: transactionImageHeroTag(transactionId),
-          imagePath: imagePath,
-        ),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            _ImagePreviewPage(
+              heroTag: transactionImageHeroTag(transactionId),
+              imagePath: imagePath,
+            ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curve = CurvedAnimation(
             parent: animation,
@@ -328,11 +337,9 @@ class _DetailHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.16),
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.18),
-                ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
               ),
-              child: Icon(resolveIcon(iconName), color: Colors.white, size: 34),
+              child: buildAdaptiveIcon(iconName, color: Colors.white, size: 34),
             ),
           ),
           const SizedBox(height: 16),
@@ -345,8 +352,8 @@ class _DetailHeader extends StatelessWidget {
                 categoryName,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.96),
-                    ),
+                  color: Colors.white.withValues(alpha: 0.96),
+                ),
               ),
             ),
           ),
@@ -360,9 +367,9 @@ class _DetailHeader extends StatelessWidget {
                 amountText,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
           ),
@@ -427,9 +434,9 @@ class _HeaderTypeBadge extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -454,13 +461,13 @@ class _TransactionStatusBadge extends StatelessWidget {
     final background = light
         ? Colors.white.withValues(alpha: 0.14)
         : verified
-            ? const Color(0xFFE8FFF3)
-            : const Color(0xFFFFF4E5);
+        ? const Color(0xFFE8FFF3)
+        : const Color(0xFFFFF4E5);
     final foreground = light
         ? Colors.white
         : verified
-            ? AppTheme.income
-            : const Color(0xFFB54708);
+        ? AppTheme.income
+        : const Color(0xFFB54708);
 
     final badge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -478,11 +485,13 @@ class _TransactionStatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            verified ? context.l10n.statusConfirmed : context.l10n.statusUnconfirmed,
+            verified
+                ? context.l10n.statusConfirmed
+                : context.l10n.statusUnconfirmed,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: foreground,
-                  fontWeight: FontWeight.w700,
-                ),
+              color: foreground,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -501,10 +510,7 @@ class _TransactionStatusBadge extends StatelessWidget {
 }
 
 class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.title,
-    required this.child,
-  });
+  const _SectionCard({required this.title, required this.child});
 
   final String title;
   final Widget child;
@@ -557,18 +563,18 @@ class _InfoRow extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
               const SizedBox(height: 3),
               Text(
                 value,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -579,10 +585,7 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _TopActionButton extends StatelessWidget {
-  const _TopActionButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _TopActionButton({required this.icon, required this.onPressed});
 
   final IconData icon;
   final VoidCallback? onPressed;
@@ -685,10 +688,7 @@ class _DetailSectionSkeleton extends StatelessWidget {
 }
 
 class _ImagePreviewPage extends StatelessWidget {
-  const _ImagePreviewPage({
-    required this.heroTag,
-    required this.imagePath,
-  });
+  const _ImagePreviewPage({required this.heroTag, required this.imagePath});
 
   final String heroTag;
   final String imagePath;
@@ -706,22 +706,21 @@ class _ImagePreviewPage extends StatelessWidget {
             ),
           ),
           SafeArea(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                child: Hero(
-                  tag: heroTag,
-                  transitionOnUserGestures: true,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InteractiveViewer(
-                        minScale: 0.9,
-                        maxScale: 4,
+            child: SizedBox.expand(
+              child: Hero(
+                tag: heroTag,
+                transitionOnUserGestures: true,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InteractiveViewer(
+                    minScale: 0.9,
+                    maxScale: 4,
+                    child: SizedBox.expand(
+                      child: Center(
                         child: ReceiptImage(
                           source: imagePath,
                           width: double.infinity,
+                          height: double.infinity,
                           fit: BoxFit.contain,
                         ),
                       ),

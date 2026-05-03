@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/database/database_provider.dart';
+import '../../../../shared/services/sync_queue_service.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../datasources/category_local_data_source.dart';
 import 'category_repository_impl.dart';
 
 CategoryRepository createCategoryRepository(Ref ref) {
   final database = ref.watch(appDatabaseProvider);
+  final queue = ref.watch(syncQueueServiceProvider);
   final localDataSource = CategoryLocalDataSource(database.categoryDao);
-  return CategoryRepositoryImpl(localDataSource);
+  return CategoryRepositoryImpl(localDataSource, queue);
 }

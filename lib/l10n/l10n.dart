@@ -34,9 +34,10 @@ String formatMonthYear(BuildContext context, DateTime value) {
 extension WalletTypeL10n on WalletType {
   String label(BuildContext context) => switch (this) {
     WalletType.cash => context.l10n.walletTypeCash,
-    WalletType.bank => Localizations.localeOf(context).languageCode == 'vi'
-        ? 'Tài khoản'
-        : 'Account',
+    WalletType.bank =>
+      Localizations.localeOf(context).languageCode == 'vi'
+          ? 'Tài khoản'
+          : 'Account',
     WalletType.saving => context.l10n.walletTypeSaving,
   };
 }
@@ -81,9 +82,10 @@ extension CategoryL10n on Category {
 
 String localizeIconLabel(BuildContext context, String icon) => switch (icon) {
   'account_balance_wallet' => context.l10n.iconWallet,
-  'account_balance' => Localizations.localeOf(context).languageCode == 'vi'
-      ? 'Tài khoản'
-      : 'Account',
+  'account_balance' =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Tài khoản'
+        : 'Account',
   'savings' => context.l10n.iconSavings,
   _ => icon,
 };
@@ -94,6 +96,12 @@ String localizeError(BuildContext context, Object error) {
     'Wallet name is required.' => context.l10n.walletNameRequired,
     'This wallet has transactions and cannot be deleted.' =>
       context.l10n.walletHasTransactionsCannotDelete,
+    'Category name is required.' => context.l10n.categoryNameRequired,
+    'Category icon is required.' => context.l10n.categoryIconRequired,
+    'This category already exists in the wallet.' =>
+      context.l10n.categoryAlreadyExists,
+    'This category is in use and cannot be deleted.' =>
+      context.l10n.categoryInUseCannotDelete,
     'Amount must be greater than zero.' =>
       context.l10n.amountMustBeGreaterThanZero,
     'Transaction not found.' => context.l10n.transactionNotFound,
@@ -105,4 +113,3 @@ String localizeError(BuildContext context, Object error) {
     _ => message,
   };
 }
-

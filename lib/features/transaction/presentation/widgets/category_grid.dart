@@ -53,7 +53,11 @@ class CategoryGrid extends StatelessWidget {
                   backgroundColor: selected
                       ? Colors.white.withValues(alpha: 0.9)
                       : scheme.surfaceContainerHighest,
-                  child: Icon(resolveIcon(category.icon), color: scheme.primary),
+                  child: buildAdaptiveIcon(
+                    category.icon,
+                    color: scheme.primary,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -61,9 +65,9 @@ class CategoryGrid extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),

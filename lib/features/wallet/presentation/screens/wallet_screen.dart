@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/finance_enums.dart';
@@ -32,6 +33,12 @@ class WalletScreen extends ConsumerWidget {
                 0,
                 (sum, wallet) => sum + wallet.balance,
               );
+              final bankCount = wallets
+                  .where((wallet) => wallet.type == WalletType.bank)
+                  .length;
+              final cashCount = wallets
+                  .where((wallet) => wallet.type == WalletType.cash)
+                  .length;
 
               return ListView(
                 padding: const EdgeInsets.only(bottom: 120),
@@ -46,15 +53,43 @@ class WalletScreen extends ConsumerWidget {
                     icon: Icons.account_balance_wallet_rounded,
                   ),
                   const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: FilledButton.icon(
-                      onPressed: () => showWalletSheet(context),
-                      icon: const Icon(Icons.add_rounded),
-                      label: Text(context.l10n.add),
-                    ),
+                  AppButton(
+                    label: context.l10n.createWallet,
+                    icon: Icons.add_rounded,
+                    expanded: false,
+                    onPressed: () => showWalletSheet(context),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _WalletOverviewCard(
+                          title: context.l10n.totalBalance,
+                          value: formatCurrency(context, totalBalance),
+                          icon: Icons.savings_rounded,
+                          accent: const Color(0xFF2563EB),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _WalletOverviewCard(
+                          title: context.l10n.accountWallets,
+                          value: bankCount.toString(),
+                          icon: Icons.account_balance_rounded,
+                          accent: const Color(0xFF16B364),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _WalletOverviewCard(
+                    title: context.l10n.cashWallets,
+                    value: cashCount.toString(),
+                    icon: Icons.payments_rounded,
+                    accent: const Color(0xFFE11D48),
+                    compact: true,
+                  ),
+                  const SizedBox(height: 16),
                   if (wallets.isEmpty)
                     EmptyState(
                       title: context.l10n.noWalletsCreated,
@@ -63,43 +98,33 @@ class WalletScreen extends ConsumerWidget {
                       actionLabel: context.l10n.createWallet,
                       onAction: () => showWalletSheet(context),
                     )
-                  else
+                  else ...[
+                    Text(
+                      context.l10n.walletPortfolio,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      context.l10n.walletPortfolioSubtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
                     ...wallets.map(
                       (wallet) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: Dismissible(
-                          key: ValueKey(wallet.id),
-                          direction: DismissDirection.endToStart,
-                          background: Container(
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 20),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.errorContainer,
-                              borderRadius: BorderRadius.circular(22),
-                            ),
-                            child: Icon(
-                              Icons.delete_outline_rounded,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                          ),
-                          onDismissed: (_) =>
-                              _deleteWallet(context, ref, wallet.id),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              WalletCard(
-                                wallet: wallet,
-                                compact: true,
-                                onTap: () =>
-                                    showWalletSheet(context, wallet: wallet),
-                              ),
-                            ],
+                        child: WalletCard(
+                          wallet: wallet,
+                          compact: true,
+                          onTap: () => context.pushNamed(
+                            'walletDetail',
+                            pathParameters: {'id': wallet.id},
                           ),
                         ),
                       ),
                     ),
+                  ],
                 ],
               );
             },
@@ -108,26 +133,77 @@ class WalletScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Future<void> _deleteWallet(
-    BuildContext context,
-    WidgetRef ref,
-    String walletId,
-  ) async {
-    try {
-      await ref.read(walletProvider.notifier).deleteWallet(walletId);
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(context.l10n.walletDeleted)));
-      }
-    } catch (error) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(localizeError(context, error))));
-      }
-    }
+class _WalletOverviewCard extends StatelessWidget {
+  const _WalletOverviewCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.accent,
+    this.compact = false,
+  });
+
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color accent;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: accent),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style:
+                      (compact
+                              ? Theme.of(context).textTheme.titleMedium
+                              : Theme.of(context).textTheme.titleLarge)
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -141,6 +217,18 @@ class _WalletsLoadingState extends StatelessWidget {
       children: [
         const ScreenTopHeaderSkeleton(showAction: true),
         const SizedBox(height: 18),
+        const SkeletonBox(height: 56, borderRadius: 18),
+        const SizedBox(height: 16),
+        Row(
+          children: const [
+            Expanded(child: SkeletonBox(height: 90, borderRadius: 22)),
+            SizedBox(width: 12),
+            Expanded(child: SkeletonBox(height: 90, borderRadius: 22)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        const SkeletonBox(height: 90, borderRadius: 22),
+        const SizedBox(height: 16),
         for (var index = 0; index < 3; index++) ...[
           Container(
             padding: const EdgeInsets.all(16),
@@ -155,42 +243,23 @@ class _WalletsLoadingState extends StatelessWidget {
                 ),
               ],
             ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final narrow = constraints.maxWidth < 320;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        SkeletonBox(
-                          height: narrow ? 36 : 40,
-                          width: narrow ? 36 : 40,
-                          shape: BoxShape.circle,
-                        ),
-                        const Spacer(),
-                        SkeletonBox(
-                          width: narrow ? 62 : 72,
-                          height: narrow ? 24 : 28,
-                          borderRadius: 999,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: narrow ? 12 : 16),
-                    SkeletonBox(
-                      width: narrow ? 108 : 120,
-                      height: narrow ? 16 : 18,
-                    ),
-                    const SizedBox(height: 8),
-                    SkeletonBox(width: narrow ? 82 : 90, height: 14),
-                    SizedBox(height: narrow ? 14 : 18),
-                    SkeletonBox(
-                      width: narrow ? 122 : 140,
-                      height: narrow ? 22 : 26,
-                    ),
+                    SkeletonBox(height: 40, width: 40, shape: BoxShape.circle),
+                    Spacer(),
+                    SkeletonBox(width: 72, height: 28, borderRadius: 999),
                   ],
-                );
-              },
+                ),
+                SizedBox(height: 16),
+                SkeletonBox(width: 120, height: 18),
+                SizedBox(height: 8),
+                SkeletonBox(width: 90, height: 14),
+                SizedBox(height: 18),
+                SkeletonBox(width: 140, height: 26),
+              ],
             ),
           ),
           if (index != 2) const SizedBox(height: 12),
@@ -219,10 +288,7 @@ class WalletSheet extends ConsumerStatefulWidget {
 }
 
 class _WalletSheetState extends ConsumerState<WalletSheet> {
-  static const _icons = [
-    'account_balance_wallet',
-    'account_balance',
-  ];
+  static const _icons = ['account_balance_wallet', 'account_balance'];
 
   late final TextEditingController _nameController;
   late final TextEditingController _balanceController;
@@ -335,7 +401,9 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerLowest,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerLowest,
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Column(
@@ -354,7 +422,9 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
                                 Expanded(
                                   child: Text(
                                     '#${_color.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}',
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                 ),
                               ],
@@ -364,19 +434,22 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
                               label: 'R',
                               value: _channelValue(Color(_color).r),
                               activeColor: Colors.red,
-                              onChanged: (value) => _updateColor(red: value.round()),
+                              onChanged: (value) =>
+                                  _updateColor(red: value.round()),
                             ),
                             _ColorSlider(
                               label: 'G',
                               value: _channelValue(Color(_color).g),
                               activeColor: Colors.green,
-                              onChanged: (value) => _updateColor(green: value.round()),
+                              onChanged: (value) =>
+                                  _updateColor(green: value.round()),
                             ),
                             _ColorSlider(
                               label: 'B',
                               value: _channelValue(Color(_color).b),
                               activeColor: Colors.blue,
-                              onChanged: (value) => _updateColor(blue: value.round()),
+                              onChanged: (value) =>
+                                  _updateColor(blue: value.round()),
                             ),
                           ],
                         ),
@@ -455,6 +528,10 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
             balance: balance,
             color: _color,
             icon: _icon,
+            bankName: widget.wallet?.bankName,
+            accountNumber: widget.wallet?.accountNumber,
+            accountHolder: widget.wallet?.accountHolder,
+            paymentNote: widget.wallet?.paymentNote,
           );
       if (mounted) {
         Navigator.of(context).pop();
@@ -530,9 +607,9 @@ class _ColorSlider extends StatelessWidget {
           width: 18,
           child: Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
         ),
         Expanded(
@@ -542,12 +619,7 @@ class _ColorSlider extends StatelessWidget {
               thumbColor: activeColor,
               overlayColor: activeColor.withValues(alpha: 0.16),
             ),
-            child: Slider(
-              value: value,
-              min: 0,
-              max: 255,
-              onChanged: onChanged,
-            ),
+            child: Slider(value: value, min: 0, max: 255, onChanged: onChanged),
           ),
         ),
         SizedBox(

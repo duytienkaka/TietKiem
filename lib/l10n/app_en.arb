@@ -355,5 +355,64 @@
     }
   },
   "spendingPaceStableTitle": "Spending pace is stable",
-  "spendingPaceStableMessage": "Your current spending pace is close to a healthy monthly rhythm"
+  "spendingPaceStableMessage": "Your current spending pace is close to a healthy monthly rhythm",
+  "categoryNameRequired": "Category name is required.",
+  "categoryIconRequired": "Category icon is required.",
+  "categoryAlreadyExists": "This category already exists in the wallet.",
+  "categoryInUseCannotDelete": "This category is in use and cannot be deleted.",
+  "categoryManagement": "Category management",
+  "categoryManagementSubtitle": "Add or remove categories for each wallet.",
+  "addCategory": "Add category",
+  "addCategorySubtitle": "Use a name and an emoji icon from your keyboard.",
+  "categoryName": "Category name",
+  "categoryEmojiIcon": "Emoji icon",
+  "categoryEmojiHint": "Example: 🍜",
+  "deleteCategoryPrompt": "Delete category \"{name}\"?",
+  "@deleteCategoryPrompt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryScopeWallet": "Categories for wallet: {walletName}",
+  "@categoryScopeWallet": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
+  "noCategoriesYet": "No categories yet",
+  "addCategoryHint": "Create your first category for this wallet.",
+  "noCategoriesForWallet": "This wallet does not have categories for the selected type yet.",
+  "selectCategoryToContinue": "Select a category to continue.",
+  "accountWallets": "Account wallets",
+  "cashWallets": "Cash wallets",
+  "walletPortfolio": "Wallet portfolio",
+  "walletPortfolioSubtitle": "Open a wallet to review details and manage it.",
+  "walletDetails": "Wallet details",
+  "editWalletSubtitle": "Change wallet name, balance, color, or type.",
+  "deleteWalletAction": "Delete wallet",
+  "deleteWalletActionSubtitle": "Remove this wallet when it has no linked transactions.",
+  "deleteWalletPrompt": "This wallet will be removed if it has no linked transactions. Continue?",
+  "addTransactionFromWallet": "Add a new transaction for {walletName}",
+  "@addTransactionFromWallet": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
+  "walletRecentTransactionsSubtitle": "Latest activity related to this wallet.",
+  "accountInfo": "Account information",
+  "accountInfoReady": "This wallet is ready to receive transfers by QR.",
+  "accountInfoIncomplete": "Add account details to generate a transaction QR.",
+  "updateAccountInfo": "Update account info",
+  "bankName": "Bank name",
+  "accountNumber": "Account number",
+  "accountHolder": "Account holder",
+  "paymentNote": "Payment note",
+  "transactionQr": "Transaction QR",
+  "notConfiguredYet": "Not configured yet"
 }

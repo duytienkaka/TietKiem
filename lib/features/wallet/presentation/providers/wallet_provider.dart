@@ -10,10 +10,14 @@ import '../../data/repositories/wallet_repository_factory.dart';
 import '../../domain/entities/wallet.dart' as entity;
 import '../../domain/repositories/wallet_repository.dart';
 
-final walletRepositoryProvider = Provider<WalletRepository>(createWalletRepository);
+final walletRepositoryProvider = Provider<WalletRepository>(
+  createWalletRepository,
+);
 
 final walletProvider =
-    AsyncNotifierProvider<WalletNotifier, List<entity.Wallet>>(WalletNotifier.new);
+    AsyncNotifierProvider<WalletNotifier, List<entity.Wallet>>(
+      WalletNotifier.new,
+    );
 
 class WalletNotifier extends AsyncNotifier<List<entity.Wallet>> {
   StreamSubscription<List<entity.Wallet>>? _subscription;
@@ -41,14 +45,19 @@ class WalletNotifier extends AsyncNotifier<List<entity.Wallet>> {
     required double balance,
     required int color,
     required String icon,
+    String? bankName,
+    String? accountNumber,
+    String? accountHolder,
+    String? paymentNote,
   }) async {
     final trimmedName = name.trim();
     if (trimmedName.isEmpty) {
       throw const AppException('Wallet name is required.');
     }
 
-    final existing =
-        id == null ? null : state.valueOrNull?.where((item) => item.id == id).firstOrNull;
+    final existing = id == null
+        ? null
+        : state.valueOrNull?.where((item) => item.id == id).firstOrNull;
     final now = DateTime.now().toUtc();
     final walletId = id ?? const Uuid().v4();
 
@@ -60,13 +69,25 @@ class WalletNotifier extends AsyncNotifier<List<entity.Wallet>> {
       balance: balance,
       color: color,
       icon: icon,
+      bankName: bankName?.trim().isEmpty == true ? null : bankName?.trim(),
+      accountNumber: accountNumber?.trim().isEmpty == true
+          ? null
+          : accountNumber?.trim(),
+      accountHolder: accountHolder?.trim().isEmpty == true
+          ? null
+          : accountHolder?.trim(),
+      paymentNote: paymentNote?.trim().isEmpty == true
+          ? null
+          : paymentNote?.trim(),
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     );
 
     await _repository.saveWallet(wallet);
     if (existing == null) {
-      await ref.read(walletBootstrapServiceProvider).ensureDefaultCategories(wallet.id);
+      await ref
+          .read(walletBootstrapServiceProvider)
+          .ensureDefaultCategories(wallet.id);
     }
   }
 

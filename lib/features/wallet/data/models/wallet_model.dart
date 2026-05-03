@@ -15,6 +15,10 @@ class WalletModel {
     required this.icon,
     required this.createdAt,
     required this.updatedAt,
+    this.bankName,
+    this.accountNumber,
+    this.accountHolder,
+    this.paymentNote,
     this.deletedAt,
   });
 
@@ -27,6 +31,10 @@ class WalletModel {
   final String icon;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? bankName;
+  final String? accountNumber;
+  final String? accountHolder;
+  final String? paymentNote;
   final DateTime? deletedAt;
 
   factory WalletModel.fromEntity(Wallet wallet) {
@@ -40,6 +48,10 @@ class WalletModel {
       icon: wallet.icon,
       createdAt: wallet.createdAt,
       updatedAt: wallet.updatedAt,
+      bankName: wallet.bankName,
+      accountNumber: wallet.accountNumber,
+      accountHolder: wallet.accountHolder,
+      paymentNote: wallet.paymentNote,
       deletedAt: wallet.deletedAt,
     );
   }
@@ -55,24 +67,32 @@ class WalletModel {
       icon: data.icon,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+      bankName: data.bankName,
+      accountNumber: data.accountNumber,
+      accountHolder: data.accountHolder,
+      paymentNote: data.paymentNote,
       deletedAt: data.deletedAt,
     );
   }
 
   Wallet toEntity() => Wallet(
-        id: id,
-        workspaceId: workspaceId,
-        name: name,
-        type: type,
-        balance: balance,
-        color: color,
-        icon: icon,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        deletedAt: deletedAt,
-      );
+    id: id,
+    workspaceId: workspaceId,
+    name: name,
+    type: type,
+    balance: balance,
+    color: color,
+    icon: icon,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+    bankName: bankName,
+    accountNumber: accountNumber,
+    accountHolder: accountHolder,
+    paymentNote: paymentNote,
+    deletedAt: deletedAt,
+  );
 
-  db.WalletsCompanion toCompanion() {
+  db.WalletsCompanion toCompanion({bool includeLocalMetadata = true}) {
     return db.WalletsCompanion.insert(
       id: id,
       workspaceId: workspaceId,
@@ -81,6 +101,18 @@ class WalletModel {
       balance: balance,
       color: color,
       icon: icon,
+      bankName: includeLocalMetadata
+          ? drift.Value(bankName)
+          : const drift.Value.absent(),
+      accountNumber: includeLocalMetadata
+          ? drift.Value(accountNumber)
+          : const drift.Value.absent(),
+      accountHolder: includeLocalMetadata
+          ? drift.Value(accountHolder)
+          : const drift.Value.absent(),
+      paymentNote: includeLocalMetadata
+          ? drift.Value(paymentNote)
+          : const drift.Value.absent(),
       createdAt: createdAt,
       updatedAt: updatedAt,
       deletedAt: drift.Value(deletedAt),

@@ -49,10 +49,12 @@ class CategorySelector extends StatelessWidget {
                     backgroundColor: selected
                         ? Colors.white
                         : scheme.surfaceContainerHighest,
-                    child: Icon(
-                      resolveIcon(category.icon),
+                    child: buildAdaptiveIcon(
+                      category.icon,
                       size: 18,
-                      color: selected ? scheme.primary : const Color(0xFF667085),
+                      color: selected
+                          ? scheme.primary
+                          : const Color(0xFF667085),
                     ),
                   ),
                 ),
@@ -62,9 +64,9 @@ class CategorySelector extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),

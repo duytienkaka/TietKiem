@@ -11,6 +11,10 @@ class Wallet {
     required this.icon,
     required this.createdAt,
     required this.updatedAt,
+    this.bankName,
+    this.accountNumber,
+    this.accountHolder,
+    this.paymentNote,
     this.deletedAt,
   });
 
@@ -23,6 +27,10 @@ class Wallet {
   final String icon;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? bankName;
+  final String? accountNumber;
+  final String? accountHolder;
+  final String? paymentNote;
   final DateTime? deletedAt;
 
   Wallet copyWith({
@@ -35,6 +43,10 @@ class Wallet {
     String? icon,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? bankName,
+    String? accountNumber,
+    String? accountHolder,
+    String? paymentNote,
     DateTime? deletedAt,
     bool clearDeletedAt = false,
   }) {
@@ -48,6 +60,10 @@ class Wallet {
       icon: icon ?? this.icon,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      bankName: bankName ?? this.bankName,
+      accountNumber: accountNumber ?? this.accountNumber,
+      accountHolder: accountHolder ?? this.accountHolder,
+      paymentNote: paymentNote ?? this.paymentNote,
       deletedAt: clearDeletedAt ? null : deletedAt ?? this.deletedAt,
     );
   }

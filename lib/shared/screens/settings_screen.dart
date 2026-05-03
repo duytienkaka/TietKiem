@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../features/category/domain/entities/category.dart';
 import '../../features/category/presentation/providers/category_provider.dart';
@@ -38,9 +39,7 @@ class SettingsScreen extends ConsumerWidget {
     final preferencesAsync = ref.watch(appPreferencesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.settingsTitle),
-      ),
+      appBar: AppBar(title: Text(context.l10n.settingsTitle)),
       body: SafeArea(
         child: AsyncValueView(
           value: preferencesAsync,
@@ -69,13 +68,26 @@ class SettingsScreen extends ConsumerWidget {
                       subtitle: preferences.languageCode == 'vi'
                           ? context.l10n.vietnamese
                           : context.l10n.english,
-                      onTap: () => _showLanguageSheet(context, ref, preferences.languageCode),
+                      onTap: () => _showLanguageSheet(
+                        context,
+                        ref,
+                        preferences.languageCode,
+                      ),
                     ),
                     SettingItem(
                       icon: Icons.payments_rounded,
                       title: context.l10n.currency,
                       subtitle: context.l10n.vndCurrency,
-                      trailing: Text('VND', style: Theme.of(context).textTheme.bodyMedium),
+                      trailing: Text(
+                        'VND',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    SettingItem(
+                      icon: Icons.category_rounded,
+                      title: context.l10n.categoryManagement,
+                      subtitle: context.l10n.categoryManagementSubtitle,
+                      onTap: () => context.pushNamed('categoryManagement'),
                     ),
                   ],
                 ),
@@ -112,7 +124,9 @@ class SettingsScreen extends ConsumerWidget {
                             if (!granted && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(context.l10n.notificationPermissionDenied),
+                                  content: Text(
+                                    context.l10n.notificationPermissionDenied,
+                                  ),
                                 ),
                               );
                               return;
@@ -179,8 +193,12 @@ class SettingsScreen extends ConsumerWidget {
                       subtitle: context.l10n.appLockSubtitle,
                       trailing: Switch(
                         value: preferences.appLockEnabled,
-                        onChanged: (value) =>
-                            _handleAppLockToggle(context, ref, preferences, value),
+                        onChanged: (value) => _handleAppLockToggle(
+                          context,
+                          ref,
+                          preferences,
+                          value,
+                        ),
                       ),
                     ),
                   ],
@@ -196,7 +214,10 @@ class SettingsScreen extends ConsumerWidget {
                     SettingItem(
                       icon: Icons.info_outline_rounded,
                       title: context.l10n.appVersion,
-                      trailing: Text('1.0.3', style: Theme.of(context).textTheme.bodyMedium),
+                      trailing: Text(
+                        '1.0.3',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ),
                     SettingItem(
                       icon: Icons.code_rounded,
@@ -285,7 +306,9 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                       IconButton(
                         onPressed: () => Navigator.of(sheetContext).pop(),
-                        tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).closeButtonTooltip,
                         style: IconButton.styleFrom(
                           backgroundColor: scheme.surfaceContainerHighest,
                           foregroundColor: scheme.onSurfaceVariant,
@@ -358,10 +381,14 @@ class SettingsScreen extends ConsumerWidget {
     AppPreferencesState preferences,
   ) async {
     final budgets = ref.read(budgetProvider).valueOrNull ?? const <Budget>[];
-    final goals = ref.read(savingsGoalProvider).valueOrNull ?? const <SavingsGoal>[];
-    final recurring = ref.read(recurringProvider).valueOrNull ?? const <RecurringRule>[];
+    final goals =
+        ref.read(savingsGoalProvider).valueOrNull ?? const <SavingsGoal>[];
+    final recurring =
+        ref.read(recurringProvider).valueOrNull ?? const <RecurringRule>[];
 
-    final savedLocation = await ref.read(appBackupServiceProvider).exportBackup(
+    final savedLocation = await ref
+        .read(appBackupServiceProvider)
+        .exportBackup(
           preferences: preferences,
           budgetsOverride: budgets,
           goalsOverride: goals,
@@ -373,23 +400,23 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.l10n.backupSavedMessage(savedLocation),
-        ),
-      ),
+      SnackBar(content: Text(context.l10n.backupSavedMessage(savedLocation))),
     );
   }
 
   Future<void> _restoreBackup(BuildContext context, WidgetRef ref) async {
     try {
-      final result = await ref.read(appBackupServiceProvider).restoreBackupFromPicker();
+      final result = await ref
+          .read(appBackupServiceProvider)
+          .restoreBackupFromPicker();
       if (result == null) {
         return;
       }
 
       if (result.preferences != null) {
-        await ref.read(appPreferencesProvider.notifier).replaceState(result.preferences!);
+        await ref
+            .read(appPreferencesProvider.notifier)
+            .replaceState(result.preferences!);
         if (result.preferences!.appLockEnabled) {
           ref.read(appLockSessionProvider.notifier).lock();
         } else {
@@ -399,7 +426,9 @@ class SettingsScreen extends ConsumerWidget {
 
       await ref.read(budgetProvider.notifier).replaceAll(result.budgets);
       await ref.read(savingsGoalProvider.notifier).replaceAll(result.goals);
-      await ref.read(recurringProvider.notifier).replaceAll(result.recurringRules);
+      await ref
+          .read(recurringProvider.notifier)
+          .replaceAll(result.recurringRules);
       ref.invalidate(walletProvider);
       ref.invalidate(categoryProvider);
       ref.invalidate(transactionProvider);
@@ -422,9 +451,9 @@ class SettingsScreen extends ConsumerWidget {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.invalidBackupFile)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.invalidBackupFile)));
     }
   }
 
@@ -435,49 +464,51 @@ class SettingsScreen extends ConsumerWidget {
   }) async {
     final wallets = ref.read(walletProvider).valueOrNull ?? const <Wallet>[];
     final transactions =
-        ref.read(transactionProvider).valueOrNull ?? const <FinanceTransaction>[];
-    final categories = ref.read(categoryProvider).valueOrNull ?? const <Category>[];
+        ref.read(transactionProvider).valueOrNull ??
+        const <FinanceTransaction>[];
+    final categories =
+        ref.read(categoryProvider).valueOrNull ?? const <Category>[];
 
     final payload = switch (format) {
       _ExportFormat.json => const JsonEncoder.withIndent('  ').convert({
-          'exportedAt': DateTime.now().toIso8601String(),
-          'wallets': [
-            for (final wallet in wallets)
-              {
-                'id': wallet.id,
-                'name': wallet.name,
-                'type': wallet.type.name,
-                'balance': wallet.balance,
-                'color': wallet.color,
-                'icon': wallet.icon,
-                'createdAt': wallet.createdAt.toIso8601String(),
-              },
-          ],
-          'transactions': [
-            for (final transaction in transactions)
-              {
-                'id': transaction.id,
-                'type': transaction.type.name,
-                'amount': transaction.amount,
-                'walletId': transaction.walletId,
-                'targetWalletId': transaction.targetWalletId,
-                'categoryId': transaction.categoryId,
-                'note': transaction.note,
-                'imagePath': transaction.imagePath,
-                'status': transaction.status.name,
-                'createdAt': transaction.createdAt.toIso8601String(),
-              },
-          ],
-          'categories': [
-            for (final category in categories)
-              {
-                'id': category.id,
-                'name': category.name,
-                'type': category.type.name,
-                'icon': category.icon,
-              },
-          ],
-        }),
+        'exportedAt': DateTime.now().toIso8601String(),
+        'wallets': [
+          for (final wallet in wallets)
+            {
+              'id': wallet.id,
+              'name': wallet.name,
+              'type': wallet.type.name,
+              'balance': wallet.balance,
+              'color': wallet.color,
+              'icon': wallet.icon,
+              'createdAt': wallet.createdAt.toIso8601String(),
+            },
+        ],
+        'transactions': [
+          for (final transaction in transactions)
+            {
+              'id': transaction.id,
+              'type': transaction.type.name,
+              'amount': transaction.amount,
+              'walletId': transaction.walletId,
+              'targetWalletId': transaction.targetWalletId,
+              'categoryId': transaction.categoryId,
+              'note': transaction.note,
+              'imagePath': transaction.imagePath,
+              'status': transaction.status.name,
+              'createdAt': transaction.createdAt.toIso8601String(),
+            },
+        ],
+        'categories': [
+          for (final category in categories)
+            {
+              'id': category.id,
+              'name': category.name,
+              'type': category.type.name,
+              'icon': category.icon,
+            },
+        ],
+      }),
       _ExportFormat.csv => _buildCsv(wallets, transactions, categories),
     };
 
@@ -511,7 +542,9 @@ class SettingsScreen extends ConsumerWidget {
                         await Clipboard.setData(ClipboardData(text: payload));
                         if (sheetContext.mounted) {
                           ScaffoldMessenger.of(sheetContext).showSnackBar(
-                            SnackBar(content: Text(context.l10n.copiedToClipboard)),
+                            SnackBar(
+                              content: Text(context.l10n.copiedToClipboard),
+                            ),
                           );
                         }
                       },
@@ -533,10 +566,8 @@ class SettingsScreen extends ConsumerWidget {
                       child: SingleChildScrollView(
                         child: Text(
                           payload,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            height: 1.45,
-                            fontFamily: 'monospace',
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(height: 1.45, fontFamily: 'monospace'),
                         ),
                       ),
                     ),
@@ -625,9 +656,9 @@ class SettingsScreen extends ConsumerWidget {
     ref.invalidate(transactionProvider);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.dataResetSuccess)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.dataResetSuccess)));
     }
   }
 
@@ -696,8 +727,8 @@ class SettingsScreen extends ConsumerWidget {
                             ? context.l10n.changePinSubtitle
                             : context.l10n.createPinSubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -745,9 +776,9 @@ class SettingsScreen extends ConsumerWidget {
                           if (formKey.currentState?.validate() != true) {
                             return;
                           }
-                          await ref.read(appPreferencesProvider.notifier).updatePinCode(
-                                pinController.text,
-                              );
+                          await ref
+                              .read(appPreferencesProvider.notifier)
+                              .updatePinCode(pinController.text);
                           if (sheetContext.mounted) {
                             Navigator.of(sheetContext).pop(true);
                           }
@@ -768,7 +799,6 @@ class SettingsScreen extends ConsumerWidget {
       confirmController.dispose();
     });
   }
-
 }
 
 class _SettingsLoadingState extends StatelessWidget {
@@ -857,17 +887,17 @@ class _SettingsHeroCard extends StatelessWidget {
                 Text(
                   context.l10n.settingsHeroTitle,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   '${context.l10n.language}: $languageLabel - '
                   '${darkModeEnabled ? context.l10n.darkMode : context.l10n.lightMode}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.84),
-                      ),
+                    color: Colors.white.withValues(alpha: 0.84),
+                  ),
                 ),
               ],
             ),
@@ -973,7 +1003,9 @@ class _LanguageOptionTile extends StatelessWidget {
                   child: Text(
                     label,
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: selected ? scheme.onPrimaryContainer : scheme.onSurface,
+                      color: selected
+                          ? scheme.onPrimaryContainer
+                          : scheme.onSurface,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
                     ),
                   ),

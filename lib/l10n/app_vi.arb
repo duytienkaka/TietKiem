@@ -349,6 +349,66 @@
       "type": "String"
     }
   }
+,
+"categoryNameRequired": "Vui lòng nhập tên danh mục.",
+"categoryIconRequired": "Vui lòng nhập icon cho danh mục.",
+"categoryAlreadyExists": "Danh mục này đã tồn tại trong ví.",
+"categoryInUseCannotDelete": "Danh mục này đang được sử dụng nên không thể xóa.",
+"categoryManagement": "Quản lý danh mục",
+"categoryManagementSubtitle": "Thêm hoặc xóa danh mục cho từng ví.",
+"addCategory": "Thêm danh mục",
+"addCategorySubtitle": "Dùng tên và emoji icon từ bàn phím của bạn.",
+"categoryName": "Tên danh mục",
+"categoryEmojiIcon": "Emoji icon",
+"categoryEmojiHint": "Ví dụ: 🍜",
+"deleteCategoryPrompt": "Xóa danh mục \"{name}\"?",
+"@deleteCategoryPrompt": {
+  "placeholders": {
+    "name": {
+      "type": "String"
+    }
+  }
+},
+"categoryScopeWallet": "Danh mục cho ví: {walletName}",
+"@categoryScopeWallet": {
+  "placeholders": {
+    "walletName": {
+      "type": "String"
+    }
+  }
+},
+"noCategoriesYet": "Chưa có danh mục nào",
+"addCategoryHint": "Hãy tạo danh mục đầu tiên cho ví này.",
+"noCategoriesForWallet": "Ví này chưa có danh mục cho loại giao dịch đang chọn.",
+"selectCategoryToContinue": "Hãy chọn danh mục để tiếp tục.",
+"accountWallets": "Ví tài khoản",
+"cashWallets": "Ví tiền mặt",
+"walletPortfolio": "Danh sách ví",
+"walletPortfolioSubtitle": "Mở một ví để xem chi tiết và thao tác nhanh hơn.",
+"walletDetails": "Chi tiết ví",
+"editWalletSubtitle": "Đổi tên, số dư, màu hoặc loại ví.",
+"deleteWalletAction": "Xóa ví",
+"deleteWalletActionSubtitle": "Chỉ xóa khi ví không còn giao dịch liên kết.",
+"deleteWalletPrompt": "Ví sẽ bị xóa nếu không còn giao dịch liên kết. Tiếp tục?",
+"addTransactionFromWallet": "Thêm giao dịch mới cho ví {walletName}",
+"@addTransactionFromWallet": {
+  "placeholders": {
+    "walletName": {
+      "type": "String"
+    }
+  }
+},
+"walletRecentTransactionsSubtitle": "Hoạt động gần nhất liên quan tới ví này.",
+"accountInfo": "Thông tin tài khoản",
+"accountInfoReady": "Ví này đã sẵn sàng nhận chuyển khoản qua QR.",
+"accountInfoIncomplete": "Hãy thêm thông tin tài khoản để tạo QR giao dịch.",
+"updateAccountInfo": "Cập nhật thông tin tài khoản",
+"bankName": "Tên ngân hàng",
+"accountNumber": "Số tài khoản",
+"accountHolder": "Chủ tài khoản",
+"paymentNote": "Nội dung chuyển khoản",
+"transactionQr": "QR giao dịch",
+"notConfiguredYet": "Chưa cấu hình"
 }
 ,
 "monthEndForecastTitle": "Dự báo cuối tháng",
