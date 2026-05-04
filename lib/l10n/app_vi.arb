@@ -164,276 +164,263 @@
   "categoryShopping": "Mua sắm",
   "categoryBills": "Hóa đơn",
   "categoryHealth": "Sức khỏe",
-  "loading": "Đang tải..."
-  ,
+  "loading": "Đang tải...",
   "transactionNotFound": "Không tìm thấy giao dịch",
-"transactionInformation": "Thông tin giao dịch",
-"dateTime": "Ngày giờ",
-"receiptImage": "Ảnh hóa đơn",
-"edit": "Chỉnh sửa",
-"delete": "Xóa",
-"cancel": "Hủy",
-"statusConfirmed": "Đã xác nhận",
-"statusUnconfirmed": "Chưa xác nhận",
-
-"errorTitle": "Đã xảy ra lỗi",
-"helloUser": "Xin chào, Bạn",
-"profileTitle": "Hồ sơ",
-"settingsTitle": "Cài đặt",
-
-"editProfile": "Chỉnh sửa hồ sơ",
-"quickOverview": "Tổng quan nhanh",
-"totalTransactions": "Tổng giao dịch",
-
-"personalInformation": "Thông tin cá nhân",
-"fullName": "Họ và tên",
-"fullNameRequired": "Vui lòng nhập họ tên.",
-"emailOptional": "Email (tùy chọn)",
-"notUpdatedYet": "Chưa cập nhật",
-"removeAvatar": "Xóa ảnh đại diện",
-"save": "Lưu",
-
-"generalSection": "Chung",
-"generalSectionSubtitle": "Ngôn ngữ và tùy chọn hiển thị",
-
-"appSettingsSection": "Tùy chọn ứng dụng",
-"appSettingsSubtitle": "Điều khiển cách ứng dụng hoạt động hằng ngày",
-
-"dataSection": "Dữ liệu",
-"dataSectionSubtitle": "Xuất hoặc đặt lại dữ liệu tài chính cục bộ",
-
-"securitySection": "Bảo mật",
-"securitySectionSubtitle": "Tăng cường bảo vệ cho dữ liệu tài chính",
-
-"aboutSection": "Giới thiệu",
-"aboutSectionSubtitle": "Thông tin ứng dụng và nhóm phát triển",
-
-"language": "Ngôn ngữ",
-"vietnamese": "Tiếng Việt",
-"english": "Tiếng Anh",
-"chooseLanguage": "Chọn ngôn ngữ",
-
-"currency": "Tiền tệ",
-"vndCurrency": "Đồng Việt Nam (VND)",
-
-"darkMode": "Chế độ tối",
-"lightMode": "Chế độ sáng",
-"darkModeSubtitle": "Giảm chói mắt và dễ dùng hơn vào ban đêm",
-
-"notifications": "Thông báo",
-"notificationsSubtitle": "Nhận nhắc nhở và cập nhật tài chính",
-
-"exportData": "Xuất dữ liệu",
-"exportDataSubtitle": "Xem trước và sao chép dữ liệu dưới dạng JSON hoặc CSV",
-"exportJson": "Xuất JSON",
-"exportCsv": "Xuất CSV",
-"copiedToClipboard": "Đã sao chép vào bộ nhớ tạm",
-"copy": "Sao chép",
-
-"resetData": "Đặt lại dữ liệu",
-"resetDataSubtitle": "Xóa ví và giao dịch trên thiết bị này",
-"resetDataPrompt": "Toàn bộ ví và giao dịch trên thiết bị này sẽ bị xóa. Bạn có muốn tiếp tục không?",
-"dataResetSuccess": "Đã đặt lại dữ liệu",
-
-"appLock": "Khóa ứng dụng",
-"appLockSubtitle": "Yêu cầu bảo vệ bổ sung khi mở ứng dụng",
-
-"pinSetup": "Thiết lập PIN",
-"pinSetupSubtitle": "Chuẩn bị mã PIN truy cập nhanh cho các bản phát hành sau",
-
-"appVersion": "Phiên bản ứng dụng",
-"developer": "Nhà phát triển",
-
-"settingsHeroTitle": "Tùy chỉnh trải nghiệm"
-,
-"editTransactionSubtitle": "Xem lại thông tin, chỉnh sửa nhanh và lưu ngay.",
-"confirmTransaction": "Xác nhận giao dịch",
-"transactionConfirmed": "Đã xác nhận giao dịch",
-"pinConfigured": "PIN đã được thiết lập và sẵn sàng sử dụng",
-"setPin": "Đặt PIN",
-"createPinSubtitle": "Tạo mã PIN 4 số để bảo vệ ứng dụng tài chính.",
-"changePinSubtitle": "Cập nhật mã PIN 4 số cho khóa ứng dụng.",
-"enterPin": "Nhập PIN",
-"confirmPin": "Xác nhận PIN",
-"pinMustBe4Digits": "PIN phải gồm đúng 4 chữ số.",
-"pinDoesNotMatch": "PIN xác nhận không khớp.",
-"unlockApp": "Mở khóa ứng dụng",
-"enterPinContinue": "Nhập PIN để tiếp tục vào PocketLedger.",
-"unlock": "Mở khóa",
-"invalidPin": "PIN không đúng. Vui lòng thử lại.",
-"smartSuggestions": "Gợi ý thông minh",
-"smartSuggestionsSubtitle": "Dựa trên số tiền và ghi chú",
-"enableRecurring": "Bật lặp lại",
-"repeatEvery": "Lặp mỗi",
-"weekly": "Hàng tuần",
-"monthly": "Hàng tháng",
-"recurringTitle": "Định kỳ",
-"noRecurringYet": "Chưa có giao dịch định kỳ",
-"createRecurringHint": "Tạo từ giao dịch mới",
-"budgetsTitle": "Ngân sách",
-"setBudget": "Đặt ngân sách",
-"budgetAmount": "Số tiền ngân sách",
-"monthlyBudgetHint": "Giới hạn theo tháng cho danh mục",
-"spentLabel": "Đã chi",
-"remainingLabel": "Còn lại",
-"budgetExceeded": "Vượt ngân sách",
-"createBudgetHint": "Đặt ngân sách để theo dõi tiến độ",
-"spendingInsightsTitle": "Phân tích chi tiêu",
-"topCategory": "Danh mục cao nhất",
-"comparedToLastPeriod": "So với tháng trước",
-"noPreviousPeriod": "Chưa có dữ liệu kỳ trước",
-"increase": "Tăng",
-"decrease": "Giảm",
-"same": "Không đổi",
-"noBudgetsYet": "Chưa có ngân sách nào",
-"exportBackup": "Tạo bản sao lưu",
-"exportBackupSubtitle": "Lưu toàn bộ dữ liệu tài chính offline thành file JSON",
-"restoreBackup": "Khôi phục bản sao lưu",
-"restoreBackupSubtitle": "Nhập file sao lưu và thay thế dữ liệu hiện tại trên thiết bị",
-"backupSavedMessage": "Đã lưu bản sao lưu: {location}",
-"@backupSavedMessage": {
-  "placeholders": {
-    "location": {
-      "type": "String"
+  "transactionInformation": "Thông tin giao dịch",
+  "dateTime": "Ngày giờ",
+  "receiptImage": "Ảnh hóa đơn",
+  "edit": "Chỉnh sửa",
+  "delete": "Xóa",
+  "cancel": "Hủy",
+  "statusConfirmed": "Đã xác nhận",
+  "statusUnconfirmed": "Chưa xác nhận",
+  "errorTitle": "Đã xảy ra lỗi",
+  "helloUser": "Xin chào, Bạn",
+  "profileTitle": "Hồ sơ",
+  "settingsTitle": "Cài đặt",
+  "editProfile": "Chỉnh sửa hồ sơ",
+  "quickOverview": "Tổng quan nhanh",
+  "totalTransactions": "Tổng giao dịch",
+  "personalInformation": "Thông tin cá nhân",
+  "fullName": "Họ và tên",
+  "fullNameRequired": "Vui lòng nhập họ tên.",
+  "emailOptional": "Email (tùy chọn)",
+  "notUpdatedYet": "Chưa cập nhật",
+  "removeAvatar": "Xóa ảnh đại diện",
+  "save": "Lưu",
+  "generalSection": "Chung",
+  "generalSectionSubtitle": "Ngôn ngữ và tùy chọn hiển thị",
+  "appSettingsSection": "Tùy chọn ứng dụng",
+  "appSettingsSubtitle": "Điều khiển cách ứng dụng hoạt động hằng ngày",
+  "dataSection": "Dữ liệu",
+  "dataSectionSubtitle": "Xuất hoặc đặt lại dữ liệu tài chính cục bộ",
+  "securitySection": "Bảo mật",
+  "securitySectionSubtitle": "Tăng cường bảo vệ cho dữ liệu tài chính",
+  "aboutSection": "Giới thiệu",
+  "aboutSectionSubtitle": "Thông tin ứng dụng và nhóm phát triển",
+  "language": "Ngôn ngữ",
+  "vietnamese": "Tiếng Việt",
+  "english": "Tiếng Anh",
+  "chooseLanguage": "Chọn ngôn ngữ",
+  "currency": "Tiền tệ",
+  "vndCurrency": "Đồng Việt Nam (VND)",
+  "darkMode": "Chế độ tối",
+  "lightMode": "Chế độ sáng",
+  "darkModeSubtitle": "Giảm chói mắt và dễ dùng hơn vào ban đêm",
+  "notifications": "Thông báo",
+  "notificationsSubtitle": "Nhận nhắc nhở và cập nhật tài chính",
+  "exportData": "Xuất dữ liệu",
+  "exportDataSubtitle": "Xem trước và sao chép dữ liệu dưới dạng JSON hoặc CSV",
+  "exportJson": "Xuất JSON",
+  "exportCsv": "Xuất CSV",
+  "copiedToClipboard": "Đã sao chép vào bộ nhớ tạm",
+  "copy": "Sao chép",
+  "resetData": "Đặt lại dữ liệu",
+  "resetDataSubtitle": "Xóa ví và giao dịch trên thiết bị này",
+  "resetDataPrompt": "Toàn bộ ví và giao dịch trên thiết bị này sẽ bị xóa. Bạn có muốn tiếp tục không?",
+  "dataResetSuccess": "Đã đặt lại dữ liệu",
+  "appLock": "Khóa ứng dụng",
+  "appLockSubtitle": "Yêu cầu bảo vệ bổ sung khi mở ứng dụng",
+  "pinSetup": "Thiết lập PIN",
+  "pinSetupSubtitle": "Chuẩn bị mã PIN truy cập nhanh cho các bản phát hành sau",
+  "appVersion": "Phiên bản ứng dụng",
+  "developer": "Nhà phát triển",
+  "settingsHeroTitle": "Tùy chỉnh trải nghiệm",
+  "editTransactionSubtitle": "Xem lại thông tin, chỉnh sửa nhanh và lưu ngay.",
+  "confirmTransaction": "Xác nhận giao dịch",
+  "transactionConfirmed": "Đã xác nhận giao dịch",
+  "pinConfigured": "PIN đã được thiết lập và sẵn sàng sử dụng",
+  "setPin": "Đặt PIN",
+  "createPinSubtitle": "Tạo mã PIN 4 số để bảo vệ ứng dụng tài chính.",
+  "changePinSubtitle": "Cập nhật mã PIN 4 số cho khóa ứng dụng.",
+  "enterPin": "Nhập PIN",
+  "confirmPin": "Xác nhận PIN",
+  "pinMustBe4Digits": "PIN phải gồm đúng 4 chữ số.",
+  "pinDoesNotMatch": "PIN xác nhận không khớp.",
+  "unlockApp": "Mở khóa ứng dụng",
+  "enterPinContinue": "Nhập PIN để tiếp tục vào Tiết Kiệm.",
+  "unlock": "Mở khóa",
+  "invalidPin": "PIN không đúng. Vui lòng thử lại.",
+  "smartSuggestions": "Gợi ý thông minh",
+  "smartSuggestionsSubtitle": "Dựa trên số tiền và ghi chú",
+  "enableRecurring": "Bật lặp lại",
+  "repeatEvery": "Lặp mỗi",
+  "weekly": "Hàng tuần",
+  "monthly": "Hàng tháng",
+  "recurringTitle": "Định kỳ",
+  "noRecurringYet": "Chưa có giao dịch định kỳ",
+  "createRecurringHint": "Tạo từ giao dịch mới",
+  "budgetsTitle": "Ngân sách",
+  "setBudget": "Đặt ngân sách",
+  "budgetAmount": "Số tiền ngân sách",
+  "monthlyBudgetHint": "Giới hạn theo tháng cho danh mục",
+  "spentLabel": "Đã chi",
+  "remainingLabel": "Còn lại",
+  "budgetExceeded": "Vượt ngân sách",
+  "createBudgetHint": "Đặt ngân sách để theo dõi tiến độ",
+  "spendingInsightsTitle": "Phân tích chi tiêu",
+  "topCategory": "Danh mục cao nhất",
+  "comparedToLastPeriod": "So với tháng trước",
+  "noPreviousPeriod": "Chưa có dữ liệu kỳ trước",
+  "increase": "Tăng",
+  "decrease": "Giảm",
+  "same": "Không đổi",
+  "noBudgetsYet": "Chưa có ngân sách nào",
+  "exportBackup": "Tạo bản sao lưu",
+  "exportBackupSubtitle": "Lưu toàn bộ dữ liệu tài chính offline thành file JSON",
+  "restoreBackup": "Khôi phục bản sao lưu",
+  "restoreBackupSubtitle": "Nhập file sao lưu và thay thế dữ liệu hiện tại trên thiết bị",
+  "backupSavedMessage": "Đã lưu bản sao lưu: {location}",
+  "@backupSavedMessage": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
     }
-  }
-},
-"backupRestoredMessage": "Đã khôi phục {walletCount} ví và {transactionCount} giao dịch",
-"@backupRestoredMessage": {
-  "placeholders": {
-    "walletCount": {
-      "type": "int"
-    },
-    "transactionCount": {
-      "type": "int"
+  },
+  "backupRestoredMessage": "Đã khôi phục {walletCount} ví và {transactionCount} giao dịch",
+  "@backupRestoredMessage": {
+    "placeholders": {
+      "walletCount": {
+        "type": "int"
+      },
+      "transactionCount": {
+        "type": "int"
+      }
     }
-  }
-},
-"invalidBackupFile": "File sao lưu không hợp lệ hoặc không thể đọc.",
-"savingsGoalsTitle": "Mục tiêu tiết kiệm",
-"savingsGoalsSubtitle": "Theo dõi tiến độ đạt mục tiêu tài chính",
-"addGoal": "Thêm mục tiêu",
-"noSavingsGoalsYet": "Chưa có mục tiêu tiết kiệm",
-"createSavingsGoalHint": "Tạo mục tiêu và gắn với một ví để theo dõi tiến độ tự động",
-"createSavingsGoal": "Tạo mục tiêu tiết kiệm",
-"editSavingsGoal": "Chỉnh sửa mục tiêu tiết kiệm",
-"savingsGoalEditorHint": "Đặt số tiền mục tiêu, chọn ví và hạn hoàn thành phù hợp.",
-"goalName": "Tên mục tiêu",
-"targetAmount": "Số tiền mục tiêu",
-"targetDate": "Ngày mục tiêu",
-"savedAmount": "Đã tiết kiệm",
-"deadlineLabel": "Hạn",
-"dailyNeeded": "Cần mỗi ngày",
-"goalOverdue": "Đã quá hạn",
-"createGoalAction": "Tạo mục tiêu",
-"notificationPermissionDenied": "Chưa cấp quyền thông báo.",
-"monthlyInsightsSubtitle": "Các điểm nhấn được phân tích tự động từ giao dịch cục bộ",
-"averageDailySpend": "Chi tiêu trung bình mỗi ngày",
-"biggestExpense": "Khoản chi lớn nhất",
-"spendingDays": "{count} ngày có chi tiêu",
-"@spendingDays": {
-  "placeholders": {
-    "count": {
-      "type": "int"
+  },
+  "invalidBackupFile": "File sao lưu không hợp lệ hoặc không thể đọc.",
+  "savingsGoalsTitle": "Mục tiêu tiết kiệm",
+  "savingsGoalsSubtitle": "Theo dõi tiến độ đạt mục tiêu tài chính",
+  "addGoal": "Thêm mục tiêu",
+  "noSavingsGoalsYet": "Chưa có mục tiêu tiết kiệm",
+  "createSavingsGoalHint": "Tạo mục tiêu và gắn với một ví để theo dõi tiến độ tự động",
+  "createSavingsGoal": "Tạo mục tiêu tiết kiệm",
+  "editSavingsGoal": "Chỉnh sửa mục tiêu tiết kiệm",
+  "savingsGoalEditorHint": "Đặt số tiền mục tiêu, chọn ví và hạn hoàn thành phù hợp.",
+  "goalName": "Tên mục tiêu",
+  "targetAmount": "Số tiền mục tiêu",
+  "targetDate": "Ngày mục tiêu",
+  "savedAmount": "Đã tiết kiệm",
+  "deadlineLabel": "Hạn",
+  "dailyNeeded": "Cần mỗi ngày",
+  "goalOverdue": "Đã quá hạn",
+  "createGoalAction": "Tạo mục tiêu",
+  "notificationPermissionDenied": "Chưa cấp quyền thông báo.",
+  "monthlyInsightsSubtitle": "Các điểm nhấn được phân tích tự động từ giao dịch cục bộ",
+  "averageDailySpend": "Chi tiêu trung bình mỗi ngày",
+  "biggestExpense": "Khoản chi lớn nhất",
+  "spendingDays": "{count} ngày có chi tiêu",
+  "@spendingDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
     }
-  }
-},
-"categoryShiftTitle": "Cần chú ý danh mục này",
-"categoryShiftMessage": "{category} đã tăng {amount} so với tháng trước",
-"@categoryShiftMessage": {
-  "placeholders": {
-    "category": {
-      "type": "String"
-    },
-    "amount": {
-      "type": "String"
+  },
+  "categoryShiftTitle": "Cần chú ý danh mục này",
+  "categoryShiftMessage": "{category} đã tăng {amount} so với tháng trước",
+  "@categoryShiftMessage": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
     }
-  }
-,
-"categoryNameRequired": "Vui lòng nhập tên danh mục.",
-"categoryIconRequired": "Vui lòng nhập icon cho danh mục.",
-"categoryAlreadyExists": "Danh mục này đã tồn tại trong ví.",
-"categoryInUseCannotDelete": "Danh mục này đang được sử dụng nên không thể xóa.",
-"categoryManagement": "Quản lý danh mục",
-"categoryManagementSubtitle": "Thêm hoặc xóa danh mục cho từng ví.",
-"addCategory": "Thêm danh mục",
-"addCategorySubtitle": "Dùng tên và emoji icon từ bàn phím của bạn.",
-"categoryName": "Tên danh mục",
-"categoryEmojiIcon": "Emoji icon",
-"categoryEmojiHint": "Ví dụ: 🍜",
-"deleteCategoryPrompt": "Xóa danh mục \"{name}\"?",
-"@deleteCategoryPrompt": {
-  "placeholders": {
-    "name": {
-      "type": "String"
+  },
+  "categoryNameRequired": "Vui lòng nhập tên danh mục.",
+  "categoryIconRequired": "Vui lòng nhập icon cho danh mục.",
+  "categoryAlreadyExists": "Danh mục này đã tồn tại trong ví.",
+  "categoryInUseCannotDelete": "Danh mục này đang được sử dụng nên không thể xóa.",
+  "categoryManagement": "Quản lý danh mục",
+  "categoryManagementSubtitle": "Thêm hoặc xóa danh mục cho từng ví.",
+  "addCategory": "Thêm danh mục",
+  "addCategorySubtitle": "Dùng tên và emoji icon từ bàn phím của bạn.",
+  "categoryName": "Tên danh mục",
+  "categoryEmojiIcon": "Emoji icon",
+  "categoryEmojiHint": "Ví dụ: 🍜",
+  "deleteCategoryPrompt": "Xóa danh mục \"{name}\"?",
+  "@deleteCategoryPrompt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
     }
-  }
-},
-"categoryScopeWallet": "Danh mục cho ví: {walletName}",
-"@categoryScopeWallet": {
-  "placeholders": {
-    "walletName": {
-      "type": "String"
+  },
+  "categoryScopeWallet": "Danh mục cho ví: {walletName}",
+  "@categoryScopeWallet": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
     }
-  }
-},
-"noCategoriesYet": "Chưa có danh mục nào",
-"addCategoryHint": "Hãy tạo danh mục đầu tiên cho ví này.",
-"noCategoriesForWallet": "Ví này chưa có danh mục cho loại giao dịch đang chọn.",
-"selectCategoryToContinue": "Hãy chọn danh mục để tiếp tục.",
-"accountWallets": "Ví tài khoản",
-"cashWallets": "Ví tiền mặt",
-"walletPortfolio": "Danh sách ví",
-"walletPortfolioSubtitle": "Mở một ví để xem chi tiết và thao tác nhanh hơn.",
-"walletDetails": "Chi tiết ví",
-"editWalletSubtitle": "Đổi tên, số dư, màu hoặc loại ví.",
-"deleteWalletAction": "Xóa ví",
-"deleteWalletActionSubtitle": "Chỉ xóa khi ví không còn giao dịch liên kết.",
-"deleteWalletPrompt": "Ví sẽ bị xóa nếu không còn giao dịch liên kết. Tiếp tục?",
-"addTransactionFromWallet": "Thêm giao dịch mới cho ví {walletName}",
-"@addTransactionFromWallet": {
-  "placeholders": {
-    "walletName": {
-      "type": "String"
+  },
+  "noCategoriesYet": "Chưa có danh mục nào",
+  "addCategoryHint": "Hãy tạo danh mục đầu tiên cho ví này.",
+  "noCategoriesForWallet": "Ví này chưa có danh mục cho loại giao dịch đang chọn.",
+  "selectCategoryToContinue": "Hãy chọn danh mục để tiếp tục.",
+  "accountWallets": "Ví tài khoản",
+  "cashWallets": "Ví tiền mặt",
+  "walletPortfolio": "Danh sách ví",
+  "walletPortfolioSubtitle": "Mở một ví để xem chi tiết và thao tác nhanh hơn.",
+  "walletDetails": "Chi tiết ví",
+  "editWalletSubtitle": "Đổi tên, số dư, màu hoặc loại ví.",
+  "deleteWalletAction": "Xóa ví",
+  "deleteWalletActionSubtitle": "Chỉ xóa khi ví không còn giao dịch liên kết.",
+  "deleteWalletPrompt": "Ví sẽ bị xóa nếu không còn giao dịch liên kết. Tiếp tục?",
+  "addTransactionFromWallet": "Thêm giao dịch mới cho ví {walletName}",
+  "@addTransactionFromWallet": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
     }
-  }
-},
-"walletRecentTransactionsSubtitle": "Hoạt động gần nhất liên quan tới ví này.",
-"accountInfo": "Thông tin tài khoản",
-"accountInfoReady": "Ví này đã sẵn sàng nhận chuyển khoản qua QR.",
-"accountInfoIncomplete": "Hãy thêm thông tin tài khoản để tạo QR giao dịch.",
-"updateAccountInfo": "Cập nhật thông tin tài khoản",
-"bankName": "Tên ngân hàng",
-"accountNumber": "Số tài khoản",
-"accountHolder": "Chủ tài khoản",
-"paymentNote": "Nội dung chuyển khoản",
-"transactionQr": "QR giao dịch",
-"notConfiguredYet": "Chưa cấu hình"
-}
-,
-"monthEndForecastTitle": "Dự báo cuối tháng",
-"monthEndForecastSubtitle": "Ước tính kết thúc tháng dựa trên tốc độ chi tiêu hiện tại",
-"projectedExpense": "Chi tiêu dự báo",
-"projectedNet": "Chênh lệch dự báo",
-"remainingDaysLabel": "Còn {count} ngày",
-"@remainingDaysLabel": {
-  "placeholders": {
-    "count": {
-      "type": "int"
+  },
+  "walletRecentTransactionsSubtitle": "Hoạt động gần nhất liên quan tới ví này.",
+  "accountInfo": "Thông tin tài khoản",
+  "accountInfoReady": "Ví này đã sẵn sàng nhận chuyển khoản qua QR.",
+  "accountInfoIncomplete": "Hãy thêm thông tin tài khoản để tạo QR giao dịch.",
+  "updateAccountInfo": "Cập nhật thông tin tài khoản",
+  "bankName": "Tên ngân hàng",
+  "accountNumber": "Số tài khoản",
+  "accountHolder": "Chủ tài khoản",
+  "paymentNote": "Nội dung chuyển khoản",
+  "transactionQr": "QR giao dịch",
+  "notConfiguredYet": "Chưa cấu hình",
+  "monthEndForecastTitle": "Dự báo cuối tháng",
+  "monthEndForecastSubtitle": "Ước tính kết thúc tháng dựa trên tốc độ chi tiêu hiện tại",
+  "projectedExpense": "Chi tiêu dự báo",
+  "projectedNet": "Chênh lệch dự báo",
+  "remainingDaysLabel": "Còn {count} ngày",
+  "@remainingDaysLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
     }
-  }
-},
-"stayOnTrack": "Vẫn đang đúng nhịp",
-"watchBudgetPressure": "Có áp lực ngân sách",
-"spendingPaceHighTitle": "Tốc độ chi đang cao",
-"spendingPaceHighMessage": "Bạn đang chi nhanh hơn tháng trước khoảng {percent}",
-"@spendingPaceHighMessage": {
-  "placeholders": {
-    "percent": {
-      "type": "String"
+  },
+  "stayOnTrack": "Vẫn đang đúng nhịp",
+  "watchBudgetPressure": "Có áp lực ngân sách",
+  "spendingPaceHighTitle": "Tốc độ chi đang cao",
+  "spendingPaceHighMessage": "Bạn đang chi nhanh hơn tháng trước khoảng {percent}",
+  "@spendingPaceHighMessage": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
     }
-  }
-},
-"spendingPaceStableTitle": "Tốc độ chi đang ổn định",
-"spendingPaceStableMessage": "Nhịp chi hiện tại đang khá cân bằng cho cả tháng"
+  },
+  "spendingPaceStableTitle": "Tốc độ chi đang ổn định",
+  "spendingPaceStableMessage": "Nhịp chi hiện tại đang khá cân bằng cho cả tháng",
+  "bankNotificationAccess": "Đọc thông báo ngân hàng",
+  "bankNotificationAccessSubtitle": "Phát hiện giao dịch mới từ thông báo của app ngân hàng trên Android.",
+  "bankNotificationAccessGranted": "Đã cấp quyền",
+  "bankNotificationAccessRequired": "Chưa cấp quyền",
+  "bankNotificationUnsupported": "Tính năng này hiện chỉ hỗ trợ trên Android.",
+  "detectedTransactionTitle": "Phát hiện giao dịch mới",
+  "detectedTransactionSubtitle": "Đã tìm thấy một thông báo ngân hàng khớp với ví của bạn. Hãy xác nhận trước khi lưu.",
+  "dismissDetectedTransaction": "Bỏ qua",
+  "confirmDetectedTransaction": "Thêm giao dịch"
 }

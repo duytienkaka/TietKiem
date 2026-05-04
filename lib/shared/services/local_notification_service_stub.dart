@@ -22,4 +22,10 @@ class LocalNotificationService {
   }) async {}
 
   Future<void> cancelRecurringNotifications() async {}
+
+  Future<void> showDetectedTransactionPrompt({
+    required String bankName,
+    required int amount,
+    required String languageCode,
+  }) async {}
 }

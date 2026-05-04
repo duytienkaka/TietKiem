@@ -46,9 +46,12 @@ class WalletNotifier extends AsyncNotifier<List<entity.Wallet>> {
     required int color,
     required String icon,
     String? bankName,
+    String? bankAliases,
     String? accountNumber,
     String? accountHolder,
     String? paymentNote,
+    String? qrImagePath,
+    String? qrPayload,
   }) async {
     final trimmedName = name.trim();
     if (trimmedName.isEmpty) {
@@ -70,6 +73,9 @@ class WalletNotifier extends AsyncNotifier<List<entity.Wallet>> {
       color: color,
       icon: icon,
       bankName: bankName?.trim().isEmpty == true ? null : bankName?.trim(),
+      bankAliases: bankAliases?.trim().isEmpty == true
+          ? null
+          : bankAliases?.trim(),
       accountNumber: accountNumber?.trim().isEmpty == true
           ? null
           : accountNumber?.trim(),
@@ -79,6 +85,8 @@ class WalletNotifier extends AsyncNotifier<List<entity.Wallet>> {
       paymentNote: paymentNote?.trim().isEmpty == true
           ? null
           : paymentNote?.trim(),
+      qrImagePath: qrImagePath?.trim().isEmpty == true ? null : qrImagePath?.trim(),
+      qrPayload: qrPayload?.trim().isEmpty == true ? null : qrPayload?.trim(),
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     );

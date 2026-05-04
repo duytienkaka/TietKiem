@@ -760,7 +760,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get unlockApp => 'Mở khóa ứng dụng';
 
   @override
-  String get enterPinContinue => 'Nhập PIN để tiếp tục vào PocketLedger.';
+  String get enterPinContinue => 'Nhập PIN để tiếp tục vào Tiết Kiệm.';
 
   @override
   String get unlock => 'Mở khóa';
@@ -906,134 +906,161 @@ class AppLocalizationsVi extends AppLocalizations {
       'Nhịp chi hiện tại đang khá cân bằng cho cả tháng';
 
   @override
-  String get categoryNameRequired => 'Category name is required.';
+  String get categoryNameRequired => 'Vui lòng nhập tên danh mục.';
 
   @override
-  String get categoryIconRequired => 'Category icon is required.';
+  String get categoryIconRequired => 'Vui lòng nhập icon cho danh mục.';
 
   @override
-  String get categoryAlreadyExists =>
-      'This category already exists in the wallet.';
+  String get categoryAlreadyExists => 'Danh mục này đã tồn tại trong ví.';
 
   @override
   String get categoryInUseCannotDelete =>
-      'This category is in use and cannot be deleted.';
+      'Danh mục này đang được sử dụng nên không thể xóa.';
 
   @override
-  String get categoryManagement => 'Category management';
+  String get categoryManagement => 'Quản lý danh mục';
 
   @override
   String get categoryManagementSubtitle =>
-      'Add or remove categories for each wallet.';
+      'Thêm hoặc xóa danh mục cho từng ví.';
 
   @override
-  String get addCategory => 'Add category';
+  String get addCategory => 'Thêm danh mục';
 
   @override
   String get addCategorySubtitle =>
-      'Use a name and an emoji icon from your keyboard.';
+      'Dùng tên và emoji icon từ bàn phím của bạn.';
 
   @override
-  String get categoryName => 'Category name';
+  String get categoryName => 'Tên danh mục';
 
   @override
   String get categoryEmojiIcon => 'Emoji icon';
 
   @override
-  String get categoryEmojiHint => 'Example: 🍜';
+  String get categoryEmojiHint => 'Ví dụ: 🍜';
 
   @override
   String deleteCategoryPrompt(String name) {
-    return 'Delete category \"$name\"?';
+    return 'Xóa danh mục \"$name\"?';
   }
 
   @override
   String categoryScopeWallet(String walletName) {
-    return 'Categories for wallet: $walletName';
+    return 'Danh mục cho ví: $walletName';
   }
 
   @override
-  String get noCategoriesYet => 'No categories yet';
+  String get noCategoriesYet => 'Chưa có danh mục nào';
 
   @override
-  String get addCategoryHint => 'Create your first category for this wallet.';
+  String get addCategoryHint => 'Hãy tạo danh mục đầu tiên cho ví này.';
 
   @override
   String get noCategoriesForWallet =>
-      'This wallet does not have categories for the selected type yet.';
+      'Ví này chưa có danh mục cho loại giao dịch đang chọn.';
 
   @override
-  String get selectCategoryToContinue => 'Select a category to continue.';
+  String get selectCategoryToContinue => 'Hãy chọn danh mục để tiếp tục.';
 
   @override
-  String get accountWallets => 'Account wallets';
+  String get accountWallets => 'Ví tài khoản';
 
   @override
-  String get cashWallets => 'Cash wallets';
+  String get cashWallets => 'Ví tiền mặt';
 
   @override
-  String get walletPortfolio => 'Wallet portfolio';
+  String get walletPortfolio => 'Danh sách ví';
 
   @override
   String get walletPortfolioSubtitle =>
-      'Open a wallet to review details and manage it.';
+      'Mở một ví để xem chi tiết và thao tác nhanh hơn.';
 
   @override
-  String get walletDetails => 'Wallet details';
+  String get walletDetails => 'Chi tiết ví';
 
   @override
-  String get editWalletSubtitle =>
-      'Change wallet name, balance, color, or type.';
+  String get editWalletSubtitle => 'Đổi tên, số dư, màu hoặc loại ví.';
 
   @override
-  String get deleteWalletAction => 'Delete wallet';
+  String get deleteWalletAction => 'Xóa ví';
 
   @override
   String get deleteWalletActionSubtitle =>
-      'Remove this wallet when it has no linked transactions.';
+      'Chỉ xóa khi ví không còn giao dịch liên kết.';
 
   @override
   String get deleteWalletPrompt =>
-      'This wallet will be removed if it has no linked transactions. Continue?';
+      'Ví sẽ bị xóa nếu không còn giao dịch liên kết. Tiếp tục?';
 
   @override
   String addTransactionFromWallet(String walletName) {
-    return 'Add a new transaction for $walletName';
+    return 'Thêm giao dịch mới cho ví $walletName';
   }
 
   @override
   String get walletRecentTransactionsSubtitle =>
-      'Latest activity related to this wallet.';
+      'Hoạt động gần nhất liên quan tới ví này.';
 
   @override
-  String get accountInfo => 'Account information';
+  String get accountInfo => 'Thông tin tài khoản';
 
   @override
-  String get accountInfoReady =>
-      'This wallet is ready to receive transfers by QR.';
+  String get accountInfoReady => 'Ví này đã sẵn sàng nhận chuyển khoản qua QR.';
 
   @override
   String get accountInfoIncomplete =>
-      'Add account details to generate a transaction QR.';
+      'Hãy thêm thông tin tài khoản để tạo QR giao dịch.';
 
   @override
-  String get updateAccountInfo => 'Update account info';
+  String get updateAccountInfo => 'Cập nhật thông tin tài khoản';
 
   @override
-  String get bankName => 'Bank name';
+  String get bankName => 'Tên ngân hàng';
 
   @override
-  String get accountNumber => 'Account number';
+  String get accountNumber => 'Số tài khoản';
 
   @override
-  String get accountHolder => 'Account holder';
+  String get accountHolder => 'Chủ tài khoản';
 
   @override
-  String get paymentNote => 'Payment note';
+  String get paymentNote => 'Nội dung chuyển khoản';
 
   @override
-  String get transactionQr => 'Transaction QR';
+  String get transactionQr => 'QR giao dịch';
 
   @override
-  String get notConfiguredYet => 'Not configured yet';
+  String get notConfiguredYet => 'Chưa cấu hình';
+
+  @override
+  String get bankNotificationAccess => 'Đọc thông báo ngân hàng';
+
+  @override
+  String get bankNotificationAccessSubtitle =>
+      'Phát hiện giao dịch mới từ thông báo của app ngân hàng trên Android.';
+
+  @override
+  String get bankNotificationAccessGranted => 'Đã cấp quyền';
+
+  @override
+  String get bankNotificationAccessRequired => 'Chưa cấp quyền';
+
+  @override
+  String get bankNotificationUnsupported =>
+      'Tính năng này hiện chỉ hỗ trợ trên Android.';
+
+  @override
+  String get detectedTransactionTitle => 'Phát hiện giao dịch mới';
+
+  @override
+  String get detectedTransactionSubtitle =>
+      'Đã tìm thấy một thông báo ngân hàng khớp với ví của bạn. Hãy xác nhận trước khi lưu.';
+
+  @override
+  String get dismissDetectedTransaction => 'Bỏ qua';
+
+  @override
+  String get confirmDetectedTransaction => 'Thêm giao dịch';
 }

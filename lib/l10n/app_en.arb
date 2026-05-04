@@ -414,5 +414,14 @@
   "accountHolder": "Account holder",
   "paymentNote": "Payment note",
   "transactionQr": "Transaction QR",
-  "notConfiguredYet": "Not configured yet"
+  "notConfiguredYet": "Not configured yet",
+  "bankNotificationAccess": "Read bank notifications",
+  "bankNotificationAccessSubtitle": "Detect new transactions from Android banking app notifications.",
+  "bankNotificationAccessGranted": "Access granted",
+  "bankNotificationAccessRequired": "Permission required",
+  "bankNotificationUnsupported": "This feature is currently available on Android only.",
+  "detectedTransactionTitle": "New transaction detected",
+  "detectedTransactionSubtitle": "A banking notification matched one of your wallets. Please confirm before saving it.",
+  "dismissDetectedTransaction": "Dismiss",
+  "confirmDetectedTransaction": "Add transaction"
 }

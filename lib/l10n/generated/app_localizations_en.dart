@@ -1034,4 +1034,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notConfiguredYet => 'Not configured yet';
+
+  @override
+  String get bankNotificationAccess => 'Read bank notifications';
+
+  @override
+  String get bankNotificationAccessSubtitle =>
+      'Detect new transactions from Android banking app notifications.';
+
+  @override
+  String get bankNotificationAccessGranted => 'Access granted';
+
+  @override
+  String get bankNotificationAccessRequired => 'Permission required';
+
+  @override
+  String get bankNotificationUnsupported =>
+      'This feature is currently available on Android only.';
+
+  @override
+  String get detectedTransactionTitle => 'New transaction detected';
+
+  @override
+  String get detectedTransactionSubtitle =>
+      'A banking notification matched one of your wallets. Please confirm before saving it.';
+
+  @override
+  String get dismissDetectedTransaction => 'Dismiss';
+
+  @override
+  String get confirmDetectedTransaction => 'Add transaction';
 }

@@ -23,6 +23,7 @@ import '../providers/app_lock_provider.dart';
 import '../providers/app_preferences_provider.dart';
 import '../services/app_backup_service.dart';
 import '../services/app_data_maintenance_service.dart';
+import '../services/bank_notification_platform_service.dart';
 import '../services/local_notification_service.dart';
 import '../widgets/animated_reveal.dart';
 import '../widgets/app_card.dart';
@@ -200,6 +201,44 @@ class SettingsScreen extends ConsumerWidget {
                           value,
                         ),
                       ),
+                    ),
+                    FutureBuilder<bool>(
+                      future: ref
+                          .read(bankNotificationPlatformServiceProvider)
+                          .hasAccess(),
+                      builder: (context, snapshot) {
+                        final platform = ref.read(
+                          bankNotificationPlatformServiceProvider,
+                        );
+                        return SettingItem(
+                          icon: Icons.mark_email_unread_rounded,
+                          title: _bankNotificationAccessTitle(context),
+                          subtitle: _bankNotificationAccessSubtitle(context),
+                          trailing: Text(
+                            platform.isSupported
+                                ? (snapshot.data == true
+                                    ? _bankNotificationAccessGranted(context)
+                                    : _bankNotificationAccessRequired(context))
+                                : _bankNotificationUnsupported(context),
+                            style: Theme.of(context).textTheme.bodySmall,
+                            textAlign: TextAlign.end,
+                          ),
+                          onTap: () async {
+                            if (!platform.isSupported) {
+                              if (!context.mounted) {
+                                return;
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(_bankNotificationUnsupported(context)),
+                                ),
+                              );
+                              return;
+                            }
+                            await platform.openAccessSettings();
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -800,6 +839,31 @@ class SettingsScreen extends ConsumerWidget {
     });
   }
 }
+
+String _bankNotificationAccessTitle(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Đọc thông báo ngân hàng'
+        : 'Read bank notifications';
+
+String _bankNotificationAccessSubtitle(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Phát hiện giao dịch mới từ thông báo của app ngân hàng trên Android.'
+        : 'Detect new transactions from Android banking app notifications.';
+
+String _bankNotificationAccessGranted(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Đã cấp quyền'
+        : 'Access granted';
+
+String _bankNotificationAccessRequired(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Chưa cấp quyền'
+        : 'Permission required';
+
+String _bankNotificationUnsupported(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Tính năng này hiện chỉ hỗ trợ trên Android.'
+        : 'This feature is currently available on Android only.';
 
 class _SettingsLoadingState extends StatelessWidget {
   const _SettingsLoadingState();

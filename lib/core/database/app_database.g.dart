@@ -86,6 +86,17 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _bankAliasesMeta = const VerificationMeta(
+    'bankAliases',
+  );
+  @override
+  late final GeneratedColumn<String> bankAliases = GeneratedColumn<String>(
+    'bank_aliases',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _accountNumberMeta = const VerificationMeta(
     'accountNumber',
   );
@@ -114,6 +125,28 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
   @override
   late final GeneratedColumn<String> paymentNote = GeneratedColumn<String>(
     'payment_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _qrImagePathMeta = const VerificationMeta(
+    'qrImagePath',
+  );
+  @override
+  late final GeneratedColumn<String> qrImagePath = GeneratedColumn<String>(
+    'qr_image_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _qrPayloadMeta = const VerificationMeta(
+    'qrPayload',
+  );
+  @override
+  late final GeneratedColumn<String> qrPayload = GeneratedColumn<String>(
+    'qr_payload',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -162,9 +195,12 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
     color,
     icon,
     bankName,
+    bankAliases,
     accountNumber,
     accountHolder,
     paymentNote,
+    qrImagePath,
+    qrPayload,
     createdAt,
     updatedAt,
     deletedAt,
@@ -243,6 +279,15 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
         bankName.isAcceptableOrUnknown(data['bank_name']!, _bankNameMeta),
       );
     }
+    if (data.containsKey('bank_aliases')) {
+      context.handle(
+        _bankAliasesMeta,
+        bankAliases.isAcceptableOrUnknown(
+          data['bank_aliases']!,
+          _bankAliasesMeta,
+        ),
+      );
+    }
     if (data.containsKey('account_number')) {
       context.handle(
         _accountNumberMeta,
@@ -268,6 +313,21 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
           data['payment_note']!,
           _paymentNoteMeta,
         ),
+      );
+    }
+    if (data.containsKey('qr_image_path')) {
+      context.handle(
+        _qrImagePathMeta,
+        qrImagePath.isAcceptableOrUnknown(
+          data['qr_image_path']!,
+          _qrImagePathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('qr_payload')) {
+      context.handle(
+        _qrPayloadMeta,
+        qrPayload.isAcceptableOrUnknown(data['qr_payload']!, _qrPayloadMeta),
       );
     }
     if (data.containsKey('created_at')) {
@@ -333,6 +393,10 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
         DriftSqlType.string,
         data['${effectivePrefix}bank_name'],
       ),
+      bankAliases: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_aliases'],
+      ),
       accountNumber: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}account_number'],
@@ -344,6 +408,14 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, Wallet> {
       paymentNote: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}payment_note'],
+      ),
+      qrImagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}qr_image_path'],
+      ),
+      qrPayload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}qr_payload'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -375,9 +447,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
   final int color;
   final String icon;
   final String? bankName;
+  final String? bankAliases;
   final String? accountNumber;
   final String? accountHolder;
   final String? paymentNote;
+  final String? qrImagePath;
+  final String? qrPayload;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
@@ -390,9 +465,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     required this.color,
     required this.icon,
     this.bankName,
+    this.bankAliases,
     this.accountNumber,
     this.accountHolder,
     this.paymentNote,
+    this.qrImagePath,
+    this.qrPayload,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -410,6 +488,9 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     if (!nullToAbsent || bankName != null) {
       map['bank_name'] = Variable<String>(bankName);
     }
+    if (!nullToAbsent || bankAliases != null) {
+      map['bank_aliases'] = Variable<String>(bankAliases);
+    }
     if (!nullToAbsent || accountNumber != null) {
       map['account_number'] = Variable<String>(accountNumber);
     }
@@ -418,6 +499,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     }
     if (!nullToAbsent || paymentNote != null) {
       map['payment_note'] = Variable<String>(paymentNote);
+    }
+    if (!nullToAbsent || qrImagePath != null) {
+      map['qr_image_path'] = Variable<String>(qrImagePath);
+    }
+    if (!nullToAbsent || qrPayload != null) {
+      map['qr_payload'] = Variable<String>(qrPayload);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -439,6 +526,9 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       bankName: bankName == null && nullToAbsent
           ? const Value.absent()
           : Value(bankName),
+      bankAliases: bankAliases == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankAliases),
       accountNumber: accountNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(accountNumber),
@@ -448,6 +538,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       paymentNote: paymentNote == null && nullToAbsent
           ? const Value.absent()
           : Value(paymentNote),
+      qrImagePath: qrImagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(qrImagePath),
+      qrPayload: qrPayload == null && nullToAbsent
+          ? const Value.absent()
+          : Value(qrPayload),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -470,9 +566,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       color: serializer.fromJson<int>(json['color']),
       icon: serializer.fromJson<String>(json['icon']),
       bankName: serializer.fromJson<String?>(json['bankName']),
+      bankAliases: serializer.fromJson<String?>(json['bankAliases']),
       accountNumber: serializer.fromJson<String?>(json['accountNumber']),
       accountHolder: serializer.fromJson<String?>(json['accountHolder']),
       paymentNote: serializer.fromJson<String?>(json['paymentNote']),
+      qrImagePath: serializer.fromJson<String?>(json['qrImagePath']),
+      qrPayload: serializer.fromJson<String?>(json['qrPayload']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -490,9 +589,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       'color': serializer.toJson<int>(color),
       'icon': serializer.toJson<String>(icon),
       'bankName': serializer.toJson<String?>(bankName),
+      'bankAliases': serializer.toJson<String?>(bankAliases),
       'accountNumber': serializer.toJson<String?>(accountNumber),
       'accountHolder': serializer.toJson<String?>(accountHolder),
       'paymentNote': serializer.toJson<String?>(paymentNote),
+      'qrImagePath': serializer.toJson<String?>(qrImagePath),
+      'qrPayload': serializer.toJson<String?>(qrPayload),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
@@ -508,9 +610,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     int? color,
     String? icon,
     Value<String?> bankName = const Value.absent(),
+    Value<String?> bankAliases = const Value.absent(),
     Value<String?> accountNumber = const Value.absent(),
     Value<String?> accountHolder = const Value.absent(),
     Value<String?> paymentNote = const Value.absent(),
+    Value<String?> qrImagePath = const Value.absent(),
+    Value<String?> qrPayload = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
@@ -523,6 +628,7 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     color: color ?? this.color,
     icon: icon ?? this.icon,
     bankName: bankName.present ? bankName.value : this.bankName,
+    bankAliases: bankAliases.present ? bankAliases.value : this.bankAliases,
     accountNumber: accountNumber.present
         ? accountNumber.value
         : this.accountNumber,
@@ -530,6 +636,8 @@ class Wallet extends DataClass implements Insertable<Wallet> {
         ? accountHolder.value
         : this.accountHolder,
     paymentNote: paymentNote.present ? paymentNote.value : this.paymentNote,
+    qrImagePath: qrImagePath.present ? qrImagePath.value : this.qrImagePath,
+    qrPayload: qrPayload.present ? qrPayload.value : this.qrPayload,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -546,6 +654,9 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       color: data.color.present ? data.color.value : this.color,
       icon: data.icon.present ? data.icon.value : this.icon,
       bankName: data.bankName.present ? data.bankName.value : this.bankName,
+      bankAliases: data.bankAliases.present
+          ? data.bankAliases.value
+          : this.bankAliases,
       accountNumber: data.accountNumber.present
           ? data.accountNumber.value
           : this.accountNumber,
@@ -555,6 +666,10 @@ class Wallet extends DataClass implements Insertable<Wallet> {
       paymentNote: data.paymentNote.present
           ? data.paymentNote.value
           : this.paymentNote,
+      qrImagePath: data.qrImagePath.present
+          ? data.qrImagePath.value
+          : this.qrImagePath,
+      qrPayload: data.qrPayload.present ? data.qrPayload.value : this.qrPayload,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -572,9 +687,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
           ..write('color: $color, ')
           ..write('icon: $icon, ')
           ..write('bankName: $bankName, ')
+          ..write('bankAliases: $bankAliases, ')
           ..write('accountNumber: $accountNumber, ')
           ..write('accountHolder: $accountHolder, ')
           ..write('paymentNote: $paymentNote, ')
+          ..write('qrImagePath: $qrImagePath, ')
+          ..write('qrPayload: $qrPayload, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -592,9 +710,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
     color,
     icon,
     bankName,
+    bankAliases,
     accountNumber,
     accountHolder,
     paymentNote,
+    qrImagePath,
+    qrPayload,
     createdAt,
     updatedAt,
     deletedAt,
@@ -611,9 +732,12 @@ class Wallet extends DataClass implements Insertable<Wallet> {
           other.color == this.color &&
           other.icon == this.icon &&
           other.bankName == this.bankName &&
+          other.bankAliases == this.bankAliases &&
           other.accountNumber == this.accountNumber &&
           other.accountHolder == this.accountHolder &&
           other.paymentNote == this.paymentNote &&
+          other.qrImagePath == this.qrImagePath &&
+          other.qrPayload == this.qrPayload &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
@@ -628,9 +752,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
   final Value<int> color;
   final Value<String> icon;
   final Value<String?> bankName;
+  final Value<String?> bankAliases;
   final Value<String?> accountNumber;
   final Value<String?> accountHolder;
   final Value<String?> paymentNote;
+  final Value<String?> qrImagePath;
+  final Value<String?> qrPayload;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
@@ -644,9 +771,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     this.color = const Value.absent(),
     this.icon = const Value.absent(),
     this.bankName = const Value.absent(),
+    this.bankAliases = const Value.absent(),
     this.accountNumber = const Value.absent(),
     this.accountHolder = const Value.absent(),
     this.paymentNote = const Value.absent(),
+    this.qrImagePath = const Value.absent(),
+    this.qrPayload = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -661,9 +791,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     required int color,
     required String icon,
     this.bankName = const Value.absent(),
+    this.bankAliases = const Value.absent(),
     this.accountNumber = const Value.absent(),
     this.accountHolder = const Value.absent(),
     this.paymentNote = const Value.absent(),
+    this.qrImagePath = const Value.absent(),
+    this.qrPayload = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
@@ -686,9 +819,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     Expression<int>? color,
     Expression<String>? icon,
     Expression<String>? bankName,
+    Expression<String>? bankAliases,
     Expression<String>? accountNumber,
     Expression<String>? accountHolder,
     Expression<String>? paymentNote,
+    Expression<String>? qrImagePath,
+    Expression<String>? qrPayload,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -703,9 +839,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
       if (color != null) 'color': color,
       if (icon != null) 'icon': icon,
       if (bankName != null) 'bank_name': bankName,
+      if (bankAliases != null) 'bank_aliases': bankAliases,
       if (accountNumber != null) 'account_number': accountNumber,
       if (accountHolder != null) 'account_holder': accountHolder,
       if (paymentNote != null) 'payment_note': paymentNote,
+      if (qrImagePath != null) 'qr_image_path': qrImagePath,
+      if (qrPayload != null) 'qr_payload': qrPayload,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -722,9 +861,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     Value<int>? color,
     Value<String>? icon,
     Value<String?>? bankName,
+    Value<String?>? bankAliases,
     Value<String?>? accountNumber,
     Value<String?>? accountHolder,
     Value<String?>? paymentNote,
+    Value<String?>? qrImagePath,
+    Value<String?>? qrPayload,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
@@ -739,9 +881,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
       color: color ?? this.color,
       icon: icon ?? this.icon,
       bankName: bankName ?? this.bankName,
+      bankAliases: bankAliases ?? this.bankAliases,
       accountNumber: accountNumber ?? this.accountNumber,
       accountHolder: accountHolder ?? this.accountHolder,
       paymentNote: paymentNote ?? this.paymentNote,
+      qrImagePath: qrImagePath ?? this.qrImagePath,
+      qrPayload: qrPayload ?? this.qrPayload,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -776,6 +921,9 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     if (bankName.present) {
       map['bank_name'] = Variable<String>(bankName.value);
     }
+    if (bankAliases.present) {
+      map['bank_aliases'] = Variable<String>(bankAliases.value);
+    }
     if (accountNumber.present) {
       map['account_number'] = Variable<String>(accountNumber.value);
     }
@@ -784,6 +932,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
     }
     if (paymentNote.present) {
       map['payment_note'] = Variable<String>(paymentNote.value);
+    }
+    if (qrImagePath.present) {
+      map['qr_image_path'] = Variable<String>(qrImagePath.value);
+    }
+    if (qrPayload.present) {
+      map['qr_payload'] = Variable<String>(qrPayload.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -811,9 +965,12 @@ class WalletsCompanion extends UpdateCompanion<Wallet> {
           ..write('color: $color, ')
           ..write('icon: $icon, ')
           ..write('bankName: $bankName, ')
+          ..write('bankAliases: $bankAliases, ')
           ..write('accountNumber: $accountNumber, ')
           ..write('accountHolder: $accountHolder, ')
           ..write('paymentNote: $paymentNote, ')
+          ..write('qrImagePath: $qrImagePath, ')
+          ..write('qrPayload: $qrPayload, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -4218,6 +4375,780 @@ class SyncQueueItemsCompanion extends UpdateCompanion<SyncQueueItem> {
   }
 }
 
+class $NotificationImportsTable extends NotificationImports
+    with TableInfo<$NotificationImportsTable, NotificationImport> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotificationImportsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceKeyMeta = const VerificationMeta(
+    'sourceKey',
+  );
+  @override
+  late final GeneratedColumn<String> sourceKey = GeneratedColumn<String>(
+    'source_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _packageNameMeta = const VerificationMeta(
+    'packageName',
+  );
+  @override
+  late final GeneratedColumn<String> packageName = GeneratedColumn<String>(
+    'package_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bankNameMeta = const VerificationMeta(
+    'bankName',
+  );
+  @override
+  late final GeneratedColumn<String> bankName = GeneratedColumn<String>(
+    'bank_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _walletIdMeta = const VerificationMeta(
+    'walletId',
+  );
+  @override
+  late final GeneratedColumn<String> walletId = GeneratedColumn<String>(
+    'wallet_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES wallets (id)',
+    ),
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _inferredTypeMeta = const VerificationMeta(
+    'inferredType',
+  );
+  @override
+  late final GeneratedColumn<String> inferredType = GeneratedColumn<String>(
+    'inferred_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _detectedAtMeta = const VerificationMeta(
+    'detectedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> detectedAt = GeneratedColumn<DateTime>(
+    'detected_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _handledAtMeta = const VerificationMeta(
+    'handledAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> handledAt = GeneratedColumn<DateTime>(
+    'handled_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdTransactionIdMeta =
+      const VerificationMeta('createdTransactionId');
+  @override
+  late final GeneratedColumn<String> createdTransactionId =
+      GeneratedColumn<String>(
+        'created_transaction_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sourceKey,
+    packageName,
+    bankName,
+    walletId,
+    amount,
+    inferredType,
+    title,
+    body,
+    status,
+    detectedAt,
+    handledAt,
+    createdTransactionId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notification_imports';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotificationImport> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('source_key')) {
+      context.handle(
+        _sourceKeyMeta,
+        sourceKey.isAcceptableOrUnknown(data['source_key']!, _sourceKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceKeyMeta);
+    }
+    if (data.containsKey('package_name')) {
+      context.handle(
+        _packageNameMeta,
+        packageName.isAcceptableOrUnknown(
+          data['package_name']!,
+          _packageNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_packageNameMeta);
+    }
+    if (data.containsKey('bank_name')) {
+      context.handle(
+        _bankNameMeta,
+        bankName.isAcceptableOrUnknown(data['bank_name']!, _bankNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bankNameMeta);
+    }
+    if (data.containsKey('wallet_id')) {
+      context.handle(
+        _walletIdMeta,
+        walletId.isAcceptableOrUnknown(data['wallet_id']!, _walletIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_walletIdMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('inferred_type')) {
+      context.handle(
+        _inferredTypeMeta,
+        inferredType.isAcceptableOrUnknown(
+          data['inferred_type']!,
+          _inferredTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_inferredTypeMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('detected_at')) {
+      context.handle(
+        _detectedAtMeta,
+        detectedAt.isAcceptableOrUnknown(data['detected_at']!, _detectedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_detectedAtMeta);
+    }
+    if (data.containsKey('handled_at')) {
+      context.handle(
+        _handledAtMeta,
+        handledAt.isAcceptableOrUnknown(data['handled_at']!, _handledAtMeta),
+      );
+    }
+    if (data.containsKey('created_transaction_id')) {
+      context.handle(
+        _createdTransactionIdMeta,
+        createdTransactionId.isAcceptableOrUnknown(
+          data['created_transaction_id']!,
+          _createdTransactionIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NotificationImport map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotificationImport(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sourceKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_key'],
+      )!,
+      packageName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}package_name'],
+      )!,
+      bankName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_name'],
+      )!,
+      walletId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}wallet_id'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}amount'],
+      )!,
+      inferredType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}inferred_type'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      ),
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      detectedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}detected_at'],
+      )!,
+      handledAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}handled_at'],
+      ),
+      createdTransactionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_transaction_id'],
+      ),
+    );
+  }
+
+  @override
+  $NotificationImportsTable createAlias(String alias) {
+    return $NotificationImportsTable(attachedDatabase, alias);
+  }
+}
+
+class NotificationImport extends DataClass
+    implements Insertable<NotificationImport> {
+  final String id;
+  final String sourceKey;
+  final String packageName;
+  final String bankName;
+  final String walletId;
+  final double amount;
+  final String inferredType;
+  final String? title;
+  final String? body;
+  final String status;
+  final DateTime detectedAt;
+  final DateTime? handledAt;
+  final String? createdTransactionId;
+  const NotificationImport({
+    required this.id,
+    required this.sourceKey,
+    required this.packageName,
+    required this.bankName,
+    required this.walletId,
+    required this.amount,
+    required this.inferredType,
+    this.title,
+    this.body,
+    required this.status,
+    required this.detectedAt,
+    this.handledAt,
+    this.createdTransactionId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['source_key'] = Variable<String>(sourceKey);
+    map['package_name'] = Variable<String>(packageName);
+    map['bank_name'] = Variable<String>(bankName);
+    map['wallet_id'] = Variable<String>(walletId);
+    map['amount'] = Variable<double>(amount);
+    map['inferred_type'] = Variable<String>(inferredType);
+    if (!nullToAbsent || title != null) {
+      map['title'] = Variable<String>(title);
+    }
+    if (!nullToAbsent || body != null) {
+      map['body'] = Variable<String>(body);
+    }
+    map['status'] = Variable<String>(status);
+    map['detected_at'] = Variable<DateTime>(detectedAt);
+    if (!nullToAbsent || handledAt != null) {
+      map['handled_at'] = Variable<DateTime>(handledAt);
+    }
+    if (!nullToAbsent || createdTransactionId != null) {
+      map['created_transaction_id'] = Variable<String>(createdTransactionId);
+    }
+    return map;
+  }
+
+  NotificationImportsCompanion toCompanion(bool nullToAbsent) {
+    return NotificationImportsCompanion(
+      id: Value(id),
+      sourceKey: Value(sourceKey),
+      packageName: Value(packageName),
+      bankName: Value(bankName),
+      walletId: Value(walletId),
+      amount: Value(amount),
+      inferredType: Value(inferredType),
+      title: title == null && nullToAbsent
+          ? const Value.absent()
+          : Value(title),
+      body: body == null && nullToAbsent ? const Value.absent() : Value(body),
+      status: Value(status),
+      detectedAt: Value(detectedAt),
+      handledAt: handledAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(handledAt),
+      createdTransactionId: createdTransactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdTransactionId),
+    );
+  }
+
+  factory NotificationImport.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotificationImport(
+      id: serializer.fromJson<String>(json['id']),
+      sourceKey: serializer.fromJson<String>(json['sourceKey']),
+      packageName: serializer.fromJson<String>(json['packageName']),
+      bankName: serializer.fromJson<String>(json['bankName']),
+      walletId: serializer.fromJson<String>(json['walletId']),
+      amount: serializer.fromJson<double>(json['amount']),
+      inferredType: serializer.fromJson<String>(json['inferredType']),
+      title: serializer.fromJson<String?>(json['title']),
+      body: serializer.fromJson<String?>(json['body']),
+      status: serializer.fromJson<String>(json['status']),
+      detectedAt: serializer.fromJson<DateTime>(json['detectedAt']),
+      handledAt: serializer.fromJson<DateTime?>(json['handledAt']),
+      createdTransactionId: serializer.fromJson<String?>(
+        json['createdTransactionId'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sourceKey': serializer.toJson<String>(sourceKey),
+      'packageName': serializer.toJson<String>(packageName),
+      'bankName': serializer.toJson<String>(bankName),
+      'walletId': serializer.toJson<String>(walletId),
+      'amount': serializer.toJson<double>(amount),
+      'inferredType': serializer.toJson<String>(inferredType),
+      'title': serializer.toJson<String?>(title),
+      'body': serializer.toJson<String?>(body),
+      'status': serializer.toJson<String>(status),
+      'detectedAt': serializer.toJson<DateTime>(detectedAt),
+      'handledAt': serializer.toJson<DateTime?>(handledAt),
+      'createdTransactionId': serializer.toJson<String?>(createdTransactionId),
+    };
+  }
+
+  NotificationImport copyWith({
+    String? id,
+    String? sourceKey,
+    String? packageName,
+    String? bankName,
+    String? walletId,
+    double? amount,
+    String? inferredType,
+    Value<String?> title = const Value.absent(),
+    Value<String?> body = const Value.absent(),
+    String? status,
+    DateTime? detectedAt,
+    Value<DateTime?> handledAt = const Value.absent(),
+    Value<String?> createdTransactionId = const Value.absent(),
+  }) => NotificationImport(
+    id: id ?? this.id,
+    sourceKey: sourceKey ?? this.sourceKey,
+    packageName: packageName ?? this.packageName,
+    bankName: bankName ?? this.bankName,
+    walletId: walletId ?? this.walletId,
+    amount: amount ?? this.amount,
+    inferredType: inferredType ?? this.inferredType,
+    title: title.present ? title.value : this.title,
+    body: body.present ? body.value : this.body,
+    status: status ?? this.status,
+    detectedAt: detectedAt ?? this.detectedAt,
+    handledAt: handledAt.present ? handledAt.value : this.handledAt,
+    createdTransactionId: createdTransactionId.present
+        ? createdTransactionId.value
+        : this.createdTransactionId,
+  );
+  NotificationImport copyWithCompanion(NotificationImportsCompanion data) {
+    return NotificationImport(
+      id: data.id.present ? data.id.value : this.id,
+      sourceKey: data.sourceKey.present ? data.sourceKey.value : this.sourceKey,
+      packageName: data.packageName.present
+          ? data.packageName.value
+          : this.packageName,
+      bankName: data.bankName.present ? data.bankName.value : this.bankName,
+      walletId: data.walletId.present ? data.walletId.value : this.walletId,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      inferredType: data.inferredType.present
+          ? data.inferredType.value
+          : this.inferredType,
+      title: data.title.present ? data.title.value : this.title,
+      body: data.body.present ? data.body.value : this.body,
+      status: data.status.present ? data.status.value : this.status,
+      detectedAt: data.detectedAt.present
+          ? data.detectedAt.value
+          : this.detectedAt,
+      handledAt: data.handledAt.present ? data.handledAt.value : this.handledAt,
+      createdTransactionId: data.createdTransactionId.present
+          ? data.createdTransactionId.value
+          : this.createdTransactionId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationImport(')
+          ..write('id: $id, ')
+          ..write('sourceKey: $sourceKey, ')
+          ..write('packageName: $packageName, ')
+          ..write('bankName: $bankName, ')
+          ..write('walletId: $walletId, ')
+          ..write('amount: $amount, ')
+          ..write('inferredType: $inferredType, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('status: $status, ')
+          ..write('detectedAt: $detectedAt, ')
+          ..write('handledAt: $handledAt, ')
+          ..write('createdTransactionId: $createdTransactionId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sourceKey,
+    packageName,
+    bankName,
+    walletId,
+    amount,
+    inferredType,
+    title,
+    body,
+    status,
+    detectedAt,
+    handledAt,
+    createdTransactionId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotificationImport &&
+          other.id == this.id &&
+          other.sourceKey == this.sourceKey &&
+          other.packageName == this.packageName &&
+          other.bankName == this.bankName &&
+          other.walletId == this.walletId &&
+          other.amount == this.amount &&
+          other.inferredType == this.inferredType &&
+          other.title == this.title &&
+          other.body == this.body &&
+          other.status == this.status &&
+          other.detectedAt == this.detectedAt &&
+          other.handledAt == this.handledAt &&
+          other.createdTransactionId == this.createdTransactionId);
+}
+
+class NotificationImportsCompanion extends UpdateCompanion<NotificationImport> {
+  final Value<String> id;
+  final Value<String> sourceKey;
+  final Value<String> packageName;
+  final Value<String> bankName;
+  final Value<String> walletId;
+  final Value<double> amount;
+  final Value<String> inferredType;
+  final Value<String?> title;
+  final Value<String?> body;
+  final Value<String> status;
+  final Value<DateTime> detectedAt;
+  final Value<DateTime?> handledAt;
+  final Value<String?> createdTransactionId;
+  final Value<int> rowid;
+  const NotificationImportsCompanion({
+    this.id = const Value.absent(),
+    this.sourceKey = const Value.absent(),
+    this.packageName = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.walletId = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.inferredType = const Value.absent(),
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.status = const Value.absent(),
+    this.detectedAt = const Value.absent(),
+    this.handledAt = const Value.absent(),
+    this.createdTransactionId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NotificationImportsCompanion.insert({
+    required String id,
+    required String sourceKey,
+    required String packageName,
+    required String bankName,
+    required String walletId,
+    required double amount,
+    required String inferredType,
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    required String status,
+    required DateTime detectedAt,
+    this.handledAt = const Value.absent(),
+    this.createdTransactionId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sourceKey = Value(sourceKey),
+       packageName = Value(packageName),
+       bankName = Value(bankName),
+       walletId = Value(walletId),
+       amount = Value(amount),
+       inferredType = Value(inferredType),
+       status = Value(status),
+       detectedAt = Value(detectedAt);
+  static Insertable<NotificationImport> custom({
+    Expression<String>? id,
+    Expression<String>? sourceKey,
+    Expression<String>? packageName,
+    Expression<String>? bankName,
+    Expression<String>? walletId,
+    Expression<double>? amount,
+    Expression<String>? inferredType,
+    Expression<String>? title,
+    Expression<String>? body,
+    Expression<String>? status,
+    Expression<DateTime>? detectedAt,
+    Expression<DateTime>? handledAt,
+    Expression<String>? createdTransactionId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sourceKey != null) 'source_key': sourceKey,
+      if (packageName != null) 'package_name': packageName,
+      if (bankName != null) 'bank_name': bankName,
+      if (walletId != null) 'wallet_id': walletId,
+      if (amount != null) 'amount': amount,
+      if (inferredType != null) 'inferred_type': inferredType,
+      if (title != null) 'title': title,
+      if (body != null) 'body': body,
+      if (status != null) 'status': status,
+      if (detectedAt != null) 'detected_at': detectedAt,
+      if (handledAt != null) 'handled_at': handledAt,
+      if (createdTransactionId != null)
+        'created_transaction_id': createdTransactionId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NotificationImportsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sourceKey,
+    Value<String>? packageName,
+    Value<String>? bankName,
+    Value<String>? walletId,
+    Value<double>? amount,
+    Value<String>? inferredType,
+    Value<String?>? title,
+    Value<String?>? body,
+    Value<String>? status,
+    Value<DateTime>? detectedAt,
+    Value<DateTime?>? handledAt,
+    Value<String?>? createdTransactionId,
+    Value<int>? rowid,
+  }) {
+    return NotificationImportsCompanion(
+      id: id ?? this.id,
+      sourceKey: sourceKey ?? this.sourceKey,
+      packageName: packageName ?? this.packageName,
+      bankName: bankName ?? this.bankName,
+      walletId: walletId ?? this.walletId,
+      amount: amount ?? this.amount,
+      inferredType: inferredType ?? this.inferredType,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      status: status ?? this.status,
+      detectedAt: detectedAt ?? this.detectedAt,
+      handledAt: handledAt ?? this.handledAt,
+      createdTransactionId: createdTransactionId ?? this.createdTransactionId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sourceKey.present) {
+      map['source_key'] = Variable<String>(sourceKey.value);
+    }
+    if (packageName.present) {
+      map['package_name'] = Variable<String>(packageName.value);
+    }
+    if (bankName.present) {
+      map['bank_name'] = Variable<String>(bankName.value);
+    }
+    if (walletId.present) {
+      map['wallet_id'] = Variable<String>(walletId.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    if (inferredType.present) {
+      map['inferred_type'] = Variable<String>(inferredType.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (detectedAt.present) {
+      map['detected_at'] = Variable<DateTime>(detectedAt.value);
+    }
+    if (handledAt.present) {
+      map['handled_at'] = Variable<DateTime>(handledAt.value);
+    }
+    if (createdTransactionId.present) {
+      map['created_transaction_id'] = Variable<String>(
+        createdTransactionId.value,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationImportsCompanion(')
+          ..write('id: $id, ')
+          ..write('sourceKey: $sourceKey, ')
+          ..write('packageName: $packageName, ')
+          ..write('bankName: $bankName, ')
+          ..write('walletId: $walletId, ')
+          ..write('amount: $amount, ')
+          ..write('inferredType: $inferredType, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('status: $status, ')
+          ..write('detectedAt: $detectedAt, ')
+          ..write('handledAt: $handledAt, ')
+          ..write('createdTransactionId: $createdTransactionId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4229,12 +5160,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RecurringTransactionsTable recurringTransactions =
       $RecurringTransactionsTable(this);
   late final $SyncQueueItemsTable syncQueueItems = $SyncQueueItemsTable(this);
+  late final $NotificationImportsTable notificationImports =
+      $NotificationImportsTable(this);
   late final WalletDao walletDao = WalletDao(this as AppDatabase);
   late final CategoryDao categoryDao = CategoryDao(this as AppDatabase);
   late final TransactionDao transactionDao = TransactionDao(
     this as AppDatabase,
   );
   late final SyncQueueDao syncQueueDao = SyncQueueDao(this as AppDatabase);
+  late final NotificationImportDao notificationImportDao =
+      NotificationImportDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4247,6 +5182,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     budgets,
     recurringTransactions,
     syncQueueItems,
+    notificationImports,
   ];
 }
 
@@ -4260,9 +5196,12 @@ typedef $$WalletsTableCreateCompanionBuilder =
       required int color,
       required String icon,
       Value<String?> bankName,
+      Value<String?> bankAliases,
       Value<String?> accountNumber,
       Value<String?> accountHolder,
       Value<String?> paymentNote,
+      Value<String?> qrImagePath,
+      Value<String?> qrPayload,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
@@ -4278,9 +5217,12 @@ typedef $$WalletsTableUpdateCompanionBuilder =
       Value<int> color,
       Value<String> icon,
       Value<String?> bankName,
+      Value<String?> bankAliases,
       Value<String?> accountNumber,
       Value<String?> accountHolder,
       Value<String?> paymentNote,
+      Value<String?> qrImagePath,
+      Value<String?> qrPayload,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
@@ -4304,6 +5246,33 @@ final class $$WalletsTableReferences
     ).filter((f) => f.walletId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_walletMembersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $NotificationImportsTable,
+    List<NotificationImport>
+  >
+  _notificationImportsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.notificationImports,
+        aliasName: $_aliasNameGenerator(
+          db.wallets.id,
+          db.notificationImports.walletId,
+        ),
+      );
+
+  $$NotificationImportsTableProcessedTableManager get notificationImportsRefs {
+    final manager = $$NotificationImportsTableTableManager(
+      $_db,
+      $_db.notificationImports,
+    ).filter((f) => f.walletId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _notificationImportsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4359,6 +5328,11 @@ class $$WalletsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get bankAliases => $composableBuilder(
+    column: $table.bankAliases,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get accountNumber => $composableBuilder(
     column: $table.accountNumber,
     builder: (column) => ColumnFilters(column),
@@ -4371,6 +5345,16 @@ class $$WalletsTableFilterComposer
 
   ColumnFilters<String> get paymentNote => $composableBuilder(
     column: $table.paymentNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get qrImagePath => $composableBuilder(
+    column: $table.qrImagePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get qrPayload => $composableBuilder(
+    column: $table.qrPayload,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4405,6 +5389,31 @@ class $$WalletsTableFilterComposer
           }) => $$WalletMembersTableFilterComposer(
             $db: $db,
             $table: $db.walletMembers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> notificationImportsRefs(
+    Expression<bool> Function($$NotificationImportsTableFilterComposer f) f,
+  ) {
+    final $$NotificationImportsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.notificationImports,
+      getReferencedColumn: (t) => t.walletId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$NotificationImportsTableFilterComposer(
+            $db: $db,
+            $table: $db.notificationImports,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4464,6 +5473,11 @@ class $$WalletsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get bankAliases => $composableBuilder(
+    column: $table.bankAliases,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get accountNumber => $composableBuilder(
     column: $table.accountNumber,
     builder: (column) => ColumnOrderings(column),
@@ -4476,6 +5490,16 @@ class $$WalletsTableOrderingComposer
 
   ColumnOrderings<String> get paymentNote => $composableBuilder(
     column: $table.paymentNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get qrImagePath => $composableBuilder(
+    column: $table.qrImagePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get qrPayload => $composableBuilder(
+    column: $table.qrPayload,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4530,6 +5554,11 @@ class $$WalletsTableAnnotationComposer
   GeneratedColumn<String> get bankName =>
       $composableBuilder(column: $table.bankName, builder: (column) => column);
 
+  GeneratedColumn<String> get bankAliases => $composableBuilder(
+    column: $table.bankAliases,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get accountNumber => $composableBuilder(
     column: $table.accountNumber,
     builder: (column) => column,
@@ -4544,6 +5573,14 @@ class $$WalletsTableAnnotationComposer
     column: $table.paymentNote,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get qrImagePath => $composableBuilder(
+    column: $table.qrImagePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get qrPayload =>
+      $composableBuilder(column: $table.qrPayload, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -4578,6 +5615,32 @@ class $$WalletsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> notificationImportsRefs<T extends Object>(
+    Expression<T> Function($$NotificationImportsTableAnnotationComposer a) f,
+  ) {
+    final $$NotificationImportsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.notificationImports,
+          getReferencedColumn: (t) => t.walletId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$NotificationImportsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.notificationImports,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$WalletsTableTableManager
@@ -4593,7 +5656,10 @@ class $$WalletsTableTableManager
           $$WalletsTableUpdateCompanionBuilder,
           (Wallet, $$WalletsTableReferences),
           Wallet,
-          PrefetchHooks Function({bool walletMembersRefs})
+          PrefetchHooks Function({
+            bool walletMembersRefs,
+            bool notificationImportsRefs,
+          })
         > {
   $$WalletsTableTableManager(_$AppDatabase db, $WalletsTable table)
     : super(
@@ -4616,9 +5682,12 @@ class $$WalletsTableTableManager
                 Value<int> color = const Value.absent(),
                 Value<String> icon = const Value.absent(),
                 Value<String?> bankName = const Value.absent(),
+                Value<String?> bankAliases = const Value.absent(),
                 Value<String?> accountNumber = const Value.absent(),
                 Value<String?> accountHolder = const Value.absent(),
                 Value<String?> paymentNote = const Value.absent(),
+                Value<String?> qrImagePath = const Value.absent(),
+                Value<String?> qrPayload = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -4632,9 +5701,12 @@ class $$WalletsTableTableManager
                 color: color,
                 icon: icon,
                 bankName: bankName,
+                bankAliases: bankAliases,
                 accountNumber: accountNumber,
                 accountHolder: accountHolder,
                 paymentNote: paymentNote,
+                qrImagePath: qrImagePath,
+                qrPayload: qrPayload,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -4650,9 +5722,12 @@ class $$WalletsTableTableManager
                 required int color,
                 required String icon,
                 Value<String?> bankName = const Value.absent(),
+                Value<String?> bankAliases = const Value.absent(),
                 Value<String?> accountNumber = const Value.absent(),
                 Value<String?> accountHolder = const Value.absent(),
                 Value<String?> paymentNote = const Value.absent(),
+                Value<String?> qrImagePath = const Value.absent(),
+                Value<String?> qrPayload = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -4666,9 +5741,12 @@ class $$WalletsTableTableManager
                 color: color,
                 icon: icon,
                 bankName: bankName,
+                bankAliases: bankAliases,
                 accountNumber: accountNumber,
                 accountHolder: accountHolder,
                 paymentNote: paymentNote,
+                qrImagePath: qrImagePath,
+                qrPayload: qrPayload,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -4682,37 +5760,63 @@ class $$WalletsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({walletMembersRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (walletMembersRefs) db.walletMembers,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (walletMembersRefs)
-                    await $_getPrefetchedData<
-                      Wallet,
-                      $WalletsTable,
-                      WalletMember
-                    >(
-                      currentTable: table,
-                      referencedTable: $$WalletsTableReferences
-                          ._walletMembersRefsTable(db),
-                      managerFromTypedResult: (p0) => $$WalletsTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).walletMembersRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.walletId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({walletMembersRefs = false, notificationImportsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (walletMembersRefs) db.walletMembers,
+                    if (notificationImportsRefs) db.notificationImports,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (walletMembersRefs)
+                        await $_getPrefetchedData<
+                          Wallet,
+                          $WalletsTable,
+                          WalletMember
+                        >(
+                          currentTable: table,
+                          referencedTable: $$WalletsTableReferences
+                              ._walletMembersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$WalletsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).walletMembersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.walletId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (notificationImportsRefs)
+                        await $_getPrefetchedData<
+                          Wallet,
+                          $WalletsTable,
+                          NotificationImport
+                        >(
+                          currentTable: table,
+                          referencedTable: $$WalletsTableReferences
+                              ._notificationImportsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$WalletsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).notificationImportsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.walletId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -4729,7 +5833,10 @@ typedef $$WalletsTableProcessedTableManager =
       $$WalletsTableUpdateCompanionBuilder,
       (Wallet, $$WalletsTableReferences),
       Wallet,
-      PrefetchHooks Function({bool walletMembersRefs})
+      PrefetchHooks Function({
+        bool walletMembersRefs,
+        bool notificationImportsRefs,
+      })
     >;
 typedef $$WalletMembersTableCreateCompanionBuilder =
     WalletMembersCompanion Function({
@@ -7413,6 +8520,504 @@ typedef $$SyncQueueItemsTableProcessedTableManager =
       SyncQueueItem,
       PrefetchHooks Function()
     >;
+typedef $$NotificationImportsTableCreateCompanionBuilder =
+    NotificationImportsCompanion Function({
+      required String id,
+      required String sourceKey,
+      required String packageName,
+      required String bankName,
+      required String walletId,
+      required double amount,
+      required String inferredType,
+      Value<String?> title,
+      Value<String?> body,
+      required String status,
+      required DateTime detectedAt,
+      Value<DateTime?> handledAt,
+      Value<String?> createdTransactionId,
+      Value<int> rowid,
+    });
+typedef $$NotificationImportsTableUpdateCompanionBuilder =
+    NotificationImportsCompanion Function({
+      Value<String> id,
+      Value<String> sourceKey,
+      Value<String> packageName,
+      Value<String> bankName,
+      Value<String> walletId,
+      Value<double> amount,
+      Value<String> inferredType,
+      Value<String?> title,
+      Value<String?> body,
+      Value<String> status,
+      Value<DateTime> detectedAt,
+      Value<DateTime?> handledAt,
+      Value<String?> createdTransactionId,
+      Value<int> rowid,
+    });
+
+final class $$NotificationImportsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $NotificationImportsTable,
+          NotificationImport
+        > {
+  $$NotificationImportsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $WalletsTable _walletIdTable(_$AppDatabase db) =>
+      db.wallets.createAlias(
+        $_aliasNameGenerator(db.notificationImports.walletId, db.wallets.id),
+      );
+
+  $$WalletsTableProcessedTableManager get walletId {
+    final $_column = $_itemColumn<String>('wallet_id')!;
+
+    final manager = $$WalletsTableTableManager(
+      $_db,
+      $_db.wallets,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_walletIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$NotificationImportsTableFilterComposer
+    extends Composer<_$AppDatabase, $NotificationImportsTable> {
+  $$NotificationImportsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceKey => $composableBuilder(
+    column: $table.sourceKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get inferredType => $composableBuilder(
+    column: $table.inferredType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get detectedAt => $composableBuilder(
+    column: $table.detectedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get handledAt => $composableBuilder(
+    column: $table.handledAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdTransactionId => $composableBuilder(
+    column: $table.createdTransactionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$WalletsTableFilterComposer get walletId {
+    final $$WalletsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.walletId,
+      referencedTable: $db.wallets,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WalletsTableFilterComposer(
+            $db: $db,
+            $table: $db.wallets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$NotificationImportsTableOrderingComposer
+    extends Composer<_$AppDatabase, $NotificationImportsTable> {
+  $$NotificationImportsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceKey => $composableBuilder(
+    column: $table.sourceKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get inferredType => $composableBuilder(
+    column: $table.inferredType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get detectedAt => $composableBuilder(
+    column: $table.detectedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get handledAt => $composableBuilder(
+    column: $table.handledAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdTransactionId => $composableBuilder(
+    column: $table.createdTransactionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$WalletsTableOrderingComposer get walletId {
+    final $$WalletsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.walletId,
+      referencedTable: $db.wallets,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WalletsTableOrderingComposer(
+            $db: $db,
+            $table: $db.wallets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$NotificationImportsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NotificationImportsTable> {
+  $$NotificationImportsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sourceKey =>
+      $composableBuilder(column: $table.sourceKey, builder: (column) => column);
+
+  GeneratedColumn<String> get packageName => $composableBuilder(
+    column: $table.packageName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bankName =>
+      $composableBuilder(column: $table.bankName, builder: (column) => column);
+
+  GeneratedColumn<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<String> get inferredType => $composableBuilder(
+    column: $table.inferredType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get detectedAt => $composableBuilder(
+    column: $table.detectedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get handledAt =>
+      $composableBuilder(column: $table.handledAt, builder: (column) => column);
+
+  GeneratedColumn<String> get createdTransactionId => $composableBuilder(
+    column: $table.createdTransactionId,
+    builder: (column) => column,
+  );
+
+  $$WalletsTableAnnotationComposer get walletId {
+    final $$WalletsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.walletId,
+      referencedTable: $db.wallets,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WalletsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.wallets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$NotificationImportsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NotificationImportsTable,
+          NotificationImport,
+          $$NotificationImportsTableFilterComposer,
+          $$NotificationImportsTableOrderingComposer,
+          $$NotificationImportsTableAnnotationComposer,
+          $$NotificationImportsTableCreateCompanionBuilder,
+          $$NotificationImportsTableUpdateCompanionBuilder,
+          (NotificationImport, $$NotificationImportsTableReferences),
+          NotificationImport,
+          PrefetchHooks Function({bool walletId})
+        > {
+  $$NotificationImportsTableTableManager(
+    _$AppDatabase db,
+    $NotificationImportsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotificationImportsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NotificationImportsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$NotificationImportsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> sourceKey = const Value.absent(),
+                Value<String> packageName = const Value.absent(),
+                Value<String> bankName = const Value.absent(),
+                Value<String> walletId = const Value.absent(),
+                Value<double> amount = const Value.absent(),
+                Value<String> inferredType = const Value.absent(),
+                Value<String?> title = const Value.absent(),
+                Value<String?> body = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> detectedAt = const Value.absent(),
+                Value<DateTime?> handledAt = const Value.absent(),
+                Value<String?> createdTransactionId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotificationImportsCompanion(
+                id: id,
+                sourceKey: sourceKey,
+                packageName: packageName,
+                bankName: bankName,
+                walletId: walletId,
+                amount: amount,
+                inferredType: inferredType,
+                title: title,
+                body: body,
+                status: status,
+                detectedAt: detectedAt,
+                handledAt: handledAt,
+                createdTransactionId: createdTransactionId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String sourceKey,
+                required String packageName,
+                required String bankName,
+                required String walletId,
+                required double amount,
+                required String inferredType,
+                Value<String?> title = const Value.absent(),
+                Value<String?> body = const Value.absent(),
+                required String status,
+                required DateTime detectedAt,
+                Value<DateTime?> handledAt = const Value.absent(),
+                Value<String?> createdTransactionId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NotificationImportsCompanion.insert(
+                id: id,
+                sourceKey: sourceKey,
+                packageName: packageName,
+                bankName: bankName,
+                walletId: walletId,
+                amount: amount,
+                inferredType: inferredType,
+                title: title,
+                body: body,
+                status: status,
+                detectedAt: detectedAt,
+                handledAt: handledAt,
+                createdTransactionId: createdTransactionId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$NotificationImportsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({walletId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (walletId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.walletId,
+                                referencedTable:
+                                    $$NotificationImportsTableReferences
+                                        ._walletIdTable(db),
+                                referencedColumn:
+                                    $$NotificationImportsTableReferences
+                                        ._walletIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$NotificationImportsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NotificationImportsTable,
+      NotificationImport,
+      $$NotificationImportsTableFilterComposer,
+      $$NotificationImportsTableOrderingComposer,
+      $$NotificationImportsTableAnnotationComposer,
+      $$NotificationImportsTableCreateCompanionBuilder,
+      $$NotificationImportsTableUpdateCompanionBuilder,
+      (NotificationImport, $$NotificationImportsTableReferences),
+      NotificationImport,
+      PrefetchHooks Function({bool walletId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7431,6 +9036,8 @@ class $AppDatabaseManager {
       $$RecurringTransactionsTableTableManager(_db, _db.recurringTransactions);
   $$SyncQueueItemsTableTableManager get syncQueueItems =>
       $$SyncQueueItemsTableTableManager(_db, _db.syncQueueItems);
+  $$NotificationImportsTableTableManager get notificationImports =>
+      $$NotificationImportsTableTableManager(_db, _db.notificationImports);
 }
 
 mixin _$WalletDaoMixin on DatabaseAccessor<AppDatabase> {
@@ -7493,5 +9100,25 @@ class SyncQueueDaoManager {
       $$SyncQueueItemsTableTableManager(
         _db.attachedDatabase,
         _db.syncQueueItems,
+      );
+}
+
+mixin _$NotificationImportDaoMixin on DatabaseAccessor<AppDatabase> {
+  $WalletsTable get wallets => attachedDatabase.wallets;
+  $NotificationImportsTable get notificationImports =>
+      attachedDatabase.notificationImports;
+  NotificationImportDaoManager get managers =>
+      NotificationImportDaoManager(this);
+}
+
+class NotificationImportDaoManager {
+  final _$NotificationImportDaoMixin _db;
+  NotificationImportDaoManager(this._db);
+  $$WalletsTableTableManager get wallets =>
+      $$WalletsTableTableManager(_db.attachedDatabase, _db.wallets);
+  $$NotificationImportsTableTableManager get notificationImports =>
+      $$NotificationImportsTableTableManager(
+        _db.attachedDatabase,
+        _db.notificationImports,
       );
 }

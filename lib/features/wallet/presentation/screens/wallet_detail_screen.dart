@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../l10n/l10n.dart';
 import '../../../../shared/finance_enums.dart';
+import '../../../../shared/services/bank_notification_parser.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_icon.dart';
@@ -14,8 +13,11 @@ import '../../../category/presentation/providers/category_provider.dart';
 import '../../../transaction/presentation/providers/transaction_provider.dart';
 import '../../../transaction/presentation/screens/transaction_form_screen.dart';
 import '../../../transaction/presentation/widgets/transaction_tile.dart';
+import '../../data/services/viet_qr_payload_builder.dart';
 import '../../domain/entities/wallet.dart';
+import '../../domain/entities/scanned_account_qr.dart';
 import '../providers/wallet_provider.dart';
+import 'account_qr_scanner_screen.dart';
 import 'wallet_screen.dart';
 
 class WalletDetailScreen extends ConsumerWidget {
@@ -455,131 +457,228 @@ class _AccountInfoSection extends ConsumerWidget {
         (wallet.bankName?.isNotEmpty ?? false) &&
         (wallet.accountNumber?.isNotEmpty ?? false) &&
         (wallet.accountHolder?.isNotEmpty ?? false);
+    final generatedQr = complete
+        ? const VietQrPayloadBuilder().build(
+            bankName: wallet.bankName!,
+            accountNumber: wallet.accountNumber!,
+            accountHolder: wallet.accountHolder!,
+            paymentNote: wallet.paymentNote,
+          )
+        : null;
+    final scheme = Theme.of(context).colorScheme;
 
     return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      padding: EdgeInsets.zero,
+      child: Container(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.3)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      scheme.primaryContainer,
+                      scheme.surfaceContainerHighest,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      context.l10n.accountInfo,
-                      style: Theme.of(context).textTheme.titleLarge,
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: scheme.surface,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(Icons.account_balance_rounded, color: scheme.primary),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      complete
-                          ? context.l10n.accountInfoReady
-                          : context.l10n.accountInfoIncomplete,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.l10n.accountInfo,
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            complete
+                                ? context.l10n.accountInfoReady
+                                : context.l10n.accountInfoIncomplete,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              OutlinedButton.icon(
-                onPressed: () => _showAccountInfoSheet(context, ref, wallet),
-                icon: const Icon(Icons.edit_rounded),
-                label: Text(context.l10n.updateAccountInfo),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          _InfoTile(
-            label: context.l10n.bankName,
-            value: wallet.bankName ?? context.l10n.notConfiguredYet,
-          ),
-          const SizedBox(height: 10),
-          _InfoTile(
-            label: context.l10n.accountNumber,
-            value: wallet.accountNumber ?? context.l10n.notConfiguredYet,
-          ),
-          const SizedBox(height: 10),
-          _InfoTile(
-            label: context.l10n.accountHolder,
-            value: wallet.accountHolder ?? context.l10n.notConfiguredYet,
-          ),
-          if (wallet.paymentNote?.isNotEmpty == true) ...[
-            const SizedBox(height: 10),
-            _InfoTile(
-              label: context.l10n.paymentNote,
-              value: wallet.paymentNote!,
-            ),
-          ],
-          if (complete) ...[
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerLowest,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
+              const SizedBox(height: 14),
+              Row(
                 children: [
-                  Text(
-                    context.l10n.transactionQr,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () => _showAccountInfoSheet(context, ref, wallet),
+                      icon: const Icon(Icons.edit_note_rounded),
+                      label: Text(_manualUpdateLabel(context)),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: QrImageView(
-                      data: jsonEncode({
-                        'app': 'TietKiem',
-                        'walletId': wallet.id,
-                        'walletName': wallet.name,
-                        'bankName': wallet.bankName,
-                        'accountNumber': wallet.accountNumber,
-                        'accountHolder': wallet.accountHolder,
-                        'paymentNote': wallet.paymentNote,
-                      }),
-                      version: QrVersions.auto,
-                      size: 220,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _scanAndOpenEditor(context, ref, wallet),
+                      icon: const Icon(Icons.qr_code_scanner_rounded),
+                      label: Text(_scanQrLabel(context)),
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ],
+              const SizedBox(height: 14),
+              _InfoTile(
+                label: context.l10n.bankName,
+                value: wallet.bankName ?? context.l10n.notConfiguredYet,
+              ),
+              if (wallet.bankAliases?.isNotEmpty == true) ...[
+                const SizedBox(height: 10),
+                _InfoTile(
+                  label: _bankAliasesLabel(context),
+                  value: wallet.bankAliases!,
+                ),
+              ],
+              const SizedBox(height: 10),
+              _InfoTile(
+                label: context.l10n.accountNumber,
+                value: wallet.accountNumber ?? context.l10n.notConfiguredYet,
+              ),
+              const SizedBox(height: 10),
+              _InfoTile(
+                label: context.l10n.accountHolder,
+                value: wallet.accountHolder ?? context.l10n.notConfiguredYet,
+              ),
+              if (wallet.paymentNote?.isNotEmpty == true) ...[
+                const SizedBox(height: 10),
+                _InfoTile(
+                  label: context.l10n.paymentNote,
+                  value: wallet.paymentNote!,
+                ),
+              ],
+              if (generatedQr != null || complete) ...[
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: scheme.surface,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        context.l10n.transactionQr,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (generatedQr != null)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: QrImageView(
+                            data: generatedQr,
+                            version: QrVersions.auto,
+                            size: 220,
+                          ),
+                        ),
+                      if (generatedQr == null)
+                        Text(
+                          _unsupportedBankQrHint(context),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
+    );
+  }
+
+  Future<void> _scanAndOpenEditor(
+    BuildContext context,
+    WidgetRef ref,
+    Wallet wallet,
+  ) async {
+    final scanned = await showAccountQrScanner(context);
+    if (!context.mounted || scanned == null) {
+      return;
+    }
+    await _showAccountInfoSheet(
+      context,
+      ref,
+      wallet,
+      initialScan: scanned,
+      initialQrPayload: scanned.rawValue,
     );
   }
 
   Future<void> _showAccountInfoSheet(
     BuildContext context,
     WidgetRef ref,
-    Wallet wallet,
-  ) async {
+    Wallet wallet, {
+    ScannedAccountQr? initialScan,
+    String? initialQrPayload,
+  }) async {
     final bankNameController = TextEditingController(
-      text: wallet.bankName ?? '',
+      text: initialScan?.bankName ?? wallet.bankName ?? '',
+    );
+    final bankAliasesController = TextEditingController(
+      text: wallet.bankAliases ?? '',
     );
     final accountNumberController = TextEditingController(
-      text: wallet.accountNumber ?? '',
+      text: initialScan?.accountNumber ?? wallet.accountNumber ?? '',
     );
     final accountHolderController = TextEditingController(
-      text: wallet.accountHolder ?? '',
+      text: initialScan?.accountHolder ?? wallet.accountHolder ?? '',
     );
     final paymentNoteController = TextEditingController(
-      text: wallet.paymentNote ?? '',
+      text: initialScan?.paymentNote ?? wallet.paymentNote ?? '',
     );
+    final parser = const BankNotificationParser();
     var saving = false;
+    final qrPayload = initialQrPayload ?? wallet.qrPayload;
 
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       showDragHandle: true,
       builder: (sheetContext) => StatefulBuilder(
         builder: (context, setSheetState) => SafeArea(
@@ -596,12 +695,73 @@ class _AccountInfoSection extends ConsumerWidget {
               children: [
                 Text(
                   context.l10n.updateAccountInfo,
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _accountInfoSheetSubtitle(context),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: bankNameController,
                   decoration: InputDecoration(labelText: context.l10n.bankName),
+                ),
+                const SizedBox(height: 10),
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: bankNameController,
+                  builder: (context, value, _) {
+                    final presets = parser.aliasPresetsForBank(value.text.trim());
+                    if (presets.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _bankAliasPresetLabel(context),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: presets.map((preset) {
+                            return ActionChip(
+                              label: Text(preset),
+                              onPressed: () {
+                                final current = bankAliasesController.text
+                                    .split(RegExp(r'[,;\n]+'))
+                                    .map((item) => item.trim())
+                                    .where((item) => item.isNotEmpty)
+                                    .toSet();
+                                current.add(preset);
+                                bankAliasesController.text = current.join(', ');
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: bankAliasesController,
+                  minLines: 2,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: _bankAliasesLabel(context),
+                    helperText: _bankAliasesHint(context),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -645,9 +805,11 @@ class _AccountInfoSection extends ConsumerWidget {
                                   color: wallet.color,
                                   icon: wallet.icon,
                                   bankName: bankNameController.text,
+                                  bankAliases: bankAliasesController.text,
                                   accountNumber: accountNumberController.text,
                                   accountHolder: accountHolderController.text,
                                   paymentNote: paymentNoteController.text,
+                                  qrPayload: qrPayload,
                                 );
                             if (sheetContext.mounted) {
                               Navigator.of(sheetContext).pop();
@@ -675,11 +837,47 @@ class _AccountInfoSection extends ConsumerWidget {
     );
 
     bankNameController.dispose();
+    bankAliasesController.dispose();
     accountNumberController.dispose();
     accountHolderController.dispose();
     paymentNoteController.dispose();
   }
 }
+
+String _bankAliasesLabel(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Alias ngân hàng'
+        : 'Bank aliases';
+
+String _bankAliasesHint(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Ví dụ: VCB, Vietcombank, VCBDigibank. Mỗi alias cách nhau bằng dấu phẩy hoặc xuống dòng.'
+        : 'Example: VCB, Vietcombank, VCBDigibank. Separate aliases with commas or new lines.';
+
+String _bankAliasPresetLabel(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Alias gợi ý'
+        : 'Suggested aliases';
+
+String _manualUpdateLabel(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Cập nhật thường'
+        : 'Manual update';
+
+String _scanQrLabel(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Quét QR'
+        : 'Scan QR';
+
+String _accountInfoSheetSubtitle(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Điền tay thông tin tài khoản hoặc quét QR để tự động lấy dữ liệu. QR hiển thị trong ví sẽ được ứng dụng tự tạo.'
+        : 'Fill account information manually or scan a QR to auto-populate the fields.';
+
+String _unsupportedBankQrHint(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Ứng dụng chưa tự tạo được VietQR cho ngân hàng này. Hãy kiểm tra lại tên ngân hàng.'
+        : 'The app cannot generate a VietQR payload for this bank yet. Please check the bank name.';
 
 class _InfoTile extends StatelessWidget {
   const _InfoTile({required this.label, required this.value});

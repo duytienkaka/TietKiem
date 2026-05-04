@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/category/presentation/screens/category_management_screen.dart';
+import '../../features/transaction/presentation/providers/notification_import_provider.dart';
 import '../../features/transaction/presentation/screens/home_screen.dart';
+import '../../features/transaction/presentation/screens/detected_transactions_screen.dart';
 import '../../features/transaction/presentation/screens/transaction_detail_screen.dart';
 import '../../features/transaction/presentation/screens/statistics_screen.dart';
 import '../../features/transaction/presentation/screens/transaction_form_screen.dart';
@@ -161,6 +163,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           child: const CategoryManagementScreen(),
         ),
       ),
+      GoRoute(
+        path: '/more/detected-transactions',
+        name: 'detectedTransactions',
+        pageBuilder: (context, state) => _slideFadePage(
+          state: state,
+          child: const DetectedTransactionsScreen(),
+        ),
+      ),
     ],
   );
 });
@@ -207,13 +217,14 @@ CustomTransitionPage<void> _slideFadePage({
   );
 }
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pendingCount = ref.watch(pendingNotificationImportCountProvider);
     final destinations = [
       ('/', context.l10n.homeTab, Icons.home_rounded),
       (
@@ -253,7 +264,20 @@ class AppShell extends StatelessWidget {
             destinations: destinations
                 .map(
                   (item) => NavigationDestination(
-                    icon: Icon(item.$3),
+                    selectedIcon: item.$1 == '/more' && pendingCount > 0
+                        ? _BadgedNavIcon(
+                            icon: item.$3,
+                            count: pendingCount,
+                            selected: true,
+                          )
+                        : null,
+                    icon: item.$1 == '/more' && pendingCount > 0
+                        ? _BadgedNavIcon(
+                            icon: item.$3,
+                            count: pendingCount,
+                            selected: false,
+                          )
+                        : Icon(item.$3),
                     label: item.$2,
                   ),
                 )
@@ -264,6 +288,46 @@ class AppShell extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BadgedNavIcon extends StatelessWidget {
+  const _BadgedNavIcon({
+    required this.icon,
+    required this.count,
+    required this.selected,
+  });
+
+  final IconData icon;
+  final int count;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Icon(icon),
+        Positioned(
+          right: -4,
+          top: -2,
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE11D48),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: selected
+                    ? Theme.of(context).colorScheme.secondaryContainer
+                    : Theme.of(context).colorScheme.surface,
+                width: 1.5,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

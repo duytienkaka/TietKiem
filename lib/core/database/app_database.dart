@@ -6,6 +6,7 @@ part 'wallet_dao.dart';
 part 'transaction_dao.dart';
 part 'category_dao.dart';
 part 'sync_queue_dao.dart';
+part 'notification_import_dao.dart';
 
 class WalletMembers extends Table {
   TextColumn get id => text()();
@@ -27,9 +28,12 @@ class Wallets extends Table {
   IntColumn get color => integer()();
   TextColumn get icon => text()();
   TextColumn get bankName => text().nullable()();
+  TextColumn get bankAliases => text().nullable()();
   TextColumn get accountNumber => text().nullable()();
   TextColumn get accountHolder => text().nullable()();
   TextColumn get paymentNote => text().nullable()();
+  TextColumn get qrImagePath => text().nullable()();
+  TextColumn get qrPayload => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -117,6 +121,25 @@ class SyncQueueItems extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class NotificationImports extends Table {
+  TextColumn get id => text()();
+  TextColumn get sourceKey => text()();
+  TextColumn get packageName => text()();
+  TextColumn get bankName => text()();
+  TextColumn get walletId => text().references(Wallets, #id)();
+  RealColumn get amount => real()();
+  TextColumn get inferredType => text()();
+  TextColumn get title => text().nullable()();
+  TextColumn get body => text().nullable()();
+  TextColumn get status => text()();
+  DateTimeColumn get detectedAt => dateTime()();
+  DateTimeColumn get handledAt => dateTime().nullable()();
+  TextColumn get createdTransactionId => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     WalletMembers,
@@ -126,14 +149,15 @@ class SyncQueueItems extends Table {
     Budgets,
     RecurringTransactions,
     SyncQueueItems,
+    NotificationImports,
   ],
-  daos: [WalletDao, CategoryDao, TransactionDao, SyncQueueDao],
+  daos: [WalletDao, CategoryDao, TransactionDao, SyncQueueDao, NotificationImportDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

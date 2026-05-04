@@ -529,9 +529,12 @@ class _WalletSheetState extends ConsumerState<WalletSheet> {
             color: _color,
             icon: _icon,
             bankName: widget.wallet?.bankName,
+            bankAliases: widget.wallet?.bankAliases,
             accountNumber: widget.wallet?.accountNumber,
             accountHolder: widget.wallet?.accountHolder,
             paymentNote: widget.wallet?.paymentNote,
+            qrImagePath: widget.wallet?.qrImagePath,
+            qrPayload: widget.wallet?.qrPayload,
           );
       if (mounted) {
         Navigator.of(context).pop();

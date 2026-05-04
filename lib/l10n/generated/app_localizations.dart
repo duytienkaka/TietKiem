@@ -2023,6 +2023,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not configured yet'**
   String get notConfiguredYet;
+
+  /// No description provided for @bankNotificationAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Read bank notifications'**
+  String get bankNotificationAccess;
+
+  /// No description provided for @bankNotificationAccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Detect new transactions from Android banking app notifications.'**
+  String get bankNotificationAccessSubtitle;
+
+  /// No description provided for @bankNotificationAccessGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Access granted'**
+  String get bankNotificationAccessGranted;
+
+  /// No description provided for @bankNotificationAccessRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission required'**
+  String get bankNotificationAccessRequired;
+
+  /// No description provided for @bankNotificationUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature is currently available on Android only.'**
+  String get bankNotificationUnsupported;
+
+  /// No description provided for @detectedTransactionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New transaction detected'**
+  String get detectedTransactionTitle;
+
+  /// No description provided for @detectedTransactionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A banking notification matched one of your wallets. Please confirm before saving it.'**
+  String get detectedTransactionSubtitle;
+
+  /// No description provided for @dismissDetectedTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismissDetectedTransaction;
+
+  /// No description provided for @confirmDetectedTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add transaction'**
+  String get confirmDetectedTransaction;
 }
 
 class _AppLocalizationsDelegate

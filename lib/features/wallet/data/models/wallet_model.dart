@@ -16,9 +16,12 @@ class WalletModel {
     required this.createdAt,
     required this.updatedAt,
     this.bankName,
+    this.bankAliases,
     this.accountNumber,
     this.accountHolder,
     this.paymentNote,
+    this.qrImagePath,
+    this.qrPayload,
     this.deletedAt,
   });
 
@@ -32,9 +35,12 @@ class WalletModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? bankName;
+  final String? bankAliases;
   final String? accountNumber;
   final String? accountHolder;
   final String? paymentNote;
+  final String? qrImagePath;
+  final String? qrPayload;
   final DateTime? deletedAt;
 
   factory WalletModel.fromEntity(Wallet wallet) {
@@ -49,9 +55,12 @@ class WalletModel {
       createdAt: wallet.createdAt,
       updatedAt: wallet.updatedAt,
       bankName: wallet.bankName,
+      bankAliases: wallet.bankAliases,
       accountNumber: wallet.accountNumber,
       accountHolder: wallet.accountHolder,
       paymentNote: wallet.paymentNote,
+      qrImagePath: wallet.qrImagePath,
+      qrPayload: wallet.qrPayload,
       deletedAt: wallet.deletedAt,
     );
   }
@@ -68,9 +77,12 @@ class WalletModel {
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
       bankName: data.bankName,
+      bankAliases: data.bankAliases,
       accountNumber: data.accountNumber,
       accountHolder: data.accountHolder,
       paymentNote: data.paymentNote,
+      qrImagePath: data.qrImagePath,
+      qrPayload: data.qrPayload,
       deletedAt: data.deletedAt,
     );
   }
@@ -86,9 +98,12 @@ class WalletModel {
     createdAt: createdAt,
     updatedAt: updatedAt,
     bankName: bankName,
+    bankAliases: bankAliases,
     accountNumber: accountNumber,
     accountHolder: accountHolder,
     paymentNote: paymentNote,
+    qrImagePath: qrImagePath,
+    qrPayload: qrPayload,
     deletedAt: deletedAt,
   );
 
@@ -104,6 +119,9 @@ class WalletModel {
       bankName: includeLocalMetadata
           ? drift.Value(bankName)
           : const drift.Value.absent(),
+      bankAliases: includeLocalMetadata
+          ? drift.Value(bankAliases)
+          : const drift.Value.absent(),
       accountNumber: includeLocalMetadata
           ? drift.Value(accountNumber)
           : const drift.Value.absent(),
@@ -112,6 +130,12 @@ class WalletModel {
           : const drift.Value.absent(),
       paymentNote: includeLocalMetadata
           ? drift.Value(paymentNote)
+          : const drift.Value.absent(),
+      qrImagePath: includeLocalMetadata
+          ? drift.Value(qrImagePath)
+          : const drift.Value.absent(),
+      qrPayload: includeLocalMetadata
+          ? drift.Value(qrPayload)
           : const drift.Value.absent(),
       createdAt: createdAt,
       updatedAt: updatedAt,

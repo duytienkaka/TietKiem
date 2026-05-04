@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../features/budget/domain/entities/budget.dart';
 import '../../features/budget/presentation/providers/budget_provider.dart';
@@ -184,6 +185,15 @@ class _MoreScreenState extends ConsumerState<MoreScreen> {
                                       ),
                                     );
                                   },
+                                ),
+                                const SizedBox(height: 10),
+                                _UtilityTile(
+                                  icon: Icons.mark_email_unread_rounded,
+                                  title: _detectedMoreTitle(context),
+                                  subtitle: _detectedMoreSubtitle(context),
+                                  actionLabel: _detectedMoreAction(context),
+                                  onTap: () =>
+                                      context.pushNamed('detectedTransactions'),
                                 ),
                               ],
                             ),
@@ -1554,3 +1564,18 @@ String _monthKey(DateTime value) {
   final month = value.month.toString().padLeft(2, '0');
   return '${value.year}-$month';
 }
+
+String _detectedMoreTitle(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Giao dịch phát hiện'
+        : 'Detected transactions';
+
+String _detectedMoreSubtitle(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Xem lại các thông báo ngân hàng đã phát hiện hoặc từng bỏ qua.'
+        : 'Review detected bank notifications, including dismissed ones.';
+
+String _detectedMoreAction(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Mở danh sách'
+        : 'Open list';

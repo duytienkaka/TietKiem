@@ -8,8 +8,10 @@ import 'l10n/generated/app_localizations.dart';
 import 'shared/models/app_preferences_state.dart';
 import 'shared/providers/app_lock_provider.dart';
 import 'shared/providers/app_preferences_provider.dart';
+import 'shared/services/bank_notification_import_bootstrap.dart';
 import 'shared/screens/app_lock_screen.dart';
 import 'shared/services/local_notification_bootstrap.dart';
+import 'shared/widgets/bank_notification_prompt_host.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,7 @@ class FinanceApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(localNotificationBootstrapProvider);
+    ref.watch(bankNotificationImportBootstrapProvider);
     final router = ref.watch(appRouterProvider);
     final preferences = ref.watch(appPreferencesProvider).valueOrNull ??
         const AppPreferencesState.defaults();
@@ -42,11 +45,13 @@ class FinanceApp extends ConsumerWidget {
       builder: (context, child) {
         final content = child ?? const SizedBox.shrink();
         final lockRequired = ref.watch(appLockRequiredProvider);
-        return Stack(
-          children: [
-            content,
-            if (lockRequired) const Positioned.fill(child: AppLockScreen()),
-          ],
+        return BankNotificationPromptHost(
+          child: Stack(
+            children: [
+              content,
+              if (lockRequired) const Positioned.fill(child: AppLockScreen()),
+            ],
+          ),
         );
       },
       routerConfig: router,

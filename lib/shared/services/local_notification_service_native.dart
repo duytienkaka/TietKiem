@@ -1,4 +1,4 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+﻿import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -17,6 +17,10 @@ class LocalNotificationService {
   static const _channelId = 'recurring_reminders';
   static const _channelName = 'Recurring reminders';
   static const _channelDescription = 'Reminders for recurring transactions and bills';
+  static const _bankChannelId = 'bank_transaction_review';
+  static const _bankChannelName = 'Bank transaction review';
+  static const _bankChannelDescription =
+      'Prompts to review detected banking notifications before saving them';
 
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
@@ -115,8 +119,42 @@ class LocalNotificationService {
     await _plugin.cancelAll();
   }
 
+  Future<void> showDetectedTransactionPrompt({
+    required String bankName,
+    required int amount,
+    required String languageCode,
+  }) async {
+    await initialize();
+    final title = languageCode == 'vi'
+        ? 'PhĂ¡t hiá»‡n giao dá»‹ch má»›i'
+        : 'New transaction detected';
+    final body = languageCode == 'vi'
+        ? '$bankName â€¢ ${amount.toStringAsFixed(0)} VND. Má»Ÿ app Ä‘á»ƒ xĂ¡c nháº­n.'
+        : '$bankName â€¢ ${amount.toStringAsFixed(0)} VND. Open the app to confirm.';
+    await _plugin.show(
+      id: _bankNotificationId(bankName, amount),
+      title: title,
+      body: body,
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _bankChannelId,
+          _bankChannelName,
+          channelDescription: _bankChannelDescription,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      payload: 'bank_notification_review',
+    );
+  }
+
   int _notificationId(String ruleId) {
     return ruleId.hashCode & 0x7fffffff;
+  }
+
+  int _bankNotificationId(String bankName, int amount) {
+    return ('bank:$bankName:$amount').hashCode & 0x7fffffff;
   }
 
   String _titleFor(
@@ -129,9 +167,9 @@ class LocalNotificationService {
     final isBills = categoryName == 'bills';
     if (languageCode == 'vi') {
       if (isBills) {
-        return 'Nhắc hóa đơn';
+        return 'Nháº¯c hĂ³a Ä‘Æ¡n';
       }
-      return rule.type.name == 'income' ? 'Nhắc thu định kỳ' : 'Nhắc chi định kỳ';
+      return rule.type.name == 'income' ? 'Nháº¯c thu Ä‘á»‹nh ká»³' : 'Nháº¯c chi Ä‘á»‹nh ká»³';
     }
     if (isBills) {
       return 'Bill reminder';
@@ -147,7 +185,7 @@ class LocalNotificationService {
     final category = categories.where((item) => item.id == rule.categoryId).firstOrNull;
     final categoryName = category?.name ?? 'transaction';
     if (languageCode == 'vi') {
-      return 'Sắp đến hạn ${_localizeCategory(categoryName, languageCode)}: ${rule.amount.toStringAsFixed(0)} VND';
+      return 'Sáº¯p Ä‘áº¿n háº¡n ${_localizeCategory(categoryName, languageCode)}: ${rule.amount.toStringAsFixed(0)} VND';
     }
     return 'Upcoming ${_localizeCategory(categoryName, languageCode)}: ${rule.amount.toStringAsFixed(0)} VND';
   }
@@ -156,17 +194,18 @@ class LocalNotificationService {
     final key = raw.toLowerCase();
     if (languageCode == 'vi') {
       return switch (key) {
-        'salary' => 'lương',
-        'gift' => 'quà tặng',
-        'bonus' => 'thưởng',
-        'food' => 'ăn uống',
-        'transport' => 'di chuyển',
-        'shopping' => 'mua sắm',
-        'bills' => 'hóa đơn',
-        'health' => 'sức khỏe',
+        'salary' => 'lÆ°Æ¡ng',
+        'gift' => 'quĂ  táº·ng',
+        'bonus' => 'thÆ°á»Ÿng',
+        'food' => 'Äƒn uá»‘ng',
+        'transport' => 'di chuyá»ƒn',
+        'shopping' => 'mua sáº¯m',
+        'bills' => 'hĂ³a Ä‘Æ¡n',
+        'health' => 'sá»©c khá»e',
         _ => raw,
       };
     }
     return raw;
   }
 }
+

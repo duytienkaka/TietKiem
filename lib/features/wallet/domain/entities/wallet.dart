@@ -12,9 +12,12 @@ class Wallet {
     required this.createdAt,
     required this.updatedAt,
     this.bankName,
+    this.bankAliases,
     this.accountNumber,
     this.accountHolder,
     this.paymentNote,
+    this.qrImagePath,
+    this.qrPayload,
     this.deletedAt,
   });
 
@@ -28,9 +31,12 @@ class Wallet {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? bankName;
+  final String? bankAliases;
   final String? accountNumber;
   final String? accountHolder;
   final String? paymentNote;
+  final String? qrImagePath;
+  final String? qrPayload;
   final DateTime? deletedAt;
 
   Wallet copyWith({
@@ -44,9 +50,12 @@ class Wallet {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? bankName,
+    String? bankAliases,
     String? accountNumber,
     String? accountHolder,
     String? paymentNote,
+    String? qrImagePath,
+    String? qrPayload,
     DateTime? deletedAt,
     bool clearDeletedAt = false,
   }) {
@@ -61,9 +70,12 @@ class Wallet {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       bankName: bankName ?? this.bankName,
+      bankAliases: bankAliases ?? this.bankAliases,
       accountNumber: accountNumber ?? this.accountNumber,
       accountHolder: accountHolder ?? this.accountHolder,
       paymentNote: paymentNote ?? this.paymentNote,
+      qrImagePath: qrImagePath ?? this.qrImagePath,
+      qrPayload: qrPayload ?? this.qrPayload,
       deletedAt: clearDeletedAt ? null : deletedAt ?? this.deletedAt,
     );
   }
