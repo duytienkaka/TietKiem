@@ -20,7 +20,6 @@ import '../../../category/presentation/providers/category_provider.dart';
 import '../../../wallet/domain/entities/wallet.dart';
 import '../../../wallet/presentation/providers/wallet_provider.dart';
 import '../../../wallet/presentation/screens/wallet_screen.dart';
-import 'bill_qr_scanner_screen.dart';
 import '../../domain/entities/finance_transaction.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/amount_input.dart';
@@ -218,13 +217,14 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                         ),
                         children: [
                           SizedBox(height: widget.embedded ? 4 : 4),
-                          _HeaderText(
+                          _ComposerIntro(
                             title: _formTitle(context),
                             subtitle: widget.transactionId == null
                                 ? context.l10n.coreFieldsFirst
                                 : context.l10n.editTransactionSubtitle,
+                            status: _status,
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 18),
                           GestureDetector(
                             onHorizontalDragEnd: (details) {
                               final velocity = details.primaryVelocity ?? 0;
@@ -240,86 +240,33 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                             },
                             child: ShakeWidget(
                               trigger: _shakeTrigger,
-                              child: AppCard(
-                                padding: const EdgeInsets.fromLTRB(
-                                  18,
-                                  18,
-                                  18,
-                                  16,
-                                ),
-                                child: Column(
-                                  children: [
-                                    _TypeStrip(
-                                      type: _type,
-                                      onChanged: (type) =>
-                                          _applyType(type, categories),
-                                    ),
-                                    const SizedBox(height: 18),
-                                    Text(
-                                      _headlineForType(context, _type),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge
-                                          ?.copyWith(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
-                                          ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    AmountInput(
-                                      controller: _amountController,
-                                      rawValue: _rawAmount,
-                                      focusNode: _amountFocusNode,
-                                      onChanged: (value) => _rawAmount = value,
-                                      onCalculated: _applyCalculatedAmount,
-                                      onFieldSubmitted: (_) => _save(),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Center(
-                                      child: OutlinedButton.icon(
-                                        onPressed: _scanBillQr,
-                                        icon: const Icon(
-                                          Icons.qr_code_scanner_rounded,
-                                        ),
-                                        label: Text(
-                                          Localizations.localeOf(
-                                                    context,
-                                                  ).languageCode ==
-                                                  'vi'
-                                              ? 'Quét mã bill'
-                                              : 'Scan bill QR',
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              child: _TransactionStage(
+                                type: _type,
+                                onTypeChanged: (type) =>
+                                    _applyType(type, categories),
+                                headline: _headlineForType(context, _type),
+                                amountController: _amountController,
+                                rawAmount: _rawAmount,
+                                amountFocusNode: _amountFocusNode,
+                                onAmountChanged: (value) => _rawAmount = value,
+                                onCalculated: _applyCalculatedAmount,
+                                onSubmitted: _save,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          _CompactSection(
-                            title: context.l10n.wallet,
-                            subtitle: context.l10n.lastUsedWalletPreselected,
-                            child: wallets.length > 1
-                                ? Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: wallets.map((wallet) {
-                                      final selected = wallet.id == _walletId;
-                                      return ChoiceChip(
-                                        avatar: Icon(
-                                          Icons.account_balance_wallet_rounded,
-                                          size: 18,
-                                          color: selected
-                                              ? Theme.of(
-                                                  context,
-                                                ).colorScheme.primary
-                                              : null,
-                                        ),
-                                        label: Text(wallet.name),
-                                        selected: selected,
-                                        onSelected: (_) => setState(() {
+                          const SizedBox(height: 22),
+                          _ComposerSheet(
+                            children: [
+                              _ComposerSection(
+                                index: '01',
+                                title: context.l10n.wallet,
+                                subtitle:
+                                    context.l10n.lastUsedWalletPreselected,
+                                child: wallets.length > 1
+                                    ? _WalletSelectorRow(
+                                        wallets: wallets,
+                                        selectedWalletId: _walletId,
+                                        onSelected: (wallet) => setState(() {
                                           _walletId = wallet.id;
                                           final matches = categories
                                               .where(
@@ -330,11 +277,9 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                                     item.id != 'transfer',
                                               )
                                               .toList();
-                                          _categoryId =
-                                              matches.any(
-                                                (item) =>
-                                                    item.id == _categoryId,
-                                              )
+                                          _categoryId = matches.any(
+                                            (item) => item.id == _categoryId,
+                                          )
                                               ? _categoryId
                                               : matches.firstOrNull?.id;
                                           if (_type ==
@@ -348,181 +293,139 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                                 ?.id;
                                           }
                                         }),
-                                      );
-                                    }).toList(),
-                                  )
-                                : _StaticSelectionChip(
-                                    icon: Icons.account_balance_wallet_rounded,
-                                    label: wallets.first.name,
-                                  ),
-                          ),
-                          if (_type == TransactionType.transfer) ...[
-                            const SizedBox(height: 14),
-                            _CompactSection(
-                              title: context.l10n.targetWallet,
-                              subtitle: context.l10n.tapOnceSwitchDestination,
-                              child: availableTargets.length > 1
-                                  ? Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: availableTargets.map((wallet) {
-                                        return ChoiceChip(
-                                          label: Text(wallet.name),
-                                          selected:
-                                              wallet.id == _targetWalletId,
-                                          onSelected: (_) => setState(
+                                      )
+                                    : _FeaturedSelectionTile(
+                                        icon: Icons
+                                            .account_balance_wallet_rounded,
+                                        label: wallets.first.name,
+                                      ),
+                              ),
+                              if (_type == TransactionType.transfer)
+                                _ComposerSection(
+                                  index: '02',
+                                  title: context.l10n.targetWallet,
+                                  subtitle:
+                                      context.l10n.tapOnceSwitchDestination,
+                                  child: availableTargets.length > 1
+                                      ? _WalletSelectorRow(
+                                          wallets: availableTargets,
+                                          selectedWalletId: _targetWalletId,
+                                          icon: Icons.savings_rounded,
+                                          selectedLabel:
+                                              context.l10n.targetWallet,
+                                          onSelected: (wallet) => setState(
                                             () => _targetWalletId = wallet.id,
                                           ),
-                                        );
-                                      }).toList(),
-                                    )
-                                  : _StaticSelectionChip(
-                                      icon: Icons.swap_horiz_rounded,
-                                      label:
-                                          availableTargets.firstOrNull?.name ??
-                                          context.l10n.noTargetWallet,
-                                    ),
-                            ),
-                          ] else ...[
-                            const SizedBox(height: 14),
-                            _CompactSection(
-                              title: context.l10n.category,
-                              subtitle: context.l10n.tapIconChangeInstantly,
-                              child: availableCategories.isEmpty
-                                  ? Text(
-                                      context.l10n.noCategoriesForWallet,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
-                                          ),
-                                    )
-                                  : CategorySelector(
-                                      categories: availableCategories,
-                                      selectedId: _categoryId,
-                                      onSelected: (value) =>
-                                          setState(() => _categoryId = value),
-                                    ),
-                            ),
-                          ],
-                          const SizedBox(height: 14),
-                          _DetailsCard(
-                            expanded: _detailsExpanded,
-                            noteText: _noteController.text,
-                            hasImage: _imagePath?.isNotEmpty == true,
-                            status: _status,
-                            onToggle: () => setState(
-                              () => _detailsExpanded = !_detailsExpanded,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                DropdownButtonFormField<TransactionStatus>(
-                                  initialValue: _status,
-                                  decoration: InputDecoration(
-                                    labelText: context.l10n.status,
-                                    prefixIcon: const Icon(
-                                      Icons.verified_user_rounded,
-                                    ),
-                                  ),
-                                  items: TransactionStatus.values
-                                      .map(
-                                        (status) => DropdownMenuItem(
-                                          value: status,
-                                          child: Text(status.label(context)),
-                                        ),
-                                      )
-                                      .toList(),
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      setState(() => _status = value);
-                                    }
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                TextFormField(
-                                  controller: _noteController,
-                                  maxLines: 2,
-                                  decoration: InputDecoration(
-                                    labelText: context.l10n.note,
-                                    hintText: context.l10n.addNoteIfNeeded,
-                                    prefixIcon: const Icon(Icons.notes_rounded),
-                                  ),
-                                  onChanged: (_) => setState(() {}),
-                                ),
-                                const SizedBox(height: 12),
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 220),
-                                  child:
-                                      _imagePath != null &&
-                                          _imagePath!.isNotEmpty
-                                      ? ClipRRect(
-                                          key: ValueKey(_imagePath),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                          child: ReceiptImage(
-                                            source: _imagePath!,
-                                            height: 150,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                          ),
                                         )
-                                      : Container(
-                                          key: const ValueKey('no-image'),
-                                          height: 110,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .surfaceContainerHighest,
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              context.l10n.noReceiptAttached,
-                                            ),
+                                      : _FeaturedSelectionTile(
+                                          icon: Icons.swap_horiz_rounded,
+                                          label:
+                                              availableTargets.firstOrNull
+                                                  ?.name ??
+                                              context.l10n.noTargetWallet,
+                                        ),
+                                )
+                              else
+                                _ComposerSection(
+                                  index: '02',
+                                  title: context.l10n.category,
+                                  subtitle:
+                                      context.l10n.tapIconChangeInstantly,
+                                  child: availableCategories.isEmpty
+                                      ? Text(
+                                          context.l10n.noCategoriesForWallet,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
+                                              ),
+                                        )
+                                      : CategorySelector(
+                                          categories: availableCategories,
+                                          selectedId: _categoryId,
+                                          onSelected: (value) => setState(
+                                            () => _categoryId = value,
                                           ),
                                         ),
                                 ),
-                                const SizedBox(height: 10),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    OutlinedButton.icon(
-                                      onPressed: () =>
-                                          _pickImage(ImageSource.camera),
-                                      icon: const Icon(
-                                        Icons.photo_camera_rounded,
-                                      ),
-                                      label: Text(context.l10n.camera),
-                                    ),
-                                    OutlinedButton.icon(
-                                      onPressed: () =>
-                                          _pickImage(ImageSource.gallery),
-                                      icon: const Icon(
-                                        Icons.photo_library_rounded,
-                                      ),
-                                      label: Text(context.l10n.gallery),
-                                    ),
-                                    if (_imagePath != null)
-                                      TextButton.icon(
-                                        onPressed: () =>
-                                            setState(() => _imagePath = null),
-                                        icon: const Icon(
-                                          Icons.delete_outline_rounded,
+                              _ComposerSection(
+                                index: '03',
+                                title: context.l10n.moreDetails,
+                                subtitle:
+                                    context.l10n.optionalFieldsOutWay,
+                                child: _DetailsCard(
+                                  expanded: _detailsExpanded,
+                                  noteText: _noteController.text,
+                                  hasImage: _imagePath?.isNotEmpty == true,
+                                  status: _status,
+                                  onToggle: () => setState(
+                                    () => _detailsExpanded = !_detailsExpanded,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      DropdownButtonFormField<
+                                        TransactionStatus
+                                      >(
+                                        initialValue: _status,
+                                        decoration: InputDecoration(
+                                          labelText: context.l10n.status,
+                                          prefixIcon: const Icon(
+                                            Icons.verified_user_rounded,
+                                          ),
                                         ),
-                                        label: Text(context.l10n.remove),
+                                        items: TransactionStatus.values
+                                            .map(
+                                              (status) => DropdownMenuItem(
+                                                value: status,
+                                                child: Text(
+                                                  status.label(context),
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            setState(() => _status = value);
+                                          }
+                                        },
                                       ),
-                                  ],
+                                      const SizedBox(height: 12),
+                                      TextFormField(
+                                        controller: _noteController,
+                                        maxLines: 2,
+                                        decoration: InputDecoration(
+                                          labelText: context.l10n.note,
+                                          hintText:
+                                              context.l10n.addNoteIfNeeded,
+                                          prefixIcon: const Icon(
+                                            Icons.notes_rounded,
+                                          ),
+                                        ),
+                                        onChanged: (_) => setState(() {}),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _ReceiptToolPanel(
+                                        imagePath: _imagePath,
+                                        onOpenCamera: () =>
+                                            _pickImage(ImageSource.camera),
+                                        onOpenGallery: () =>
+                                            _pickImage(ImageSource.gallery),
+                                        onRemove: _imagePath == null
+                                            ? null
+                                            : () => setState(
+                                                () => _imagePath = null,
+                                              ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -677,27 +580,6 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
     });
   }
 
-  Future<void> _scanBillQr() async {
-    FocusScope.of(context).unfocus();
-    final scanned = await showBillQrScanner(context);
-    if (!mounted || scanned == null) {
-      return;
-    }
-
-    setState(() {
-      if (scanned.amount != null && scanned.amount! > 0) {
-        _rawAmount = scanned.amount!;
-        applyCurrencyEditingValue(_amountController, scanned.amount!);
-      }
-
-      final note = scanned.composedNote ?? scanned.rawValue;
-      if (note.trim().isNotEmpty) {
-        _noteController.text = note.trim();
-      }
-      _detailsExpanded = true;
-    });
-  }
-
   Future<void> _save() async {
     if (!_formKey.currentState!.validate() ||
         _rawAmount <= 0 ||
@@ -782,23 +664,59 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
   }
 }
 
-class _HeaderText extends StatelessWidget {
-  const _HeaderText({required this.title, required this.subtitle});
+class _ComposerIntro extends StatelessWidget {
+  const _ComposerIntro({
+    required this.title,
+    required this.subtitle,
+    required this.status,
+  });
 
   final String title;
   final String subtitle;
+  final TransactionStatus status;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.headlineSmall),
-        const SizedBox(height: 4),
-        Text(
-          subtitle,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: scheme.outlineVariant.withValues(alpha: 0.35),
+            ),
+          ),
+          child: Text(
+            status.label(context),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: scheme.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
@@ -806,68 +724,417 @@ class _HeaderText extends StatelessWidget {
   }
 }
 
-class _CompactSection extends StatelessWidget {
-  const _CompactSection({
+class _ComposerSheet extends StatelessWidget {
+  const _ComposerSheet({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      borderRadius: 30,
+      padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+      child: Column(
+        children: [
+          Container(
+            width: 44,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Theme.of(
+                context,
+              ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...children.expand((child) => [child, const SizedBox(height: 18)]),
+        ]..removeLast(),
+      ),
+    );
+  }
+}
+
+class _ComposerSection extends StatelessWidget {
+  const _ComposerSection({
+    required this.index,
     required this.title,
     required this.subtitle,
     required this.child,
   });
 
+  final String index;
   final String title;
   final String subtitle;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SectionHeader(title: title, subtitle: subtitle),
-          const SizedBox(height: 10),
-          child,
-        ],
-      ),
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                index,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: scheme.primary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: SectionHeader(title: title, subtitle: subtitle)),
+          ],
+        ),
+        const SizedBox(height: 14),
+        child,
+      ],
     );
   }
 }
 
-class _TypeStrip extends StatelessWidget {
-  const _TypeStrip({required this.type, required this.onChanged});
+class _StageTypeSwitcher extends StatelessWidget {
+  const _StageTypeSwitcher({required this.type, required this.onChanged});
 
   final TransactionType type;
   final ValueChanged<TransactionType> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton<TransactionType>(
-      showSelectedIcon: false,
-      segments: [
-        ButtonSegment(
-          value: TransactionType.income,
-          label: Text(context.l10n.income),
-          icon: const Icon(Icons.south_west_rounded),
-        ),
-        ButtonSegment(
-          value: TransactionType.expense,
-          label: Text(context.l10n.expense),
-          icon: const Icon(Icons.north_east_rounded),
-        ),
-        ButtonSegment(
-          value: TransactionType.transfer,
-          label: Text(context.l10n.transfer),
-          icon: const Icon(Icons.swap_horiz_rounded),
-        ),
-      ],
-      selected: {type},
-      onSelectionChanged: (selection) => onChanged(selection.first),
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      children: TransactionType.values.map((item) {
+        final selected = item == type;
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: GestureDetector(
+              onTap: () => onChanged(item),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: selected ? scheme.primary : scheme.surface,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: selected
+                        ? scheme.primary
+                        : scheme.outlineVariant.withValues(alpha: 0.35),
+                  ),
+                  boxShadow: selected
+                      ? [
+                          BoxShadow(
+                            color: scheme.primary.withValues(alpha: 0.22),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      switch (item) {
+                        TransactionType.income => Icons.south_west_rounded,
+                        TransactionType.expense => Icons.north_east_rounded,
+                        TransactionType.transfer => Icons.swap_horiz_rounded,
+                      },
+                      size: 18,
+                      color: selected ? scheme.onPrimary : null,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      switch (item) {
+                        TransactionType.income => context.l10n.income,
+                        TransactionType.expense => context.l10n.expense,
+                        TransactionType.transfer => context.l10n.transfer,
+                      },
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: selected ? scheme.onPrimary : null,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
 
-class _StaticSelectionChip extends StatelessWidget {
-  const _StaticSelectionChip({required this.icon, required this.label});
+class _AmountHeroContent extends StatelessWidget {
+  const _AmountHeroContent({
+    required this.type,
+    required this.onTypeChanged,
+    required this.headline,
+    required this.amountController,
+    required this.rawAmount,
+    required this.amountFocusNode,
+    required this.onAmountChanged,
+    required this.onCalculated,
+    required this.onSubmitted,
+  });
+
+  final TransactionType type;
+  final ValueChanged<TransactionType> onTypeChanged;
+  final String headline;
+  final TextEditingController amountController;
+  final int rawAmount;
+  final FocusNode amountFocusNode;
+  final ValueChanged<int> onAmountChanged;
+  final ValueChanged<int> onCalculated;
+  final VoidCallback onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: _StageTypeSwitcher(type: type, onChanged: onTypeChanged),
+        ),
+        const SizedBox(height: 22),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 300),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                headline,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 10),
+              AmountInput(
+                controller: amountController,
+                rawValue: rawAmount,
+                focusNode: amountFocusNode,
+                onChanged: onAmountChanged,
+                onCalculated: onCalculated,
+                onFieldSubmitted: (_) => onSubmitted(),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TransactionStage extends StatelessWidget {
+  const _TransactionStage({
+    required this.type,
+    required this.onTypeChanged,
+    required this.headline,
+    required this.amountController,
+    required this.rawAmount,
+    required this.amountFocusNode,
+    required this.onAmountChanged,
+    required this.onCalculated,
+    required this.onSubmitted,
+  });
+
+  final TransactionType type;
+  final ValueChanged<TransactionType> onTypeChanged;
+  final String headline;
+  final TextEditingController amountController;
+  final int rawAmount;
+  final FocusNode amountFocusNode;
+  final ValueChanged<int> onAmountChanged;
+  final ValueChanged<int> onCalculated;
+  final VoidCallback onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final colors = switch (type) {
+      TransactionType.income => [scheme.primary, scheme.primaryContainer],
+      TransactionType.expense => [scheme.secondary, scheme.secondaryContainer],
+      TransactionType.transfer => [scheme.tertiary, scheme.tertiaryContainer],
+    };
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colors.first,
+            colors.last.withValues(alpha: 0.95),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(34),
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(1.2),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLowest.withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(33),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Editor',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      letterSpacing: 0.6,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (rawAmount > 0)
+                    Text(
+                      formatCurrency(context, rawAmount.toDouble()),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              _AmountHeroContent(
+                type: type,
+                onTypeChanged: onTypeChanged,
+                headline: headline,
+                amountController: amountController,
+                rawAmount: rawAmount,
+                amountFocusNode: amountFocusNode,
+                onAmountChanged: onAmountChanged,
+                onCalculated: onCalculated,
+                onSubmitted: onSubmitted,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WalletSelectorRow extends StatelessWidget {
+  const _WalletSelectorRow({
+    required this.wallets,
+    required this.selectedWalletId,
+    required this.onSelected,
+    this.icon = Icons.account_balance_wallet_rounded,
+    this.selectedLabel,
+  });
+
+  final List<Wallet> wallets;
+  final String? selectedWalletId;
+  final ValueChanged<Wallet> onSelected;
+  final IconData icon;
+  final String? selectedLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 96,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: wallets.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final wallet = wallets[index];
+          final selected = wallet.id == selectedWalletId;
+          final scheme = Theme.of(context).colorScheme;
+          return SizedBox(
+            width: 158,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(22),
+                onTap: () => onSelected(wallet),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+                    color: selected
+                        ? scheme.primaryContainer
+                        : scheme.surfaceContainerLow,
+                    border: Border.all(
+                      color: selected
+                          ? scheme.primary.withValues(alpha: 0.5)
+                          : scheme.outlineVariant.withValues(alpha: 0.35),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? scheme.surface.withValues(alpha: 0.72)
+                                : scheme.surface,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(
+                            icon,
+                            size: 18,
+                            color: selected ? scheme.primary : null,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          wallet.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          selected
+                              ? (selectedLabel ?? context.l10n.wallet)
+                              : wallet.type.label(context),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _FeaturedSelectionTile extends StatelessWidget {
+  const _FeaturedSelectionTile({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -875,19 +1142,204 @@ class _StaticSelectionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(
+            context,
+          ).colorScheme.outlineVariant.withValues(alpha: 0.32),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 18),
-          const SizedBox(width: 8),
-          Text(label, style: Theme.of(context).textTheme.titleSmall),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              label,
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _ReceiptToolPanel extends StatelessWidget {
+  const _ReceiptToolPanel({
+    required this.imagePath,
+    required this.onOpenCamera,
+    required this.onOpenGallery,
+    required this.onRemove,
+  });
+
+  final String? imagePath;
+  final VoidCallback onOpenCamera;
+  final VoidCallback onOpenGallery;
+  final VoidCallback? onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final hasImage = imagePath != null && imagePath!.isNotEmpty;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: SectionHeader(
+                  title: context.l10n.receiptImage,
+                  subtitle: hasImage
+                      ? context.l10n.receiptAttached
+                      : context.l10n.noReceiptAttached,
+                ),
+              ),
+              if (hasImage)
+                TextButton.icon(
+                  onPressed: onRemove,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  label: Text(context.l10n.remove),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            child: hasImage
+                ? ClipRRect(
+                    key: ValueKey(imagePath),
+                    borderRadius: BorderRadius.circular(20),
+                    child: ReceiptImage(
+                      source: imagePath!,
+                      height: 156,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Container(
+                    key: const ValueKey('no-image'),
+                    height: 132,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: scheme.surface,
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.receipt_long_rounded,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            context.l10n.noReceiptAttached,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _ToolActionButton(
+                  icon: Icons.photo_camera_rounded,
+                  label: context.l10n.camera,
+                  filled: true,
+                  onPressed: onOpenCamera,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ToolActionButton(
+                  icon: Icons.photo_library_rounded,
+                  label: context.l10n.gallery,
+                  onPressed: onOpenGallery,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToolActionButton extends StatelessWidget {
+  const _ToolActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.filled = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      height: 52,
+      child: filled
+          ? FilledButton.icon(
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(label),
+              style: FilledButton.styleFrom(
+                backgroundColor: scheme.primary,
+                foregroundColor: scheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
+            )
+          : OutlinedButton.icon(
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(label),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                side: BorderSide(
+                  color: scheme.outlineVariant.withValues(alpha: 0.45),
+                ),
+              ),
+            ),
     );
   }
 }

@@ -55,6 +55,9 @@ object BankNotificationBridge {
             "title" to payload.optString("title").ifBlank { null },
             "body" to payload.optString("body").ifBlank { null },
             "subText" to payload.optString("subText").ifBlank { null },
+            "bigText" to payload.optString("bigText").ifBlank { null },
+            "summaryText" to payload.optString("summaryText").ifBlank { null },
+            "textLines" to payload.optString("textLines").ifBlank { null },
             "postedAt" to payload.optString("postedAt"),
         )
     }

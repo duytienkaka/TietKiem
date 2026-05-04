@@ -5,6 +5,9 @@ class BankNotificationEvent {
     this.title,
     this.body,
     this.subText,
+    this.bigText,
+    this.summaryText,
+    this.textLines,
   });
 
   final String packageName;
@@ -12,6 +15,9 @@ class BankNotificationEvent {
   final String? title;
   final String? body;
   final String? subText;
+  final String? bigText;
+  final String? summaryText;
+  final String? textLines;
 
   factory BankNotificationEvent.fromJson(Map<Object?, Object?> json) {
     return BankNotificationEvent(
@@ -21,6 +27,9 @@ class BankNotificationEvent {
       title: json['title'] as String?,
       body: json['body'] as String?,
       subText: json['subText'] as String?,
+      bigText: json['bigText'] as String?,
+      summaryText: json['summaryText'] as String?,
+      textLines: json['textLines'] as String?,
     );
   }
 
@@ -28,6 +37,9 @@ class BankNotificationEvent {
         title?.trim(),
         body?.trim(),
         subText?.trim(),
+        bigText?.trim(),
+        summaryText?.trim(),
+        textLines?.trim(),
         packageName.trim(),
       ].whereType<String>().where((item) => item.isNotEmpty).join(' ');
 
@@ -37,5 +49,8 @@ class BankNotificationEvent {
         title?.trim() ?? '',
         body?.trim() ?? '',
         subText?.trim() ?? '',
+        bigText?.trim() ?? '',
+        summaryText?.trim() ?? '',
+        textLines?.trim() ?? '',
       ].join('|');
 }

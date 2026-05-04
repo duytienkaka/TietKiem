@@ -451,17 +451,29 @@ class _AccountInfoSection extends ConsumerWidget {
 
   final Wallet wallet;
 
+  static final ButtonStyle _accountActionButtonStyle = ButtonStyle(
+    minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52)),
+    padding: const WidgetStatePropertyAll(
+      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    ),
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    visualDensity: VisualDensity.standard,
+    iconAlignment: IconAlignment.start,
+  );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final complete =
         (wallet.bankName?.isNotEmpty ?? false) &&
-        (wallet.accountNumber?.isNotEmpty ?? false) &&
-        (wallet.accountHolder?.isNotEmpty ?? false);
+        (wallet.accountNumber?.isNotEmpty ?? false);
     final generatedQr = complete
         ? const VietQrPayloadBuilder().build(
             bankName: wallet.bankName!,
             accountNumber: wallet.accountNumber!,
-            accountHolder: wallet.accountHolder!,
+            accountHolder:
+                (wallet.accountHolder?.trim().isNotEmpty ?? false)
+                    ? wallet.accountHolder!
+                    : wallet.name,
             paymentNote: wallet.paymentNote,
           )
         : null;
@@ -532,102 +544,128 @@ class _AccountInfoSection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () => _showAccountInfoSheet(context, ref, wallet),
-                      icon: const Icon(Icons.edit_note_rounded),
-                      label: Text(_manualUpdateLabel(context)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 56,
+                        child: FilledButton.icon(
+                          style: _accountActionButtonStyle,
+                          onPressed: () =>
+                              _showAccountInfoSheet(context, ref, wallet),
+                          icon: const Icon(Icons.edit_note_rounded),
+                          label: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _manualUpdateLabel(context),
+                              maxLines: 1,
+                              softWrap: false,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: SizedBox(
+                        height: 56,
+                        child: OutlinedButton.icon(
+                          style: _accountActionButtonStyle,
+                          onPressed: () =>
+                              _scanAndOpenEditor(context, ref, wallet),
+                          icon: const Icon(Icons.qr_code_scanner_rounded),
+                          label: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _scanQrLabel(context),
+                              maxLines: 1,
+                              softWrap: false,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _InfoTile(
+                  label: context.l10n.bankName,
+                  value: wallet.bankName ?? context.l10n.notConfiguredYet,
+                ),
+                if (wallet.bankAliases?.isNotEmpty == true) ...[
+                  const SizedBox(height: 10),
+                  _InfoTile(
+                    label: _bankAliasesLabel(context),
+                    value: wallet.bankAliases!,
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _scanAndOpenEditor(context, ref, wallet),
-                      icon: const Icon(Icons.qr_code_scanner_rounded),
-                      label: Text(_scanQrLabel(context)),
+                ],
+                const SizedBox(height: 10),
+                _InfoTile(
+                  label: context.l10n.accountNumber,
+                  value: wallet.accountNumber ?? context.l10n.notConfiguredYet,
+                ),
+                if (wallet.accountHolder?.isNotEmpty == true) ...[
+                  const SizedBox(height: 10),
+                  _InfoTile(
+                    label: context.l10n.accountHolder,
+                    value: wallet.accountHolder!,
+                  ),
+                ],
+                if (wallet.paymentNote?.isNotEmpty == true) ...[
+                  const SizedBox(height: 10),
+                  _InfoTile(
+                    label: context.l10n.paymentNote,
+                    value: wallet.paymentNote!,
+                  ),
+                ],
+                if (generatedQr != null || complete) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: scheme.surface,
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          context.l10n.transactionQr,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                        const SizedBox(height: 12),
+                        if (generatedQr != null)
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: QrImageView(
+                              data: generatedQr,
+                              version: QrVersions.auto,
+                              size: 220,
+                            ),
+                          ),
+                        if (generatedQr == null)
+                          Text(
+                            _unsupportedBankQrHint(context),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                            textAlign: TextAlign.center,
+                          ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 14),
-              _InfoTile(
-                label: context.l10n.bankName,
-                value: wallet.bankName ?? context.l10n.notConfiguredYet,
-              ),
-              if (wallet.bankAliases?.isNotEmpty == true) ...[
-                const SizedBox(height: 10),
-                _InfoTile(
-                  label: _bankAliasesLabel(context),
-                  value: wallet.bankAliases!,
-                ),
               ],
-              const SizedBox(height: 10),
-              _InfoTile(
-                label: context.l10n.accountNumber,
-                value: wallet.accountNumber ?? context.l10n.notConfiguredYet,
-              ),
-              const SizedBox(height: 10),
-              _InfoTile(
-                label: context.l10n.accountHolder,
-                value: wallet.accountHolder ?? context.l10n.notConfiguredYet,
-              ),
-              if (wallet.paymentNote?.isNotEmpty == true) ...[
-                const SizedBox(height: 10),
-                _InfoTile(
-                  label: context.l10n.paymentNote,
-                  value: wallet.paymentNote!,
-                ),
-              ],
-              if (generatedQr != null || complete) ...[
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: scheme.surface,
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        context.l10n.transactionQr,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (generatedQr != null)
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: QrImageView(
-                            data: generatedQr,
-                            version: QrVersions.auto,
-                            size: 220,
-                          ),
-                        ),
-                      if (generatedQr == null)
-                        Text(
-                          _unsupportedBankQrHint(context),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
         ),
-      ),
     );
   }
 
@@ -664,9 +702,6 @@ class _AccountInfoSection extends ConsumerWidget {
     );
     final accountNumberController = TextEditingController(
       text: initialScan?.accountNumber ?? wallet.accountNumber ?? '',
-    );
-    final accountHolderController = TextEditingController(
-      text: initialScan?.accountHolder ?? wallet.accountHolder ?? '',
     );
     final paymentNoteController = TextEditingController(
       text: initialScan?.paymentNote ?? wallet.paymentNote ?? '',
@@ -773,13 +808,6 @@ class _AccountInfoSection extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  controller: accountHolderController,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.accountHolder,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
                   controller: paymentNoteController,
                   decoration: InputDecoration(
                     labelText: context.l10n.paymentNote,
@@ -807,7 +835,8 @@ class _AccountInfoSection extends ConsumerWidget {
                                   bankName: bankNameController.text,
                                   bankAliases: bankAliasesController.text,
                                   accountNumber: accountNumberController.text,
-                                  accountHolder: accountHolderController.text,
+                                  accountHolder: initialScan?.accountHolder ??
+                                      wallet.accountHolder,
                                   paymentNote: paymentNoteController.text,
                                   qrPayload: qrPayload,
                                 );
@@ -839,7 +868,6 @@ class _AccountInfoSection extends ConsumerWidget {
     bankNameController.dispose();
     bankAliasesController.dispose();
     accountNumberController.dispose();
-    accountHolderController.dispose();
     paymentNoteController.dispose();
   }
 }

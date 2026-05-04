@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/widgets.dart';
@@ -69,26 +70,54 @@ class BankNotificationImportBootstrap with WidgetsBindingObserver {
   }
 
   Future<void> _handleEvent(BankNotificationEvent event) async {
+    developer.log(
+      'notification_event package=${event.packageName} text=${event.combinedText}',
+      name: 'BankNotification',
+    );
     final wallets = await _database.walletDao.getWallets();
     final bankWallets = wallets.where(_isConfiguredBankWallet).toList();
     if (bankWallets.isEmpty) {
+      developer.log(
+        'notification_skipped reason=no_configured_bank_wallet',
+        name: 'BankNotification',
+      );
       return;
     }
 
     final parsed = _parser.parse(event);
     if (parsed == null) {
+      developer.log(
+        'notification_skipped reason=parse_failed',
+        name: 'BankNotification',
+      );
       return;
     }
+    developer.log(
+      'notification_parsed bank=${parsed.bankSignature.canonicalName} amount=${parsed.amount} type=${parsed.inferredType.name}',
+      name: 'BankNotification',
+    );
 
     final wallet = _matchWallet(parsed, event.combinedText, bankWallets);
     if (wallet == null) {
+      developer.log(
+        'notification_skipped reason=wallet_not_matched walletKeywords=${bankWallets.map((item) => _walletKeywords(item).join(",")).join("|")}',
+        name: 'BankNotification',
+      );
       return;
     }
+    developer.log(
+      'notification_matched wallet=${wallet.name}',
+      name: 'BankNotification',
+    );
 
     final existing = await _database.notificationImportDao.getBySourceKey(
       event.sourceKey,
     );
     if (existing != null) {
+      developer.log(
+        'notification_skipped reason=duplicate',
+        name: 'BankNotification',
+      );
       return;
     }
 
@@ -107,6 +136,10 @@ class BankNotificationImportBootstrap with WidgetsBindingObserver {
         detectedAt: event.postedAt,
       ),
     );
+    developer.log(
+      'notification_saved status=pending wallet=${wallet.name}',
+      name: 'BankNotification',
+    );
 
     if (_lifecycleState != AppLifecycleState.resumed) {
       await _localNotifications.showDetectedTransactionPrompt(
@@ -114,6 +147,10 @@ class BankNotificationImportBootstrap with WidgetsBindingObserver {
         amount: parsed.amount,
         languageCode:
             WidgetsBinding.instance.platformDispatcher.locale.languageCode,
+      );
+      developer.log(
+        'notification_local_prompt_shown bank=${parsed.bankSignature.canonicalName} amount=${parsed.amount}',
+        name: 'BankNotification',
       );
     }
   }

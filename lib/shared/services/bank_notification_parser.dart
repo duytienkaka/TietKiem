@@ -40,13 +40,13 @@ class BankNotificationParser {
     BankSignature(
       canonicalName: 'Techcombank',
       aliasPresets: ['TCB', 'Techcombank', 'F@st Mobile'],
-      keywords: ['techcombank', 'tcb', 'f@st mobile'],
+      keywords: ['techcombank', 'tcb', 'f@st mobile', 'fast mobile'],
       packageHints: ['techcombank', 'tcb', 'fastmobile'],
     ),
     BankSignature(
       canonicalName: 'MB Bank',
       aliasPresets: ['MB', 'MBBank', 'MB Bank'],
-      keywords: ['mb bank', 'mbbank', 'mbbank', 'mb'],
+      keywords: ['mb bank', 'mbbank', 'mb'],
       packageHints: ['mbbank', 'mb.mobile', 'mbbankapp'],
     ),
     BankSignature(
@@ -125,7 +125,7 @@ class BankNotificationParser {
       if (bank.packageHints.any(normalizedPackage.contains)) {
         return bank;
       }
-      if (bank.keywords.any(normalizedText.contains)) {
+      if (bank.keywords.map(_normalize).any(normalizedText.contains)) {
         return bank;
       }
     }
@@ -135,6 +135,7 @@ class BankNotificationParser {
   int? _extractForVietcombank(String text) {
     return _extractByPatterns(text, const [
       r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'so tien[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
     ]);
@@ -142,23 +143,26 @@ class BankNotificationParser {
 
   int? _extractForTechcombank(String text) {
     return _extractByPatterns(text, const [
-      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'gd\s*(?:\+|-)\s*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
     ]);
   }
 
   int? _extractForMb(String text) {
     return _extractByPatterns(text, const [
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'gd:\s*(?:\+|-)\s*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
     ]);
   }
 
   int? _extractForBidv(String text) {
     return _extractByPatterns(text, const [
       r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'so tien gd[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
     ]);
@@ -166,6 +170,9 @@ class BankNotificationParser {
 
   int? _extractGenericAmount(String text) {
     return _extractByPatterns(text, const [
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
       r'(?<!\d)(\d{4,18})(?!\d)',
     ]);
@@ -173,7 +180,7 @@ class BankNotificationParser {
 
   int? _extractByPatterns(String text, List<String> patterns) {
     for (final pattern in patterns) {
-      final regExp = RegExp(pattern, caseSensitive: false);
+      final regExp = RegExp(pattern, caseSensitive: false, dotAll: true);
       final match = regExp.firstMatch(text);
       final raw = match?.group(1);
       if (raw == null) {
@@ -190,21 +197,23 @@ class BankNotificationParser {
   TransactionType _inferType(String normalizedText) {
     const incomeKeywords = [
       'ghi co',
-      'received',
-      'credited',
       'nhan tien',
+      'nhan ck',
+      'chuyen den',
+      'tien vao',
       'vao tk',
-      'cong',
+      'credited',
+      'received',
       '+',
     ];
     const expenseKeywords = [
       'ghi no',
-      'debited',
-      'payment',
       'rut tien',
       'tru tien',
-      'chuyen tien',
       'thanh toan',
+      'payment',
+      'debited',
+      'chuyen tien',
       '-',
     ];
     if (incomeKeywords.any(normalizedText.contains)) {
@@ -227,9 +236,10 @@ class BankNotificationParser {
     ].map(normalize).where((item) => item.isNotEmpty);
 
     for (final candidate in candidates) {
-      best = best < _scoreCandidate(candidate, normalizedQuery)
-          ? _scoreCandidate(candidate, normalizedQuery)
-          : best;
+      final score = _scoreCandidate(candidate, normalizedQuery);
+      if (score > best) {
+        best = score;
+      }
     }
     return best;
   }
@@ -280,80 +290,151 @@ class BankNotificationParser {
   }
 
   String _normalize(String value) {
-    final lower = value.toLowerCase();
-    final replacements = <String, String>{
-      'á': 'a',
+    final lower = _stripVietnameseDiacritics(value).toLowerCase();
+    return lower.replaceAll(RegExp(r'[^a-z0-9+\-]+'), ' ').trim();
+  }
+
+  String _stripVietnameseDiacritics(String value) {
+    const replacements = <String, String>{
       'à': 'a',
+      'á': 'a',
       'ả': 'a',
       'ã': 'a',
       'ạ': 'a',
       'ă': 'a',
-      'ắ': 'a',
       'ằ': 'a',
+      'ắ': 'a',
       'ẳ': 'a',
       'ẵ': 'a',
       'ặ': 'a',
       'â': 'a',
-      'ấ': 'a',
       'ầ': 'a',
+      'ấ': 'a',
       'ẩ': 'a',
       'ẫ': 'a',
       'ậ': 'a',
-      'é': 'e',
       'è': 'e',
+      'é': 'e',
       'ẻ': 'e',
       'ẽ': 'e',
       'ẹ': 'e',
       'ê': 'e',
-      'ế': 'e',
       'ề': 'e',
+      'ế': 'e',
       'ể': 'e',
       'ễ': 'e',
       'ệ': 'e',
-      'í': 'i',
       'ì': 'i',
+      'í': 'i',
       'ỉ': 'i',
       'ĩ': 'i',
       'ị': 'i',
-      'ó': 'o',
       'ò': 'o',
+      'ó': 'o',
       'ỏ': 'o',
       'õ': 'o',
       'ọ': 'o',
       'ô': 'o',
-      'ố': 'o',
       'ồ': 'o',
+      'ố': 'o',
       'ổ': 'o',
       'ỗ': 'o',
       'ộ': 'o',
       'ơ': 'o',
-      'ớ': 'o',
       'ờ': 'o',
+      'ớ': 'o',
       'ở': 'o',
       'ỡ': 'o',
       'ợ': 'o',
-      'ú': 'u',
       'ù': 'u',
+      'ú': 'u',
       'ủ': 'u',
       'ũ': 'u',
       'ụ': 'u',
       'ư': 'u',
-      'ứ': 'u',
       'ừ': 'u',
+      'ứ': 'u',
       'ử': 'u',
       'ữ': 'u',
       'ự': 'u',
-      'ý': 'y',
       'ỳ': 'y',
+      'ý': 'y',
       'ỷ': 'y',
       'ỹ': 'y',
       'ỵ': 'y',
       'đ': 'd',
+      'À': 'A',
+      'Á': 'A',
+      'Ả': 'A',
+      'Ã': 'A',
+      'Ạ': 'A',
+      'Ă': 'A',
+      'Ằ': 'A',
+      'Ắ': 'A',
+      'Ẳ': 'A',
+      'Ẵ': 'A',
+      'Ặ': 'A',
+      'Â': 'A',
+      'Ầ': 'A',
+      'Ấ': 'A',
+      'Ẩ': 'A',
+      'Ẫ': 'A',
+      'Ậ': 'A',
+      'È': 'E',
+      'É': 'E',
+      'Ẻ': 'E',
+      'Ẽ': 'E',
+      'Ẹ': 'E',
+      'Ê': 'E',
+      'Ề': 'E',
+      'Ế': 'E',
+      'Ể': 'E',
+      'Ễ': 'E',
+      'Ệ': 'E',
+      'Ì': 'I',
+      'Í': 'I',
+      'Ỉ': 'I',
+      'Ĩ': 'I',
+      'Ị': 'I',
+      'Ò': 'O',
+      'Ó': 'O',
+      'Ỏ': 'O',
+      'Õ': 'O',
+      'Ọ': 'O',
+      'Ô': 'O',
+      'Ồ': 'O',
+      'Ố': 'O',
+      'Ổ': 'O',
+      'Ỗ': 'O',
+      'Ộ': 'O',
+      'Ơ': 'O',
+      'Ờ': 'O',
+      'Ớ': 'O',
+      'Ở': 'O',
+      'Ỡ': 'O',
+      'Ợ': 'O',
+      'Ù': 'U',
+      'Ú': 'U',
+      'Ủ': 'U',
+      'Ũ': 'U',
+      'Ụ': 'U',
+      'Ư': 'U',
+      'Ừ': 'U',
+      'Ứ': 'U',
+      'Ử': 'U',
+      'Ữ': 'U',
+      'Ự': 'U',
+      'Ỳ': 'Y',
+      'Ý': 'Y',
+      'Ỷ': 'Y',
+      'Ỹ': 'Y',
+      'Ỵ': 'Y',
+      'Đ': 'D',
     };
-    var result = lower;
+    var result = value;
     replacements.forEach((key, replacement) {
       result = result.replaceAll(key, replacement);
     });
-    return result.replaceAll(RegExp(r'[^a-z0-9+\-]+'), ' ').trim();
+    return result;
   }
 }

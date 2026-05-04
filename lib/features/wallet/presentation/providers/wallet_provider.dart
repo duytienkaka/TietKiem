@@ -80,7 +80,7 @@ class WalletNotifier extends AsyncNotifier<List<entity.Wallet>> {
           ? null
           : accountNumber?.trim(),
       accountHolder: accountHolder?.trim().isEmpty == true
-          ? null
+          ? existing?.accountHolder
           : accountHolder?.trim(),
       paymentNote: paymentNote?.trim().isEmpty == true
           ? null

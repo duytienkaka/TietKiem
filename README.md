@@ -1,33 +1,38 @@
 # Tiết Kiệm
 
-Ứng dụng quản lý tài chính cá nhân viết bằng Flutter, tối ưu cho trải nghiệm mobile, offline-first, và phù hợp để theo dõi thu chi hằng ngày.
+Ứng dụng quản lý tài chính cá nhân viết bằng Flutter, tối ưu cho mobile, offline-first và phù hợp để theo dõi thu chi hằng ngày.
 
 ## Tải xuống
 
 - APK mới nhất: [Tải `TietKiem-latest.apk`](https://github.com/duytienkaka/TietKiem/raw/main/downloads/TietKiem-latest.apk)
 
-Nếu GitHub chặn tải trực tiếp trên mobile, bạn có thể vào thư mục [`downloads/`](downloads/) trong repo và bấm vào file APK.
+Nếu GitHub chặn tải trực tiếp trên điện thoại, vào thư mục [`downloads/`](downloads/) trong repo và bấm vào file APK.
 
 ## Tính năng chính
 
-- Quản lý nhiều ví: tiền mặt, tài khoản ngân hàng.
-- Ghi nhận giao dịch: thu nhập, chi tiêu, chuyển tiền.
-- Đính kèm ảnh hóa đơn bằng camera hoặc thư viện.
-- Xem thống kê theo tháng với biểu đồ thu chi.
-- Quản lý ngân sách.
-- Quản lý giao dịch định kỳ.
-- Máy tính nhanh trong tab `Khác`.
-- Mục tiêu tiết kiệm theo ví.
-- Quản lý danh mục riêng theo từng ví.
-- Sao lưu và khôi phục dữ liệu cục bộ bằng file JSON.
-- Khóa ứng dụng bằng PIN.
+- Quản lý nhiều ví: tiền mặt, tài khoản ngân hàng, tiết kiệm
+- Ghi nhận giao dịch: thu nhập, chi tiêu, chuyển tiền
+- Quản lý danh mục riêng theo từng ví
+- Giao dịch định kỳ và ngân sách
+- Mục tiêu tiết kiệm
+- Đính kèm ảnh hóa đơn từ camera hoặc thư viện
+- Sao lưu và khôi phục dữ liệu cục bộ bằng JSON
+- Khóa ứng dụng bằng PIN
+- Phát hiện giao dịch ngân hàng từ thông báo Android và yêu cầu người dùng xác nhận trước khi lưu
 
 ## Cài đặt nhanh
 
-1. Tải file APK ở mục `Tải xuống`.
-2. Chép file sang điện thoại Android.
-3. Cài đặt ứng dụng.
-4. Nếu Android cảnh báo nguồn không xác định, cho phép cài đặt từ nguồn này rồi thử lại.
+1. Tải file APK ở mục `Tải xuống`
+2. Chép file sang điện thoại Android
+3. Mở file APK để cài đặt
+4. Nếu Android cảnh báo nguồn không xác định, cho phép cài đặt từ nguồn này rồi thử lại
+
+## Lưu ý cho tính năng đọc thông báo ngân hàng
+
+- Chỉ hỗ trợ Android
+- Cần bật `Notification Access` trong phần cài đặt của thiết bị
+- App chỉ dùng dữ liệu thông báo để gợi ý tạo giao dịch
+- Giao dịch chỉ được lưu sau khi người dùng xác nhận trong app
 
 ## Chạy local cho developer
 
@@ -58,6 +63,7 @@ flutter build apk --release
 - SharedPreferences
 - image_picker
 - fl_chart
+- Supabase
 
 ## Cấu trúc thư mục
 
