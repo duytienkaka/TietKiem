@@ -126,7 +126,7 @@ class NotificationImports extends Table {
   TextColumn get sourceKey => text()();
   TextColumn get packageName => text()();
   TextColumn get bankName => text()();
-  TextColumn get walletId => text().references(Wallets, #id)();
+  TextColumn get walletId => text().nullable().references(Wallets, #id)();
   RealColumn get amount => real()();
   TextColumn get inferredType => text()();
   TextColumn get title => text().nullable()();
@@ -157,7 +157,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

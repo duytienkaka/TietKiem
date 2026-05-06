@@ -42,6 +42,13 @@ class NotificationImportDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
+  Future<List<NotificationImport>> getRecentImports(DateTime sinceUtc) {
+    return (select(notificationImports)
+          ..where((t) => t.detectedAt.isBiggerOrEqualValue(sinceUtc))
+          ..orderBy([(t) => OrderingTerm.desc(t.detectedAt)]))
+        .get();
+  }
+
   Future<void> upsertImport(NotificationImportsCompanion value) {
     return into(notificationImports).insertOnConflictUpdate(value);
   }

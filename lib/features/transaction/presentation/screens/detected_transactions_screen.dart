@@ -93,17 +93,23 @@ class _DetectedTransactionsScreenState
                           _DetectedImportCard(
                             entry: filtered[index],
                             walletName: wallets
-                                    .where((wallet) => wallet.id == filtered[index].walletId)
+                                    .where(
+                                      (wallet) =>
+                                          wallet.id == filtered[index].walletId,
+                                    )
                                     .firstOrNull
                                     ?.name ??
-                                context.l10n.unknownWallet,
+                                _pendingWalletMatchLabel(context),
                             onReview: () => ref
                                 .read(notificationImportProvider.notifier)
                                 .reopenImport(filtered[index].id),
                             onDismiss: () => ref
                                 .read(notificationImportProvider.notifier)
                                 .dismissImport(filtered[index].id),
-                            onQuickAdd: () async {
+                            onQuickAdd: filtered[index].walletId == null ||
+                                    filtered[index].amount <= 0
+                                ? null
+                                : () async {
                               final success = await ref
                                   .read(notificationImportProvider.notifier)
                                   .quickConfirmImport(filtered[index].id);
@@ -116,10 +122,10 @@ class _DetectedTransactionsScreenState
                                     success
                                         ? _quickAddSuccess(context)
                                         : _quickAddFailed(context),
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                                },
                             onOpenTransaction: filtered[index].createdTransactionId == null
                                 ? null
                                 : () => context.pushNamed(
@@ -158,7 +164,7 @@ class _DetectedImportCard extends StatelessWidget {
   final String walletName;
   final VoidCallback onReview;
   final VoidCallback onDismiss;
-  final VoidCallback onQuickAdd;
+  final VoidCallback? onQuickAdd;
   final VoidCallback? onOpenTransaction;
 
   @override
@@ -178,9 +184,11 @@ class _DetectedImportCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
-                  entry.inferredType == TransactionType.income
-                      ? Icons.south_west_rounded
-                      : Icons.north_east_rounded,
+                  switch (entry.inferredType) {
+                    TransactionType.income => Icons.south_west_rounded,
+                    TransactionType.expense => Icons.north_east_rounded,
+                    TransactionType.transfer => Icons.swap_horiz_rounded,
+                  },
                   color: scheme.primary,
                 ),
               ),
@@ -230,38 +238,133 @@ class _DetectedImportCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 14),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              if (entry.status == NotificationImportStatus.pending)
-                FilledButton.icon(
-                  onPressed: onQuickAdd,
-                  icon: const Icon(Icons.add_task_rounded),
-                  label: Text(_quickAddLabel(context)),
-                ),
-              if (entry.status != NotificationImportStatus.pending)
-                OutlinedButton.icon(
-                  onPressed: onReview,
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: Text(_reviewLabel(context)),
-                ),
-              if (entry.status == NotificationImportStatus.pending)
-                OutlinedButton.icon(
-                  onPressed: onDismiss,
-                  icon: const Icon(Icons.visibility_off_rounded),
-                  label: Text(_dismissLabel(context)),
-                ),
-              if (onOpenTransaction != null)
-                FilledButton.icon(
-                  onPressed: onOpenTransaction,
-                  icon: const Icon(Icons.open_in_new_rounded),
-                  label: Text(_openTransactionLabel(context)),
-                ),
-            ],
+          _DetectedActionGroup(
+            entry: entry,
+            onQuickAdd: onQuickAdd,
+            onReview: onReview,
+            onDismiss: onDismiss,
+            onOpenTransaction: onOpenTransaction,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DetectedActionGroup extends StatelessWidget {
+  const _DetectedActionGroup({
+    required this.entry,
+    required this.onQuickAdd,
+    required this.onReview,
+    required this.onDismiss,
+    required this.onOpenTransaction,
+  });
+
+  final NotificationImportEntry entry;
+  final VoidCallback? onQuickAdd;
+  final VoidCallback onReview;
+  final VoidCallback onDismiss;
+  final VoidCallback? onOpenTransaction;
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = <Widget>[
+      if (entry.status == NotificationImportStatus.pending && onQuickAdd != null)
+        _EqualCardActionButton(
+          filled: true,
+          icon: Icons.add_task_rounded,
+          label: _quickAddLabel(context),
+          onPressed: onQuickAdd!,
+        ),
+      if (entry.status != NotificationImportStatus.pending)
+        _EqualCardActionButton(
+          icon: Icons.refresh_rounded,
+          label: _reviewLabel(context),
+          onPressed: onReview,
+        ),
+      if (entry.status == NotificationImportStatus.pending)
+        _EqualCardActionButton(
+          icon: Icons.visibility_off_rounded,
+          label: _dismissLabel(context),
+          onPressed: onDismiss,
+        ),
+      if (onOpenTransaction != null)
+        _EqualCardActionButton(
+          filled: true,
+          icon: Icons.open_in_new_rounded,
+          label: _openTransactionLabel(context),
+          onPressed: onOpenTransaction!,
+        ),
+    ];
+
+    if (actions.length == 2) {
+      return Row(
+        children: [
+          Expanded(child: actions[0]),
+          const SizedBox(width: 10),
+          Expanded(child: actions[1]),
+        ],
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: actions,
+    );
+  }
+}
+
+class _EqualCardActionButton extends StatelessWidget {
+  const _EqualCardActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.filled = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final style = (filled ? FilledButton.styleFrom : OutlinedButton.styleFrom)(
+      minimumSize: const Size(0, 52),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      side: filled
+          ? null
+          : BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.45)),
+    );
+
+    return SizedBox(
+      height: 52,
+      child: filled
+          ? FilledButton.icon(
+              style: style,
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            )
+          : OutlinedButton.icon(
+              style: style,
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ),
     );
   }
 }
@@ -375,6 +478,11 @@ String _quickAddLabel(BuildContext context) =>
     Localizations.localeOf(context).languageCode == 'vi'
         ? 'Thêm nhanh'
         : 'Quick add';
+
+String _pendingWalletMatchLabel(BuildContext context) =>
+    Localizations.localeOf(context).languageCode == 'vi'
+        ? 'Chưa ghép được ví'
+        : 'Wallet not matched yet';
 
 String _quickAddSuccess(BuildContext context) =>
     Localizations.localeOf(context).languageCode == 'vi'

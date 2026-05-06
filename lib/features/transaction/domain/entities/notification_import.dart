@@ -8,7 +8,7 @@ class NotificationImportEntry {
     required this.sourceKey,
     required this.packageName,
     required this.bankName,
-    required this.walletId,
+    this.walletId,
     required this.amount,
     required this.inferredType,
     this.title,
@@ -23,7 +23,7 @@ class NotificationImportEntry {
   final String sourceKey;
   final String packageName;
   final String bankName;
-  final String walletId;
+  final String? walletId;
   final double amount;
   final TransactionType inferredType;
   final String? title;

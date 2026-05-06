@@ -47,13 +47,19 @@ class BankNotificationParser {
       canonicalName: 'MB Bank',
       aliasPresets: ['MB', 'MBBank', 'MB Bank'],
       keywords: ['mb bank', 'mbbank', 'mb'],
-      packageHints: ['mbbank', 'mb.mobile', 'mbbankapp'],
+      packageHints: ['mbbank', 'mb.mobile', 'mbbankapp', 'mbmobile'],
     ),
     BankSignature(
       canonicalName: 'BIDV',
       aliasPresets: ['BIDV', 'BIDV SmartBanking', 'SmartBanking'],
       keywords: ['bidv', 'smartbanking'],
       packageHints: ['bidv', 'smartbanking'],
+    ),
+    BankSignature(
+      canonicalName: 'VPBank',
+      aliasPresets: ['VPBank', 'VPBank NEO', 'VPBank Online'],
+      keywords: ['vpbank', 'vpbank neo', 'vpbank online'],
+      packageHints: ['vpbank', 'vnpay.vpbankonline'],
     ),
   ];
 
@@ -103,10 +109,11 @@ class BankNotificationParser {
       'Techcombank' => _extractForTechcombank(event.combinedText),
       'MB Bank' => _extractForMb(event.combinedText),
       'BIDV' => _extractForBidv(event.combinedText),
+      'VPBank' => _extractForVpbank(event.combinedText),
       _ => _extractGenericAmount(event.combinedText),
     };
 
-    if (amount == null || amount <= 0) {
+    if (amount == null) {
       return null;
     }
 
@@ -122,7 +129,7 @@ class BankNotificationParser {
     final normalizedText = _normalize(event.combinedText);
     final normalizedPackage = _normalize(event.packageName);
     for (final bank in knownBanks) {
-      if (bank.packageHints.any(normalizedPackage.contains)) {
+      if (bank.packageHints.map(_normalize).any(normalizedPackage.contains)) {
         return bank;
       }
       if (bank.keywords.map(_normalize).any(normalizedText.contains)) {
@@ -134,54 +141,74 @@ class BankNotificationParser {
 
   int? _extractForVietcombank(String text) {
     return _extractByPatterns(text, const [
-      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'so tien[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'\+(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'so tien[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
     ]);
   }
 
   int? _extractForTechcombank(String text) {
     return _extractByPatterns(text, const [
-      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'gd\s*(?:\+|-)\s*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'\+(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'gd\s*(?:\+|-)\s*(\d[\d\., ]+)\s*(?:vnd|d)',
     ]);
   }
 
   int? _extractForMb(String text) {
     return _extractByPatterns(text, const [
-      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'gd:\s*(?:\+|-)\s*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'gd:\s*(?:\+|-)\s*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'\+(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
     ]);
   }
 
   int? _extractForBidv(String text) {
     return _extractByPatterns(text, const [
-      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'so tien gd[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'\+(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'so tien gd[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
     ]);
+  }
+
+  int? _extractForVpbank(String text) {
+    final matched = _extractByPatterns(text, const [
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'ghi no[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'so du[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'(\d[\d\., ]+)\s*(?:vnd|d)',
+    ]);
+    if (matched != null) {
+      return matched;
+    }
+
+    final normalized = _normalize(text);
+    if (normalized.contains('bien dong so du')) {
+      return 0;
+    }
+    return null;
   }
 
   int? _extractGenericAmount(String text) {
     return _extractByPatterns(text, const [
-      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'\+(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
-      r'(\d[\d\., ]+)\s*(?:vnd|vnđ|đ)',
+      r'ghi co[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'nhan[^0-9]*(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'\+(\d[\d\., ]+)\s*(?:vnd|d)',
+      r'(\d[\d\., ]+)\s*(?:vnd|d)',
       r'(?<!\d)(\d{4,18})(?!\d)',
     ]);
   }
 
   int? _extractByPatterns(String text, List<String> patterns) {
+    final searchable = _normalizeAmountText(text);
     for (final pattern in patterns) {
       final regExp = RegExp(pattern, caseSensitive: false, dotAll: true);
-      final match = regExp.firstMatch(text);
+      final match = regExp.firstMatch(searchable);
       final raw = match?.group(1);
       if (raw == null) {
         continue;
@@ -294,146 +321,42 @@ class BankNotificationParser {
     return lower.replaceAll(RegExp(r'[^a-z0-9+\-]+'), ' ').trim();
   }
 
+  String _normalizeAmountText(String value) {
+    final normalizedCurrency = value
+        .replaceAll('₫', ' d')
+        .replaceAll('đ', ' d')
+        .replaceAll('Đ', ' D')
+        .replaceAll('VNĐ', 'VND')
+        .replaceAll('vnđ', 'vnd');
+    return _stripVietnameseDiacritics(normalizedCurrency)
+        .toLowerCase()
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
   String _stripVietnameseDiacritics(String value) {
-    const replacements = <String, String>{
-      'à': 'a',
-      'á': 'a',
-      'ả': 'a',
-      'ã': 'a',
-      'ạ': 'a',
-      'ă': 'a',
-      'ằ': 'a',
-      'ắ': 'a',
-      'ẳ': 'a',
-      'ẵ': 'a',
-      'ặ': 'a',
-      'â': 'a',
-      'ầ': 'a',
-      'ấ': 'a',
-      'ẩ': 'a',
-      'ẫ': 'a',
-      'ậ': 'a',
-      'è': 'e',
-      'é': 'e',
-      'ẻ': 'e',
-      'ẽ': 'e',
-      'ẹ': 'e',
-      'ê': 'e',
-      'ề': 'e',
-      'ế': 'e',
-      'ể': 'e',
-      'ễ': 'e',
-      'ệ': 'e',
-      'ì': 'i',
-      'í': 'i',
-      'ỉ': 'i',
-      'ĩ': 'i',
-      'ị': 'i',
-      'ò': 'o',
-      'ó': 'o',
-      'ỏ': 'o',
-      'õ': 'o',
-      'ọ': 'o',
-      'ô': 'o',
-      'ồ': 'o',
-      'ố': 'o',
-      'ổ': 'o',
-      'ỗ': 'o',
-      'ộ': 'o',
-      'ơ': 'o',
-      'ờ': 'o',
-      'ớ': 'o',
-      'ở': 'o',
-      'ỡ': 'o',
-      'ợ': 'o',
-      'ù': 'u',
-      'ú': 'u',
-      'ủ': 'u',
-      'ũ': 'u',
-      'ụ': 'u',
-      'ư': 'u',
-      'ừ': 'u',
-      'ứ': 'u',
-      'ử': 'u',
-      'ữ': 'u',
-      'ự': 'u',
-      'ỳ': 'y',
-      'ý': 'y',
-      'ỷ': 'y',
-      'ỹ': 'y',
-      'ỵ': 'y',
+    const groups = <String, String>{
+      'àáảãạăằắẳẵặâầấẩẫậ': 'a',
+      'èéẻẽẹêềếểễệ': 'e',
+      'ìíỉĩị': 'i',
+      'òóỏõọôồốổỗộơờớởỡợ': 'o',
+      'ùúủũụưừứửữự': 'u',
+      'ỳýỷỹỵ': 'y',
       'đ': 'd',
-      'À': 'A',
-      'Á': 'A',
-      'Ả': 'A',
-      'Ã': 'A',
-      'Ạ': 'A',
-      'Ă': 'A',
-      'Ằ': 'A',
-      'Ắ': 'A',
-      'Ẳ': 'A',
-      'Ẵ': 'A',
-      'Ặ': 'A',
-      'Â': 'A',
-      'Ầ': 'A',
-      'Ấ': 'A',
-      'Ẩ': 'A',
-      'Ẫ': 'A',
-      'Ậ': 'A',
-      'È': 'E',
-      'É': 'E',
-      'Ẻ': 'E',
-      'Ẽ': 'E',
-      'Ẹ': 'E',
-      'Ê': 'E',
-      'Ề': 'E',
-      'Ế': 'E',
-      'Ể': 'E',
-      'Ễ': 'E',
-      'Ệ': 'E',
-      'Ì': 'I',
-      'Í': 'I',
-      'Ỉ': 'I',
-      'Ĩ': 'I',
-      'Ị': 'I',
-      'Ò': 'O',
-      'Ó': 'O',
-      'Ỏ': 'O',
-      'Õ': 'O',
-      'Ọ': 'O',
-      'Ô': 'O',
-      'Ồ': 'O',
-      'Ố': 'O',
-      'Ổ': 'O',
-      'Ỗ': 'O',
-      'Ộ': 'O',
-      'Ơ': 'O',
-      'Ờ': 'O',
-      'Ớ': 'O',
-      'Ở': 'O',
-      'Ỡ': 'O',
-      'Ợ': 'O',
-      'Ù': 'U',
-      'Ú': 'U',
-      'Ủ': 'U',
-      'Ũ': 'U',
-      'Ụ': 'U',
-      'Ư': 'U',
-      'Ừ': 'U',
-      'Ứ': 'U',
-      'Ử': 'U',
-      'Ữ': 'U',
-      'Ự': 'U',
-      'Ỳ': 'Y',
-      'Ý': 'Y',
-      'Ỷ': 'Y',
-      'Ỹ': 'Y',
-      'Ỵ': 'Y',
+      'ÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬ': 'A',
+      'ÈÉẺẼẸÊỀẾỂỄỆ': 'E',
+      'ÌÍỈĨỊ': 'I',
+      'ÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢ': 'O',
+      'ÙÚỦŨỤƯỪỨỬỮỰ': 'U',
+      'ỲÝỶỸỴ': 'Y',
       'Đ': 'D',
     };
+
     var result = value;
-    replacements.forEach((key, replacement) {
-      result = result.replaceAll(key, replacement);
+    groups.forEach((chars, replacement) {
+      for (final char in chars.split('')) {
+        result = result.replaceAll(char, replacement);
+      }
     });
     return result;
   }

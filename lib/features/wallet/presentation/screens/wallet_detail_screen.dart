@@ -446,20 +446,64 @@ class _ActionRow extends StatelessWidget {
   }
 }
 
+class _AccountActionButton extends StatelessWidget {
+  const _AccountActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.filled = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final style = (filled ? FilledButton.styleFrom : OutlinedButton.styleFrom)(
+      minimumSize: const Size.fromHeight(56),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      side: filled
+          ? null
+          : BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.45)),
+    );
+
+    return SizedBox(
+      height: 56,
+      child: filled
+          ? FilledButton.icon(
+              style: style,
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            )
+          : OutlinedButton.icon(
+              style: style,
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ),
+    );
+  }
+}
+
 class _AccountInfoSection extends ConsumerWidget {
   const _AccountInfoSection({required this.wallet});
 
   final Wallet wallet;
-
-  static final ButtonStyle _accountActionButtonStyle = ButtonStyle(
-    minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52)),
-    padding: const WidgetStatePropertyAll(
-      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    visualDensity: VisualDensity.standard,
-    iconAlignment: IconAlignment.start,
-  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -544,50 +588,29 @@ class _AccountInfoSection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 56,
-                        child: FilledButton.icon(
-                          style: _accountActionButtonStyle,
-                          onPressed: () =>
-                              _showAccountInfoSheet(context, ref, wallet),
-                          icon: const Icon(Icons.edit_note_rounded),
-                          label: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              _manualUpdateLabel(context),
-                              maxLines: 1,
-                              softWrap: false,
-                            ),
-                          ),
-                        ),
-                      ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _AccountActionButton(
+                      filled: true,
+                      icon: Icons.edit_note_rounded,
+                      label: _manualUpdateLabel(context),
+                      onPressed: () =>
+                          _showAccountInfoSheet(context, ref, wallet),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: SizedBox(
-                        height: 56,
-                        child: OutlinedButton.icon(
-                          style: _accountActionButtonStyle,
-                          onPressed: () =>
-                              _scanAndOpenEditor(context, ref, wallet),
-                          icon: const Icon(Icons.qr_code_scanner_rounded),
-                          label: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              _scanQrLabel(context),
-                              maxLines: 1,
-                              softWrap: false,
-                            ),
-                          ),
-                        ),
-                      ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _AccountActionButton(
+                      icon: Icons.qr_code_scanner_rounded,
+                      label: _scanQrLabel(context),
+                      onPressed: () =>
+                          _scanAndOpenEditor(context, ref, wallet),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 14),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
                 _InfoTile(
                   label: context.l10n.bankName,
                   value: wallet.bankName ?? context.l10n.notConfiguredYet,

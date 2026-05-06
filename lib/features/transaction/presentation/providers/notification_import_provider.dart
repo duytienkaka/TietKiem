@@ -109,7 +109,7 @@ class NotificationImportNotifier
       return;
     }
 
-    await ref.read(transactionProvider.notifier).saveTransaction(
+    final transactionId = await ref.read(transactionProvider.notifier).saveTransaction(
           id: null,
           type: type,
           amount: existing.amount,
@@ -133,18 +133,18 @@ class NotificationImportNotifier
         status: const drift.Value('accepted'),
         detectedAt: drift.Value(existing.detectedAt),
         handledAt: drift.Value(DateTime.now().toUtc()),
-        createdTransactionId: const drift.Value(null),
+        createdTransactionId: drift.Value(transactionId),
       ),
     );
   }
 
   Future<bool> quickConfirmImport(String id) async {
     final existing = await _database.notificationImportDao.getById(id);
-    if (existing == null) {
+    if (existing == null || existing.walletId == null) {
       return false;
     }
     final type = TransactionType.values.byName(existing.inferredType);
-    final categories = categoriesForWallet(existing.walletId, type);
+    final categories = categoriesForWallet(existing.walletId!, type);
     final category = categories.firstOrNull;
     if (category == null) {
       return false;
@@ -155,7 +155,7 @@ class NotificationImportNotifier
     await confirmImport(
       id: id,
       type: type,
-      walletId: existing.walletId,
+      walletId: existing.walletId!,
       categoryId: category.id,
       note: fallbackNote,
     );

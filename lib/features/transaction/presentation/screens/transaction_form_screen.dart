@@ -210,19 +210,22 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                         keyboardDismissBehavior:
                             ScrollViewKeyboardDismissBehavior.onDrag,
                         padding: EdgeInsets.fromLTRB(
-                          16,
+                          0,
                           widget.embedded ? 8 : 8,
-                          16,
+                          0,
                           actionAreaHeight,
                         ),
                         children: [
                           SizedBox(height: widget.embedded ? 4 : 4),
-                          _ComposerIntro(
-                            title: _formTitle(context),
-                            subtitle: widget.transactionId == null
-                                ? context.l10n.coreFieldsFirst
-                                : context.l10n.editTransactionSubtitle,
-                            status: _status,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _ComposerIntro(
+                              title: _formTitle(context),
+                              subtitle: widget.transactionId == null
+                                  ? context.l10n.coreFieldsFirst
+                                  : context.l10n.editTransactionSubtitle,
+                              status: _status,
+                            ),
                           ),
                           const SizedBox(height: 18),
                           GestureDetector(
@@ -240,7 +243,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                             },
                             child: ShakeWidget(
                               trigger: _shakeTrigger,
-                              child: _TransactionStage(
+                              child: _UnifiedTransactionForm(
                                 type: _type,
                                 onTypeChanged: (type) =>
                                     _applyType(type, categories),
@@ -251,12 +254,7 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                 onAmountChanged: (value) => _rawAmount = value,
                                 onCalculated: _applyCalculatedAmount,
                                 onSubmitted: _save,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 22),
-                          _ComposerSheet(
-                            children: [
+                                children: [
                               _ComposerSection(
                                 index: '01',
                                 title: context.l10n.wallet,
@@ -425,7 +423,9 @@ class _TransactionEntryViewState extends ConsumerState<TransactionEntryView> {
                                   ),
                                 ),
                               ),
-                            ],
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -724,36 +724,6 @@ class _ComposerIntro extends StatelessWidget {
   }
 }
 
-class _ComposerSheet extends StatelessWidget {
-  const _ComposerSheet({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      borderRadius: 30,
-      padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
-      child: Column(
-        children: [
-          Container(
-            width: 44,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.outlineVariant.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(999),
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...children.expand((child) => [child, const SizedBox(height: 18)]),
-        ]..removeLast(),
-      ),
-    );
-  }
-}
-
 class _ComposerSection extends StatelessWidget {
   const _ComposerSection({
     required this.index,
@@ -941,8 +911,8 @@ class _AmountHeroContent extends StatelessWidget {
   }
 }
 
-class _TransactionStage extends StatelessWidget {
-  const _TransactionStage({
+class _UnifiedTransactionForm extends StatelessWidget {
+  const _UnifiedTransactionForm({
     required this.type,
     required this.onTypeChanged,
     required this.headline,
@@ -952,6 +922,7 @@ class _TransactionStage extends StatelessWidget {
     required this.onAmountChanged,
     required this.onCalculated,
     required this.onSubmitted,
+    required this.children,
   });
 
   final TransactionType type;
@@ -963,6 +934,7 @@ class _TransactionStage extends StatelessWidget {
   final ValueChanged<int> onAmountChanged;
   final ValueChanged<int> onCalculated;
   final VoidCallback onSubmitted;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
@@ -973,64 +945,93 @@ class _TransactionStage extends StatelessWidget {
       TransactionType.transfer => [scheme.tertiary, scheme.tertiaryContainer],
     };
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colors.first,
-            colors.last.withValues(alpha: 0.95),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(34),
-      ),
-      child: Container(
-        margin: const EdgeInsets.all(1.2),
-        decoration: BoxDecoration(
-          color: scheme.surfaceContainerLowest.withValues(alpha: 0.92),
-          borderRadius: BorderRadius.circular(33),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'Editor',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                      letterSpacing: 0.6,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (rawAmount > 0)
-                    Text(
-                      formatCurrency(context, rawAmount.toDouble()),
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              _AmountHeroContent(
-                type: type,
-                onTypeChanged: onTypeChanged,
-                headline: headline,
-                amountController: amountController,
-                rawAmount: rawAmount,
-                amountFocusNode: amountFocusNode,
-                onAmountChanged: onAmountChanged,
-                onCalculated: onCalculated,
-                onSubmitted: onSubmitted,
-              ),
-            ],
+        color: scheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.22),
+          ),
+          bottom: BorderSide(
+            color: scheme.outlineVariant.withValues(alpha: 0.22),
           ),
         ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colors.first.withValues(alpha: 0.18),
+                  colors.last.withValues(alpha: 0.24),
+                ],
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Editor',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          letterSpacing: 0.6,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (rawAmount > 0)
+                        Text(
+                          formatCurrency(context, rawAmount.toDouble()),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  _AmountHeroContent(
+                    type: type,
+                    onTypeChanged: onTypeChanged,
+                    headline: headline,
+                    amountController: amountController,
+                    rawAmount: rawAmount,
+                    amountFocusNode: amountFocusNode,
+                    onAmountChanged: onAmountChanged,
+                    onCalculated: onCalculated,
+                    onSubmitted: onSubmitted,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+            child: Column(
+              children: [
+                Container(
+                  width: 44,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: scheme.outlineVariant.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...children.expand(
+                  (child) => [child, const SizedBox(height: 18)],
+                ),
+              ]..removeLast(),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1433,16 +1434,24 @@ class _TransactionFormLoadingState extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: EdgeInsets.fromLTRB(
-                16,
+                0,
                 embedded ? 8 : 8,
-                16,
+                0,
                 112 + safeBottomInset,
               ),
               children: [
                 SizedBox(height: embedded ? 4 : 4),
-                const SkeletonBox(width: 150, height: 28),
-                const SizedBox(height: 8),
-                const SkeletonBox(width: 240, height: 14),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SkeletonBox(width: 150, height: 28),
+                      SizedBox(height: 8),
+                      SkeletonBox(width: 240, height: 14),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 14),
                 AppCard(
                   padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),

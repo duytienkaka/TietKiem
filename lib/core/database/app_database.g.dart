@@ -4430,9 +4430,9 @@ class $NotificationImportsTable extends NotificationImports
   late final GeneratedColumn<String> walletId = GeneratedColumn<String>(
     'wallet_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES wallets (id)',
     ),
@@ -4582,8 +4582,6 @@ class $NotificationImportsTable extends NotificationImports
         _walletIdMeta,
         walletId.isAcceptableOrUnknown(data['wallet_id']!, _walletIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_walletIdMeta);
     }
     if (data.containsKey('amount')) {
       context.handle(
@@ -4675,7 +4673,7 @@ class $NotificationImportsTable extends NotificationImports
       walletId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}wallet_id'],
-      )!,
+      ),
       amount: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}amount'],
@@ -4723,7 +4721,7 @@ class NotificationImport extends DataClass
   final String sourceKey;
   final String packageName;
   final String bankName;
-  final String walletId;
+  final String? walletId;
   final double amount;
   final String inferredType;
   final String? title;
@@ -4737,7 +4735,7 @@ class NotificationImport extends DataClass
     required this.sourceKey,
     required this.packageName,
     required this.bankName,
-    required this.walletId,
+    this.walletId,
     required this.amount,
     required this.inferredType,
     this.title,
@@ -4754,7 +4752,9 @@ class NotificationImport extends DataClass
     map['source_key'] = Variable<String>(sourceKey);
     map['package_name'] = Variable<String>(packageName);
     map['bank_name'] = Variable<String>(bankName);
-    map['wallet_id'] = Variable<String>(walletId);
+    if (!nullToAbsent || walletId != null) {
+      map['wallet_id'] = Variable<String>(walletId);
+    }
     map['amount'] = Variable<double>(amount);
     map['inferred_type'] = Variable<String>(inferredType);
     if (!nullToAbsent || title != null) {
@@ -4780,7 +4780,9 @@ class NotificationImport extends DataClass
       sourceKey: Value(sourceKey),
       packageName: Value(packageName),
       bankName: Value(bankName),
-      walletId: Value(walletId),
+      walletId: walletId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(walletId),
       amount: Value(amount),
       inferredType: Value(inferredType),
       title: title == null && nullToAbsent
@@ -4808,7 +4810,7 @@ class NotificationImport extends DataClass
       sourceKey: serializer.fromJson<String>(json['sourceKey']),
       packageName: serializer.fromJson<String>(json['packageName']),
       bankName: serializer.fromJson<String>(json['bankName']),
-      walletId: serializer.fromJson<String>(json['walletId']),
+      walletId: serializer.fromJson<String?>(json['walletId']),
       amount: serializer.fromJson<double>(json['amount']),
       inferredType: serializer.fromJson<String>(json['inferredType']),
       title: serializer.fromJson<String?>(json['title']),
@@ -4829,7 +4831,7 @@ class NotificationImport extends DataClass
       'sourceKey': serializer.toJson<String>(sourceKey),
       'packageName': serializer.toJson<String>(packageName),
       'bankName': serializer.toJson<String>(bankName),
-      'walletId': serializer.toJson<String>(walletId),
+      'walletId': serializer.toJson<String?>(walletId),
       'amount': serializer.toJson<double>(amount),
       'inferredType': serializer.toJson<String>(inferredType),
       'title': serializer.toJson<String?>(title),
@@ -4846,7 +4848,7 @@ class NotificationImport extends DataClass
     String? sourceKey,
     String? packageName,
     String? bankName,
-    String? walletId,
+    Value<String?> walletId = const Value.absent(),
     double? amount,
     String? inferredType,
     Value<String?> title = const Value.absent(),
@@ -4860,7 +4862,7 @@ class NotificationImport extends DataClass
     sourceKey: sourceKey ?? this.sourceKey,
     packageName: packageName ?? this.packageName,
     bankName: bankName ?? this.bankName,
-    walletId: walletId ?? this.walletId,
+    walletId: walletId.present ? walletId.value : this.walletId,
     amount: amount ?? this.amount,
     inferredType: inferredType ?? this.inferredType,
     title: title.present ? title.value : this.title,
@@ -4958,7 +4960,7 @@ class NotificationImportsCompanion extends UpdateCompanion<NotificationImport> {
   final Value<String> sourceKey;
   final Value<String> packageName;
   final Value<String> bankName;
-  final Value<String> walletId;
+  final Value<String?> walletId;
   final Value<double> amount;
   final Value<String> inferredType;
   final Value<String?> title;
@@ -4989,7 +4991,7 @@ class NotificationImportsCompanion extends UpdateCompanion<NotificationImport> {
     required String sourceKey,
     required String packageName,
     required String bankName,
-    required String walletId,
+    this.walletId = const Value.absent(),
     required double amount,
     required String inferredType,
     this.title = const Value.absent(),
@@ -5003,7 +5005,6 @@ class NotificationImportsCompanion extends UpdateCompanion<NotificationImport> {
        sourceKey = Value(sourceKey),
        packageName = Value(packageName),
        bankName = Value(bankName),
-       walletId = Value(walletId),
        amount = Value(amount),
        inferredType = Value(inferredType),
        status = Value(status),
@@ -5048,7 +5049,7 @@ class NotificationImportsCompanion extends UpdateCompanion<NotificationImport> {
     Value<String>? sourceKey,
     Value<String>? packageName,
     Value<String>? bankName,
-    Value<String>? walletId,
+    Value<String?>? walletId,
     Value<double>? amount,
     Value<String>? inferredType,
     Value<String?>? title,
@@ -8526,7 +8527,7 @@ typedef $$NotificationImportsTableCreateCompanionBuilder =
       required String sourceKey,
       required String packageName,
       required String bankName,
-      required String walletId,
+      Value<String?> walletId,
       required double amount,
       required String inferredType,
       Value<String?> title,
@@ -8543,7 +8544,7 @@ typedef $$NotificationImportsTableUpdateCompanionBuilder =
       Value<String> sourceKey,
       Value<String> packageName,
       Value<String> bankName,
-      Value<String> walletId,
+      Value<String?> walletId,
       Value<double> amount,
       Value<String> inferredType,
       Value<String?> title,
@@ -8573,9 +8574,9 @@ final class $$NotificationImportsTableReferences
         $_aliasNameGenerator(db.notificationImports.walletId, db.wallets.id),
       );
 
-  $$WalletsTableProcessedTableManager get walletId {
-    final $_column = $_itemColumn<String>('wallet_id')!;
-
+  $$WalletsTableProcessedTableManager? get walletId {
+    final $_column = $_itemColumn<String>('wallet_id');
+    if ($_column == null) return null;
     final manager = $$WalletsTableTableManager(
       $_db,
       $_db.wallets,
@@ -8891,7 +8892,7 @@ class $$NotificationImportsTableTableManager
                 Value<String> sourceKey = const Value.absent(),
                 Value<String> packageName = const Value.absent(),
                 Value<String> bankName = const Value.absent(),
-                Value<String> walletId = const Value.absent(),
+                Value<String?> walletId = const Value.absent(),
                 Value<double> amount = const Value.absent(),
                 Value<String> inferredType = const Value.absent(),
                 Value<String?> title = const Value.absent(),
@@ -8923,7 +8924,7 @@ class $$NotificationImportsTableTableManager
                 required String sourceKey,
                 required String packageName,
                 required String bankName,
-                required String walletId,
+                Value<String?> walletId = const Value.absent(),
                 required double amount,
                 required String inferredType,
                 Value<String?> title = const Value.absent(),

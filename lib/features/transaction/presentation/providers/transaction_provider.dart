@@ -34,7 +34,7 @@ class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
     return initial;
   }
 
-  Future<void> saveTransaction({
+  Future<String> saveTransaction({
     required String? id,
     required TransactionType type,
     required double amount,
@@ -71,6 +71,7 @@ class TransactionNotifier extends AsyncNotifier<List<FinanceTransaction>> {
     );
 
     await _repository.saveTransaction(transaction);
+    return transaction.id;
   }
 
   Future<void> updateTransactionStatus(

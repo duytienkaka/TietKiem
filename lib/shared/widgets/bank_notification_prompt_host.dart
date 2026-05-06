@@ -32,7 +32,10 @@ class _BankNotificationPromptHostState
       notificationImportProvider,
       (_, next) {
         final imports = (next.valueOrNull ?? const <NotificationImportEntry>[])
-            .where((item) => item.status == NotificationImportStatus.pending)
+            .where(
+              (item) =>
+                  item.status == NotificationImportStatus.pending,
+            )
             .toList();
         if (imports.length > _lastPendingCount && mounted) {
           final count = imports.length;
@@ -48,9 +51,15 @@ class _BankNotificationPromptHostState
         if (_dialogVisible || imports.isEmpty) {
           return;
         }
-        final nextImport = imports.firstWhere(
+        final promptable = imports.where(
+          (item) => item.walletId != null && item.amount > 0,
+        );
+        if (promptable.isEmpty) {
+          return;
+        }
+        final nextImport = promptable.firstWhere(
           (item) => item.id != _activeImportId,
-          orElse: () => imports.first,
+          orElse: () => promptable.first,
         );
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted || _dialogVisible) {
@@ -65,8 +74,22 @@ class _BankNotificationPromptHostState
   }
 
   Future<void> _showPrompt(NotificationImportEntry entry) async {
+    final navigator = Navigator.maybeOf(context, rootNavigator: true);
+    if (navigator == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _dialogVisible) {
+          return;
+        }
+        _showPrompt(entry);
+      });
+      return;
+    }
+    final walletId = entry.walletId;
+    if (walletId == null) {
+      return;
+    }
     final wallets = ref.read(walletProvider).valueOrNull ?? const <Wallet>[];
-    final wallet = wallets.where((item) => item.id == entry.walletId).firstOrNull;
+    final wallet = wallets.where((item) => item.id == walletId).firstOrNull;
     if (wallet == null) {
       await ref.read(notificationImportProvider.notifier).dismissImport(entry.id);
       return;
@@ -84,7 +107,7 @@ class _BankNotificationPromptHostState
     var selectedCategoryId = categories.firstOrNull?.id;
     try {
       await showDialog<void>(
-        context: context,
+        context: navigator.context,
         barrierDismissible: false,
         builder: (dialogContext) {
           return StatefulBuilder(
